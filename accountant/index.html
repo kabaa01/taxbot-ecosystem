@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Accountant Office Guide — TaxBot Kenya</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=DM+Mono:wght@400;500&display=swap');
+:root{
+  --ink:#0E1117;--muted:#6B7280;--border:#E2E8F0;--cream:#F8F9FB;
+  --green:#065F46;--green2:#047857;--mint:#ECFDF5;--sage:#6EE7B7;
+  --gold:#92400E;--amber:#FEF3C7;--amber2:#D97706;
+  --red:#991B1B;--red2:#FEE2E2;--blue:#1E3A5F;--blue2:#DBEAFE;
+  --r:10px;--shadow:0 2px 12px rgba(0,0,0,.07);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Sora',system-ui,sans-serif;background:var(--cream);color:var(--ink);font-size:14px;line-height:1.6}
+.topbar{background:var(--green);color:#fff;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.topbar .logo{font-weight:700;font-size:16px;letter-spacing:.02em}
+.topbar .badge{background:rgba(255,255,255,.15);padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.06em}
+.hero{background:linear-gradient(135deg,var(--green) 0%,#064E3B 100%);color:#fff;padding:48px 32px 40px;text-align:center}
+.hero h1{font-size:clamp(24px,4vw,36px);font-weight:700;margin-bottom:10px}
+.hero p{font-size:15px;opacity:.8;max-width:600px;margin:0 auto}
+.hero-badges{display:flex;gap:8px;justify-content:center;margin-top:18px;flex-wrap:wrap}
+.hb{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);padding:5px 14px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.05em}
+.wrap{max-width:1100px;margin:0 auto;padding:32px 20px 80px}
+.tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:28px;overflow-x:auto}
+.tab{padding:10px 18px;cursor:pointer;font-size:13px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:all .2s}
+.tab.active{color:var(--green);border-color:var(--green)}
+.tab:hover{color:var(--green2)}
+.panel{display:none}
+.panel.active{display:block}
+h2{font-size:20px;color:var(--green);margin-bottom:16px;font-weight:700}
+h3{font-size:15px;font-weight:600;color:var(--ink);margin:20px 0 10px}
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:22px;margin-bottom:16px;box-shadow:var(--shadow)}
+.card-hdr{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.card-icon{font-size:22px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:var(--mint);border-radius:8px;flex-shrink:0}
+.card-title{font-weight:700;font-size:15px}
+.card-sub{font-size:11px;color:var(--muted)}
+.checklist{list-style:none;display:flex;flex-direction:column;gap:6px}
+.checklist li{display:flex;align-items:flex-start;gap:10px;padding:8px 10px;border-radius:6px;font-size:13px}
+.checklist li:nth-child(odd){background:var(--cream)}
+.chk{width:18px;height:18px;border:2px solid var(--border);border-radius:4px;flex-shrink:0;margin-top:1px}
+.chk-g{background:var(--green2);border-color:var(--green2);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px}
+.tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.tag-g{background:var(--mint);color:var(--green)}
+.tag-r{background:var(--red2);color:var(--red)}
+.tag-a{background:var(--amber);color:var(--gold)}
+.tag-b{background:var(--blue2);color:var(--blue)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:680px){.grid2{grid-template-columns:1fr}}
+.timeline{display:flex;flex-direction:column;gap:0}
+.tl-item{display:flex;gap:16px;position:relative}
+.tl-item::before{content:'';position:absolute;left:19px;top:36px;bottom:0;width:2px;background:var(--border)}
+.tl-item:last-child::before{display:none}
+.tl-dot{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;position:relative;z-index:1;border:3px solid #fff;box-shadow:0 0 0 2px var(--border)}
+.tl-dot.g{background:var(--mint)}
+.tl-dot.a{background:var(--amber)}
+.tl-dot.r{background:var(--red2)}
+.tl-content{padding:0 0 24px;flex:1}
+.tl-title{font-weight:700;font-size:14px;margin-bottom:4px}
+.tl-desc{font-size:13px;color:var(--muted);line-height:1.6}
+code{font-family:'DM Mono',monospace;background:var(--cream);padding:2px 6px;border-radius:4px;font-size:12px;color:var(--green2)}
+pre{background:#0E1117;color:#E2E8F0;padding:16px;border-radius:8px;font-family:'DM Mono',monospace;font-size:12px;overflow-x:auto;margin:10px 0;line-height:1.7}
+pre .cm{color:#6B7280}
+pre .ky{color:#7DD3FC}
+pre .st{color:#86EFAC}
+pre .fn{color:#FDE68A}
+.alert{display:flex;gap:10px;padding:12px 14px;border-radius:8px;font-size:13px;line-height:1.6;margin-bottom:12px}
+.alert-g{background:var(--mint);border-left:3px solid var(--green2);color:var(--green)}
+.alert-a{background:var(--amber);border-left:3px solid var(--amber2);color:var(--gold)}
+.alert-r{background:var(--red2);border-left:3px solid var(--red);color:var(--red)}
+.alert-b{background:var(--blue2);border-left:3px solid var(--blue);color:var(--blue)}
+table{width:100%;border-collapse:collapse;font-size:13px;margin:10px 0}
+th{background:var(--green);color:#fff;padding:9px 12px;text-align:left;font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+td{padding:9px 12px;border-bottom:1px solid var(--border)}
+tr:nth-child(even) td{background:var(--cream)}
+.cmd-box{background:#0E1117;border-radius:8px;overflow:hidden;margin:10px 0}
+.cmd-hdr{background:#1E293B;padding:8px 14px;font-size:11px;color:#94A3B8;display:flex;align-items:center;gap:8px;font-family:'DM Mono',monospace}
+.cmd-body{padding:14px;font-family:'DM Mono',monospace;font-size:12px;color:#E2E8F0;line-height:1.8}
+.cmd-body .prompt{color:var(--sage)}
+.cmd-body .comment{color:#6B7280}
+.fee-row{display:flex;justify-content:space-between;padding:8px 12px;border-radius:6px;font-size:13px}
+.fee-row:nth-child(odd){background:var(--cream)}
+.fee-row .fee-label{color:var(--ink)}
+.fee-row .fee-val{font-weight:700;color:var(--green)}
+.section-hdr{background:linear-gradient(90deg,var(--green),var(--green2));color:#fff;padding:10px 16px;border-radius:8px;margin-bottom:14px;font-weight:700;font-size:14px;letter-spacing:.02em}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">🇰🇪 TaxBot Kenya — Accountant Office Guide</div>
+  <div class="badge">ICPAK · ACCA · IFAC Compliant</div>
+</div>
+
+<div class="hero">
+  <h1>Accountant Office Operating Guide</h1>
+  <p>Your complete reference for managing personal tax clients, business clients, weekly automation, and advisory reports. Delegate confidently — every task is defined here.</p>
+  <div class="hero-badges">
+    <span class="hb">📋 Weekly Checklists</span>
+    <span class="hb">🤖 Automation Scripts</span>
+    <span class="hb">👤 Personal Tax</span>
+    <span class="hb">💼 Business Tax</span>
+    <span class="hb">📊 Advisory Reports</span>
+    <span class="hb">🏛️ ICPAK Standards</span>
+  </div>
+</div>
+
+<div class="wrap">
+
+<div class="tabs">
+  <div class="tab active" onclick="show('weekly')">📅 Weekly Tasks</div>
+  <div class="tab" onclick="show('personal')">👤 Personal Tax Clients</div>
+  <div class="tab" onclick="show('business')">💼 Business Clients</div>
+  <div class="tab" onclick="show('advisory')">📊 Advisory Reports</div>
+  <div class="tab" onclick="show('automation')">🤖 Automation</div>
+  <div class="tab" onclick="show('fees')">💰 Fee Schedule</div>
+  <div class="tab" onclick="show('standards')">🏛️ Standards</div>
+  <div class="tab" onclick="show('qpredict')">📈 Q-Predict</div>
+  <div class="tab" onclick="show('pwa')">📱 Receipt PWA</div>
+</div>
+
+<!-- ═══════════ WEEKLY TASKS ═══════════ -->
+<div class="panel active" id="panel-weekly">
+<h2>📅 Weekly Recurring Tasks — Every Client</h2>
+
+<div class="alert alert-b">
+  <span>ℹ️</span>
+  <div>These tasks run on a fixed weekly schedule. Assign one staff member per task. Every task has a TaxBot command. Print this page and pin it on the office wall.</div>
+</div>
+
+<div class="grid2">
+<div class="card">
+  <div class="card-hdr">
+    <div class="card-icon">📆</div>
+    <div><div class="card-title">MONDAY — Data & Onboarding</div><div class="card-sub">9:00 AM · 45 min</div></div>
+  </div>
+  <ul class="checklist">
+    <li><div class="chk"></div><div>Open TaxBot portal → check new client submissions from weekend (client_onboarding.html)</div></li>
+    <li><div class="chk"></div><div>For each new client: <code>python taxbot.py add-client</code> or <code>python taxbot.py add-individual</code></div></li>
+    <li><div class="chk"></div><div>Import onboarding JSON files from disconnected sessions: <code>python taxbot.py import-onboard &lt;file.json&gt;</code></div></li>
+    <li><div class="chk"></div><div>Scan Gmail for new receipts: <code>python taxbot.py scan-gmail</code></div></li>
+    <li><div class="chk"></div><div>Process all pending receipts: <code>python taxbot.py process</code></div></li>
+    <li><div class="chk"></div><div>Send WhatsApp status update to new clients (use template below)</div></li>
+  </ul>
+</div>
+
+<div class="card">
+  <div class="card-hdr">
+    <div class="card-icon">📊</div>
+    <div><div class="card-title">TUESDAY — Reports & Analysis</div><div class="card-sub">9:00 AM · 60 min</div></div>
+  </div>
+  <ul class="checklist">
+    <li><div class="chk"></div><div>Run monthly sequence for each business client: <code>python taxbot.py monthly &lt;id&gt;</code></div></li>
+    <li><div class="chk"></div><div>Generate P&L for any client that had receipts last week: <code>python taxbot.py pl &lt;id&gt;</code></div></li>
+    <li><div class="chk"></div><div>Check Trial Balance for any discrepancies: <code>python taxbot.py tb &lt;id&gt;</code></div></li>
+    <li><div class="chk"></div><div>Flag REVIEW rows in Expenses sheet for client clarification</div></li>
+    <li><div class="chk"></div><div>Generate advisory report for clients due quarterly update</div></li>
+  </ul>
+</div>
+</div>
+
+<div class="grid2">
+<div class="card">
+  <div class="card-hdr">
+    <div class="card-icon">🏦</div>
+    <div><div class="card-title">WEDNESDAY — Tax Compliance</div><div class="card-sub">9:00 AM · 90 min</div></div>
+  </div>
+  <ul class="checklist">
+    <li><div class="chk"></div><div><span class="tag tag-r">KRA Deadline</span> File VAT-3 for any client with VAT due (20th of each month)</div></li>
+    <li><div class="chk"></div><div><span class="tag tag-r">KRA Deadline</span> Remit PAYE by 9th — check all payrolls are processed</div></li>
+    <li><div class="chk"></div><div>Generate KRA eTIMS template: <code>python taxbot.py kra-input &lt;id&gt;</code></div></li>
+    <li><div class="chk"></div><div>After client completes template: <code>python taxbot.py kra-run &lt;id&gt;</code></div></li>
+    <li><div class="chk"></div><div>Remit NSSF by 15th · SHIF by 9th · AHL by 9th</div></li>
+    <li><div class="chk"></div><div>Check compliance-check output: <code>python taxbot.py compliance-check</code></div></li>
+    <li><div class="chk"></div><div>File NITA levy (0.5% of gross payroll) by 20th</div></li>
+  </ul>
+</div>
+
+<div class="card">
+  <div class="card-hdr">
+    <div class="card-icon">📧</div>
+    <div><div class="card-title">THURSDAY — Client Communication</div><div class="card-sub">2:00 PM · 45 min</div></div>
+  </div>
+  <ul class="checklist">
+    <li><div class="chk"></div><div>Send weekly brief to all clients: <code>python taxbot.py weekly-brief</code></div></li>
+    <li><div class="chk"></div><div>Send handover package to accountant clients: <code>python taxbot.py handover &lt;id&gt;</code></div></li>
+    <li><div class="chk"></div><div>Follow up on any unresolved REVIEW transactions via WhatsApp/email</div></li>
+    <li><div class="chk"></div><div>Send status update to personal tax clients awaiting return</div></li>
+    <li><div class="chk"></div><div>Send advisory report (PDF/Excel) to clients with completed quarter</div></li>
+    <li><div class="chk"></div><div>Log all client interactions in the Audit Log</div></li>
+  </ul>
+</div>
+</div>
+
+<div class="grid2">
+<div class="card">
+  <div class="card-hdr">
+    <div class="card-icon">🔍</div>
+    <div><div class="card-title">FRIDAY — QA & Maintenance</div><div class="card-sub">3:00 PM · 30 min</div></div>
+  </div>
+  <ul class="checklist">
+    <li><div class="chk"></div><div>Run full QA suite: <code>python qa_full.py --report</code> — must be 100%</div></li>
+    <li><div class="chk"></div><div>Check error log: <code>type C:\MyERP\logs\taxbot.log | findstr ERROR</code></div></li>
+    <li><div class="chk"></div><div>Back up all client workbooks to external drive</div></li>
+    <li><div class="chk"></div><div>Update Ollama model if new version available: <code>ollama pull qwen2.5:3b</code></div></li>
+    <li><div class="chk"></div><div>Generate billing invoice for all clients: <code>python taxbot.py billing</code></div></li>
+    <li><div class="chk"></div><div>Send billing to clients by end of month</div></li>
+  </ul>
+</div>
+
+<div class="card">
+  <div class="card-hdr">
+    <div class="card-icon">⚡</div>
+    <div><div class="card-title">DAILY (Every Day)</div><div class="card-sub">8:30 AM · 10 min</div></div>
+  </div>
+  <ul class="checklist">
+    <li><div class="chk"></div><div>Start TaxBot watch mode (keep running all day): <code>python taxbot.py watch</code></div></li>
+    <li><div class="chk"></div><div>Check for any new receipts dropped in inbox folders</div></li>
+    <li><div class="chk"></div><div>Review any URGENT client WhatsApp messages</div></li>
+    <li><div class="chk"></div><div>Check KRA iTax portal for any notices or demand letters</div></li>
+    <li><div class="chk"></div><div>Note: TaxBot watch mode auto-processes — you supervise, not manually push</div></li>
+  </ul>
+</div>
+</div>
+
+<h3>📅 Monthly Compliance Calendar</h3>
+<table>
+<tr><th>Date</th><th>Obligation</th><th>Who</th><th>TaxBot Command</th><th>Penalty if Late</th></tr>
+<tr><td><strong>9th</strong></td><td>PAYE, SHIF, AHL remittance</td><td>Payroll staff</td><td><code>python taxbot.py tax &lt;id&gt;</code></td><td>5% of tax + 2% per month interest</td></tr>
+<tr><td><strong>15th</strong></td><td>NSSF remittance</td><td>HR / Finance</td><td>—</td><td>5% of contribution</td></tr>
+<tr><td><strong>20th</strong></td><td>VAT-3 return + payment</td><td>Accountant</td><td><code>kra-run &lt;id&gt;</code></td><td>KES 20,000 or 5% of VAT (higher)</td></tr>
+<tr><td><strong>20th</strong></td><td>Instalment Tax (Apr/Jun/Sep/Dec)</td><td>Accountant</td><td>—</td><td>20% penalty + 2% interest</td></tr>
+<tr><td><strong>20th</strong></td><td>NITA (0.5% of payroll)</td><td>HR</td><td>—</td><td>KES 2,000 per employee missed</td></tr>
+<tr><td><strong>Month-end</strong></td><td>Management Accounts + Billing</td><td>Accountant</td><td><code>monthly &lt;id&gt;</code></td><td>—</td></tr>
+<tr><td><strong>31 Jan</strong></td><td>WHT Annual Summary (WHT-Cert)</td><td>Accountant</td><td>—</td><td>KES 20,000</td></tr>
+<tr><td><strong>30 Jun</strong></td><td>Income Tax Return (IT1 / IT1C)</td><td>Accountant</td><td><code>personal-return &lt;id&gt;</code></td><td>KES 20,000 or 5% of tax (higher)</td></tr>
+</table>
+</div>
+
+<!-- ═══════════ PERSONAL TAX ═══════════ -->
+<div class="panel" id="panel-personal">
+<h2>👤 Personal Tax Clients — Individual Filers</h2>
+
+<div class="alert alert-g">
+  <span>✅</span>
+  <div><strong>No business registration needed.</strong> These clients file once a year using their personal KRA PIN (format A000000000X). They do NOT use eTIMS as a registered business — just their personal PIN on the KRA iTax portal.</div>
+</div>
+
+<h3>👥 Client Groups — How to Categorise</h3>
+<div class="grid2">
+<div class="card">
+  <div class="card-hdr"><div class="card-icon">💼</div><div><div class="card-title">Group 1: Employed (PAYE Only)</div><div class="card-sub">Simplest · File once a year</div></div></div>
+  <p style="font-size:13px;color:var(--muted);margin-bottom:10px">Salary earner with one employer. PAYE already deducted. Annual return confirms no underpayment.</p>
+  <ul class="checklist">
+    <li><div class="chk-g chk">✓</div><div>Needs: P9A from employer</div></li>
+    <li><div class="chk-g chk">✓</div><div>File IT1 nil return if no other income</div></li>
+    <li><div class="chk-g chk">✓</div><div>Claim: mortgage interest, pension, SHIF</div></li>
+    <li><div class="chk-g chk">✓</div><div>Fee: KES 3,000 (standard)</div></li>
+  </ul>
+  <p style="margin-top:10px"><span class="tag tag-g">TaxBot</span> <code>python taxbot.py add-individual</code></p>
+</div>
+
+<div class="card">
+  <div class="card-hdr"><div class="card-icon">🏠</div><div><div class="card-title">Group 2: Employed + Rental Income</div><div class="card-sub">Medium complexity</div></div></div>
+  <p style="font-size:13px;color:var(--muted);margin-bottom:10px">Has salary + residential or commercial rental. Rental WHT at 10% (residential) or included in IT1 (commercial).</p>
+  <ul class="checklist">
+    <li><div class="chk-g chk">✓</div><div>Needs: P9A + rental receipts/agreements</div></li>
+    <li><div class="chk-g chk">✓</div><div>Residential rent <KES 288K/yr = 0% tax</div></li>
+    <li><div class="chk-g chk">✓</div><div>Residential rent 288K-15M = 10% WHT final</div></li>
+    <li><div class="chk-g chk">✓</div><div>Deduct: agent fees, repairs, rates, depreciation</div></li>
+    <li><div class="chk-g chk">✓</div><div>Fee: KES 6,500</div></li>
+  </ul>
+</div>
+
+<div class="card">
+  <div class="card-hdr"><div class="card-icon">💡</div><div><div class="card-title">Group 3: Freelancer / Consultant</div><div class="card-sub">Self-employed, no biz registration</div></div></div>
+  <p style="font-size:13px;color:var(--muted);margin-bottom:10px">Earns fees/consultancy without a registered company. Subject to WHT 5% at source from clients. Must file IT1 annually.</p>
+  <ul class="checklist">
+    <li><div class="chk-g chk">✓</div><div>Needs: WHT certificates from each client, bank statements</div></li>
+    <li><div class="chk-g chk">✓</div><div>Deduct: home office, equipment, transport, internet</div></li>
+    <li><div class="chk-g chk">✓</div><div>If earning >KES 5M: must register for VAT</div></li>
+    <li><div class="chk-g chk">✓</div><div>Consider TOT (1%) if revenue <KES 25M</div></li>
+    <li><div class="chk-g chk">✓</div><div>Fee: KES 8,000</div></li>
+  </ul>
+</div>
+
+<div class="card">
+  <div class="card-hdr"><div class="card-icon">📈</div><div><div class="card-title">Group 4: Retired / Pensioner</div><div class="card-sub">Pension + investments</div></div></div>
+  <p style="font-size:13px;color:var(--muted);margin-bottom:10px">Pension income + dividends + interest. May have multiple income streams. Needs careful calculation of tax reliefs.</p>
+  <ul class="checklist">
+    <li><div class="chk-g chk">✓</div><div>Needs: pension statement, bank interest certificates</div></li>
+    <li><div class="chk-g chk">✓</div><div>NSSF pension payout: tax on full amount less personal relief</div></li>
+    <li><div class="chk-g chk">✓</div><div>Dividends: 5% WHT final (residents)</div></li>
+    <li><div class="chk-g chk">✓</div><div>Interest: 15% WHT final (bank savings)</div></li>
+    <li><div class="chk-g chk">✓</div><div>Fee: KES 5,500</div></li>
+  </ul>
+</div>
+
+<div class="card">
+  <div class="card-hdr"><div class="card-icon">🌍</div><div><div class="card-title">Group 5: Multiple Employers / Complex</div><div class="card-sub">Most complex individual</div></div></div>
+  <p style="font-size:13px;color:var(--muted);margin-bottom:10px">Works for 2+ employers, or has employment + business + rentals + foreign income. Full IT1 required with all sources consolidated.</p>
+  <ul class="checklist">
+    <li><div class="chk-g chk">✓</div><div>Needs: P9A from ALL employers, WHT certs, rental records</div></li>
+    <li><div class="chk-g chk">✓</div><div>Consolidate all income onto one IT1 return</div></li>
+    <li><div class="chk-g chk">✓</div><div>Foreign income: declare + claim tax credit (DTAs)</div></li>
+    <li><div class="chk-g chk">✓</div><div>Director of a company: include director's fees</div></li>
+    <li><div class="chk-g chk">✓</div><div>Fee: KES 12,000–18,000</div></li>
+  </ul>
+</div>
+
+<div class="card">
+  <div class="card-hdr"><div class="card-icon">🏡</div><div><div class="card-title">Group 6: Investor (No Employment)</div><div class="card-sub">Dividends, gains, interest only</div></div></div>
+  <p style="font-size:13px;color:var(--muted);margin-bottom:10px">No salary — lives on investment returns. Dividends (5% WHT final), interest (15% WHT final), capital gains on shares (5% CGT).</p>
+  <ul class="checklist">
+    <li><div class="chk-g chk">✓</div><div>Capital gains on shares: 5% CGT (sold after 3 yrs = exempt)</div></li>
+    <li><div class="chk-g chk">✓</div><div>NSE listed shares: 5% CGT</div></li>
+    <li><div class="chk-g chk">✓</div><div>Property gains: 5% CGT on gross proceeds</div></li>
+    <li><div class="chk-g chk">✓</div><div>WHT on dividends is final for residents</div></li>
+    <li><div class="chk-g chk">✓</div><div>Fee: KES 6,500–10,000</div></li>
+  </ul>
+</div>
+</div>
+
+<h3>📋 Personal Tax Annual Checklist (per individual client)</h3>
+<div class="card">
+<ul class="checklist">
+  <li><div class="chk"></div><div><strong>STEP 1 — DOCUMENTS:</strong> Collect P9A (from employer), bank statements, rental receipts, WHT certificates, NSSF statements, SHIF receipts, mortgage statements</div></li>
+  <li><div class="chk"></div><div><strong>STEP 2 — CLIENT ONBOARD:</strong> If new client, open <code>client_onboarding.html</code> or <code>taxbot_portal.html</code>, select "Individual", complete form offline → export JSON</div></li>
+  <li><div class="chk"></div><div><strong>STEP 3 — REGISTER:</strong> Import JSON: <code>python taxbot.py add-individual</code></div></li>
+  <li><div class="chk"></div><div><strong>STEP 4 — GENERATE IT1 WORKBOOK:</strong> <code>python taxbot.py personal-return &lt;id&gt;</code> → fill the Excel template with all income sources</div></li>
+  <li><div class="chk"></div><div><strong>STEP 5 — TAX COMPUTATION:</strong> Review calculated figures: gross tax, personal relief (KES 28,800/yr), reliefs, PAYE already paid, balance due/refund</div></li>
+  <li><div class="chk"></div><div><strong>STEP 6 — CLIENT REVIEW:</strong> Send draft to client for approval. Use status messaging: "We are reviewing your file and looking for every legal way to reduce your tax."</div></li>
+  <li><div class="chk"></div><div><strong>STEP 7 — FILE:</strong> Login to iTax (itax.kra.go.ke) → Individual → Returns → IT1 → upload or fill online → submit</div></li>
+  <li><div class="chk"></div><div><strong>STEP 8 — PAYMENT:</strong> If tax due, pay via KRA iTax payment gateway → M-Pesa or bank → get e-slip</div></li>
+  <li><div class="chk"></div><div><strong>STEP 9 — CONFIRMATION:</strong> Download acknowledgement slip from iTax → send to client → file in records</div></li>
+  <li><div class="chk"></div><div><strong>STEP 10 — INVOICE:</strong> Issue VAT-exempt invoice to client → receive payment</div></li>
+</ul>
+</div>
+
+<h3>💬 Client Status Messages — Template Library</h3>
+<div class="card">
+<div class="section-hdr">📱 WhatsApp / SMS Templates</div>
+<br>
+<div class="alert alert-b"><strong>Initial Receipt Confirmation (send same day as documents received):</strong><br><br>
+"Dear [Name], we have received your documents for your [Year] tax return. Your file reference is [REF]. We are now reviewing everything and will be in touch within 3 working days. If you have any questions, please don't hesitate to reach out. — [Firm Name] | ICPAK Registered Accountants"</div>
+
+<div class="alert alert-a"><strong>Status Update (send mid-process, after 3 days):</strong><br><br>
+"Dear [Name], we are actively working on your [Year] tax return (Ref: [REF]). Our team is analysing all your income sources, deductions, and reliefs to legally minimise your tax liability. This typically takes 3–5 working days to do thoroughly. We'll be in touch very soon. — [Firm Name]"</div>
+
+<div class="alert alert-g"><strong>Draft Ready (send for client review):</strong><br><br>
+"Dear [Name], your [Year] tax return is ready for your review. Tax payable: KES [X] / Refund due: KES [X]. Please review and approve or raise any questions within 2 working days. Once approved, we file immediately. — [Firm Name] | ICPAK Registered"</div>
+
+<div class="alert alert-g"><strong>Filed Confirmation:</strong><br><br>
+"Dear [Name], your [Year] income tax return has been successfully filed with KRA. Acknowledgement number: [ACK]. Tax paid: KES [X]. Please keep this number safe. Your records are filed in our system. — [Firm Name]"</div>
+
+<div class="alert alert-a"><strong>Documents Still Needed:</strong><br><br>
+"Dear [Name], we need a few more documents to complete your return: [LIST]. Please send via WhatsApp or email by [DATE]. Without these, we cannot file your return on time and penalties may apply. — [Firm Name]"</div>
+</div>
+</div>
+
+<!-- ═══════════ BUSINESS CLIENTS ═══════════ -->
+<div class="panel" id="panel-business">
+<h2>💼 Business Client Management</h2>
+
+<h3>🏢 Business Client Categories</h3>
+<div class="grid2">
+<div class="card">
+  <div class="card-hdr"><div class="card-icon">🌱</div><div><div class="card-title">Micro Business (Tier 1)</div><div class="card-sub">Revenue < KES 5M · No VAT</div></div></div>
+  <ul class="checklist">
+    <li><div class="chk-g chk">✓</div><div>Monthly: receipt processing, basic P&L</div></li>
+    <li><div class="chk-g chk">✓</div><div>Tax: TOT (1%) or no tax if below threshold</div></li>
+    <li><div class="chk-g chk">✓</div><div>Annual: IT1 filing only</div></li>
+    <li><div class="chk-g chk">✓</div><div>Tools: <code>monthly</code>, <code>personal-return</code></div></li>
+  </ul>
+</div>
+<div class="card">
+  <div class="card-hdr"><div class="card-icon">🏗️</div><div><div class="card-title">SME (Tier 2)</div><div class="card-sub">Revenue KES 5M–50M · VAT registered</div></div></div>
+  <ul class="checklist">
+    <li><div class="chk-g chk">✓</div><div>Monthly: full accounting suite</div></li>
+    <li><div class="chk-g chk">✓</div><div>Tax: CIT 30%, VAT monthly, PAYE</div></li>
+    <li><div class="chk-g chk">✓</div><div>Annual: IT1C, financial statements</div></li>
+    <li><div class="chk-g chk">✓</div><div>Advisory report: quarterly</div></li>
+  </ul>
+</div>
+<div class="card">
+  <div class="card-hdr"><div class="card-icon">🏢</div><div><div class="card-title">Enterprise (Tier 3)</div><div class="card-sub">Revenue >KES 50M · Full compliance</div></div></div>
+  <ul class="checklist">
+    <li><div class="chk-g chk">✓</div><div>Weekly: KPI monitoring, cash flow</div></li>
+    <li><div class="chk-g chk">✓</div><div>Monthly: full suite + audit preparation</div></li>
+    <li><div class="chk-g chk">✓</div><div>Annual: audited accounts, CIT, WHT annual</div></li>
+    <li><div class="chk-g chk">✓</div><div>Advisory: monthly strategic report</div></li>
+  </ul>
+</div>
+<div class="card">
+  <div class="card-hdr"><div class="card-icon">🌾</div><div><div class="card-title">Agri / Trust / SACCO (Special)</div><div class="card-sub">LHT-type entities · IFC standards</div></div></div>
+  <ul class="checklist">
+    <li><div class="chk-g chk">✓</div><div>GIIN IRIS+ impact metrics reporting</div></li>
+    <li><div class="chk-g chk">✓</div><td>SROI analysis (Social Value UK 6-stage)</td></li>
+    <li><div class="chk-g chk">✓</div><div>Green bond compliance · ISO 31000 risk</div></li>
+    <li><div class="chk-g chk">✓</div><div>CMA Cap 485A · AMLA 2010 compliance</div></li>
+  </ul>
+</div>
+</div>
+
+<h3>🔄 Month-End Sequence (every business client)</h3>
+<div class="card">
+<div class="timeline">
+<div class="tl-item">
+  <div class="tl-dot g">1</div>
+  <div class="tl-content">
+    <div class="tl-title">Check what months have data</div>
+    <div class="tl-desc"><code>python taxbot.py months &lt;id&gt;</code> — confirms data is available before running reports</div>
+  </div>
+</div>
+<div class="tl-item">
+  <div class="tl-dot g">2</div>
+  <div class="tl-content">
+    <div class="tl-title">Fix REVIEW rows</div>
+    <div class="tl-desc">Open <code>C:\MyERP\clients\&lt;id&gt;\db\&lt;id&gt;_expenses.xlsx</code> → Expenses tab → fix flagged rows</div>
+  </div>
+</div>
+<div class="tl-item">
+  <div class="tl-dot g">3</div>
+  <div class="tl-content">
+    <div class="tl-title">Run the full sequence in ONE command</div>
+    <div class="tl-desc"><code>python taxbot.py monthly &lt;id&gt; --month YYYY-MM</code><br>Runs: P&L → Balance Sheet → Trial Balance → COA → Reconciliation → Handover note</div>
+  </div>
+</div>
+<div class="tl-item">
+  <div class="tl-dot a">4</div>
+  <div class="tl-content">
+    <div class="tl-title">Generate KRA eTIMS workbook</div>
+    <div class="tl-desc"><code>python taxbot.py kra-input &lt;id&gt;</code> → fill Excel template → <code>python taxbot.py kra-run &lt;id&gt;</code></div>
+  </div>
+</div>
+<div class="tl-item">
+  <div class="tl-dot g">5</div>
+  <div class="tl-content">
+    <div class="tl-title">Generate advisory report (quarterly)</div>
+    <div class="tl-desc"><code>python taxbot.py advisory-report &lt;id&gt;</code> → generates 12-sheet Excel with KRIs, KPIs, ratios, credit score</div>
+  </div>
+</div>
+<div class="tl-item">
+  <div class="tl-dot g">6</div>
+  <div class="tl-content">
+    <div class="tl-title">Send to client</div>
+    <div class="tl-desc">Email: workbook + advisory report. WhatsApp: summary message. Portal: client checks status online.</div>
+  </div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ═══════════ ADVISORY REPORTS ═══════════ -->
+<div class="panel" id="panel-advisory">
+<h2>📊 Advisory Reports — Generation Guide</h2>
+
+<div class="alert alert-g">
+  <span>💡</span>
+  <div><strong>Advisory reports are a premium service.</strong> Charge KES 25,000–65,000 per report. All ratios follow ReadyRatios.com methodology. Standards: ACCA, ICPAK, INAA, IFAC. Use client financials from the workbook or the portal input form.</div>
+</div>
+
+<h3>📋 12-Sheet Advisory Report — What Each Sheet Contains</h3>
+<table>
+<tr><th>Sheet</th><th>Contents</th><th>Standard</th></tr>
+<tr><td>🏠 Cover</td><td>Client info, at-a-glance scorecard, what's covered</td><td>ICPAK engagement letter format</td></tr>
+<tr><td>📊 Dashboard</td><td>All KPIs in one view, RAG traffic lights, period summary</td><td>ACCA P3 Business Analysis</td></tr>
+<tr><td>💰 P&L Ratios</td><td>10 profitability ratios with plain-English explanations</td><td>ReadyRatios + ACCA F7</td></tr>
+<tr><td>🏦 Liquidity & Solvency</td><td>12 ratios: current, quick, leverage, gearing, interest cover</td><td>ReadyRatios + ACCA F3</td></tr>
+<tr><td>⚡ Efficiency</td><td>7 ratios: debtor days, creditor days, stock days, asset turnover, WCC</td><td>ReadyRatios.com</td></tr>
+<tr><td>⭐ Credit Score</td><td>Sydebiz 5-factor model, 0–100 score, A–E grade, stop questions</td><td>Sydebiz International</td></tr>
+<tr><td>⚠️ Risk (KRI)</td><td>15 Key Risk Indicators with ISO 31000 structure, mitigation actions</td><td>ISO 31000:2018, COSO ERM</td></tr>
+<tr><td>📈 KPIs</td><td>30+ KPIs: financial, liquidity, operational, tax compliance</td><td>ACCA Performance Management</td></tr>
+<tr><td>🧭 Tax Planning</td><td>12 legal tax strategies under Finance Act 2024 + ITA 2023</td><td>KRA / Finance Act 2024</td></tr>
+<tr><td>✅ Action Plan</td><td>30/60/90-day prioritised action plan with owner and deadline</td><td>ICPAK Advisory Framework</td></tr>
+<tr><td>🏛️ Standards</td><td>ACCA, ICPAK, INAA, IFAC, ReadyRatios declaration + ethics statement</td><td>IESBA Code of Ethics</td></tr>
+<tr><td>💰 Fees</td><td>ICPAK-standard fee proposal for all services</td><td>ICPAK Fee Guidelines</td></tr>
+</table>
+
+<h3>🚀 How to Generate an Advisory Report</h3>
+<div class="cmd-box">
+<div class="cmd-hdr">💻 TaxBot Command Line — Advisory Report</div>
+<div class="cmd-body">
+<span class="prompt">C:\MyERP&gt;</span> python taxbot.py advisory-report coastal_freight___lo<br>
+<br>
+<span class="comment"># TaxBot will prompt you for financial data, or use the portal:</span><br>
+<span class="prompt">C:\MyERP&gt;</span> <span class="comment"># 1. Open taxbot_portal.html → Advisory tab</span><br>
+<span class="comment">#    Enter the financial data for the client</span><br>
+<span class="comment">#    Click "Generate Advisory Report" → downloads Excel</span><br>
+<br>
+<span class="comment"># Or build directly from a JSON data file:</span><br>
+<span class="prompt">C:\MyERP&gt;</span> python build_advisory_excel.py<br>
+<br>
+<span class="comment"># Output: ClientName_Advisory_Report_YYYYMMDD_HHMM.xlsx (12 sheets)</span><br>
+<span class="comment"># QA check: python scripts/recalc.py &lt;report.xlsx&gt;</span>
+</div>
+</div>
+
+<h3>💰 Advisory Fees by Client Size</h3>
+<div class="card">
+<div class="fee-row"><div class="fee-label">Micro Business (revenue < KES 5M)</div><div class="fee-val">KES 15,000</div></div>
+<div class="fee-row"><div class="fee-label">Small Business (KES 5M–25M)</div><div class="fee-val">KES 25,000–35,000</div></div>
+<div class="fee-row"><div class="fee-label">Medium Business (KES 25M–100M)</div><div class="fee-val">KES 45,000–55,000</div></div>
+<div class="fee-row"><div class="fee-label">Large Business / Enterprise (>KES 100M)</div><div class="fee-val">KES 65,000+</div></div>
+<div class="fee-row"><div class="fee-label">Quarterly Update (existing client)</div><div class="fee-val">KES 22,000</div></div>
+<div class="fee-row"><div class="fee-label">Annual Strategic Review (board)</div><div class="fee-val">KES 65,000</div></div>
+<div class="fee-row"><div class="fee-label">LHT / Trust / SACCO (GIIN IRIS+ + SROI)</div><div class="fee-val">KES 55,000–85,000</div></div>
+</div>
+</div>
+
+<!-- ═══════════ AUTOMATION ═══════════ -->
+<div class="panel" id="panel-automation">
+<h2>🤖 Automation Setup — Send Weekly to Accountant</h2>
+
+<div class="alert alert-a">
+  <span>⚠️</span>
+  <div><strong>Set these up ONCE, then they run automatically.</strong> The scheduled tasks below run TaxBot commands on a fixed schedule. Your staff only review the output — they don't manually push buttons every day.</div>
+</div>
+
+<h3>⚡ Windows Task Scheduler — Weekly Automation</h3>
+<div class="cmd-box">
+<div class="cmd-hdr">📁 weekly_taxbot.bat — Save to C:\MyERP\ and schedule</div>
+<div class="cmd-body">
+<span class="comment">@echo off</span><br>
+<span class="comment">REM ── TaxBot Weekly Automation ─────────────────────────────────</span><br>
+<span class="comment">REM Run every Monday 8:30 AM via Task Scheduler</span><br>
+<br>
+cd /d C:\MyERP<br>
+<br>
+<span class="comment">REM 1. Scan Gmail for new receipts</span><br>
+python taxbot.py scan-gmail >> C:\MyERP\logs\weekly.log 2>&amp;1<br>
+<br>
+<span class="comment">REM 2. Process all pending receipts</span><br>
+python taxbot.py process >> C:\MyERP\logs\weekly.log 2>&amp;1<br>
+<br>
+<span class="comment">REM 3. Generate weekly brief for all clients</span><br>
+python taxbot.py weekly-brief >> C:\MyERP\logs\weekly.log 2>&amp;1<br>
+<br>
+<span class="comment">REM 4. Run QA check</span><br>
+python qa_full.py --report >> C:\MyERP\logs\weekly.log 2>&amp;1<br>
+<br>
+<span class="comment">REM 5. Check for compliance issues</span><br>
+python taxbot.py compliance-check >> C:\MyERP\logs\weekly.log 2>&amp;1<br>
+<br>
+<span class="comment">REM Done — review weekly.log for any errors</span><br>
+echo Weekly run complete: %date% %time% >> C:\MyERP\logs\weekly.log
+</div>
+</div>
+
+<div class="cmd-box">
+<div class="cmd-hdr">💻 Set up Task Scheduler (run once as Administrator)</div>
+<div class="cmd-body">
+<span class="comment">REM Create weekly scheduled task</span><br>
+schtasks /create /tn "TaxBot Weekly" /tr "C:\MyERP\weekly_taxbot.bat" /sc WEEKLY /d MON /st 08:30 /ru SYSTEM /f<br>
+<br>
+<span class="comment">REM Create daily watch task (runs continuously)</span><br>
+schtasks /create /tn "TaxBot Daily Watch" /tr "python C:\MyERP\taxbot.py watch" /sc DAILY /st 08:00 /ru SYSTEM /f<br>
+<br>
+<span class="comment">REM Verify tasks are created</span><br>
+schtasks /query /tn "TaxBot Weekly"
+</div>
+</div>
+
+<h3>📧 Email Template — Weekly Client Brief</h3>
+<div class="card">
+<div class="section-hdr">Weekly Status Email (sent every Thursday)</div>
+<br>
+<pre style="white-space:pre-wrap">Subject: [FIRM NAME] — Your Weekly Accounting Update — Week of [DATE]
+
+Dear [Client Name],
+
+Here is your weekly accounting update for [Business Name]:
+
+📊 TRANSACTIONS THIS WEEK
+   Receipts processed: [X]
+   Total expenses recorded: KES [X]
+   Pending review (REVIEW flag): [X] items
+
+💰 MONTH-TO-DATE POSITION
+   Revenue: KES [X]
+   Expenses: KES [X]
+   Estimated profit: KES [X]
+
+⚠️ ACTION REQUIRED
+   [List any REVIEW transactions needing clarification]
+   [Any missing documents: invoices, receipts]
+   [Upcoming tax deadlines this month]
+
+📋 UPCOMING DEADLINES
+   [Date]: [Obligation] — [Amount estimate if known]
+
+If you have questions or need to send documents, please reply to this email or WhatsApp us at [NUMBER].
+
+Best regards,
+[NAME] | ICPAK Registered Accountant
+[FIRM NAME] | Tel: [NUMBER] | Email: [EMAIL]
+Regulated by: ICPAK (Certificate No. [XXXX])</pre>
+</div>
+
+<h3>🔔 Compliance Alert — Automated Checks</h3>
+<div class="cmd-box">
+<div class="cmd-hdr">📋 Monthly compliance check script</div>
+<div class="cmd-body">
+<span class="comment">REM Run on 1st of each month</span><br>
+python taxbot.py compliance-check > compliance_report.txt<br>
+<br>
+<span class="comment">REM Email the report (if sendmail configured)</span><br>
+<span class="comment">REM Otherwise: open compliance_report.txt and review manually</span><br>
+<br>
+<span class="comment">REM Key checks the script performs:</span><br>
+<span class="comment">REM   - VAT return status (due 20th)</span><br>
+<span class="comment">REM   - PAYE remittance (due 9th)</span><br>
+<span class="comment">REM   - NSSF/SHIF status (due 15th/9th)</span><br>
+<span class="comment">REM   - Instalment tax quarters (Apr/Jun/Sep/Dec)</span><br>
+<span class="comment">REM   - Annual return deadline (30 Jun)</span>
+</div>
+</div>
+
+<h3>📤 Sending Reports When You Reconnect</h3>
+<div class="card">
+<ul class="checklist">
+  <li><div class="chk-g chk">1</div><div><strong>Import offline data:</strong> When clients onboard offline, they get a JSON file. Run: <code>python taxbot.py import-onboard [path/to/file.json]</code></div></li>
+  <li><div class="chk-g chk">2</div><div><strong>Batch process:</strong> <code>python taxbot.py process</code> processes all files that arrived while offline</div></li>
+  <li><div class="chk-g chk">3</div><div><strong>Auto-generate reports:</strong> The weekly_taxbot.bat script generates all reports automatically on reconnection</div></li>
+  <li><div class="chk-g chk">4</div><div><strong>Send KRA eTIMS:</strong> Files all pending eTIMS invoices with KRA when connection is restored</div></li>
+  <li><div class="chk-g chk">5</div><div><strong>Sync status:</strong> Update client portal status — they can check their file status immediately</div></li>
+</ul>
+</div>
+</div>
+
+<!-- ═══════════ FEES ═══════════ -->
+<div class="panel" id="panel-fees">
+<h2>💰 ICPAK-Standard Fee Schedule</h2>
+
+<div class="alert alert-b">
+  <span>ℹ️</span>
+  <div>All fees are exclusive of VAT (16%). Fee structure aligns with ICPAK recommended guidelines and international INAA/IFAC member firm standards. Fees are adjustable based on client complexity.</div>
+</div>
+
+<h3>A. Monthly Retainer (Recurring)</h3>
+<table>
+<tr><th>Service</th><th>Fee (KES/month)</th><th>Included</th></tr>
+<tr><td>Basic Bookkeeping (≤50 transactions)</td><td><strong>5,500</strong></td><td>Ledger, basic reports</td></tr>
+<tr><td>Standard Bookkeeping (≤150 transactions)</td><td><strong>8,500</strong></td><td>Ledger, P&L, BS</td></tr>
+<tr><td>VAT Return (monthly)</td><td><strong>4,500</strong></td><td>VAT-3 filing</td></tr>
+<tr><td>PAYE Payroll (≤10 employees)</td><td><strong>6,500</strong></td><td>P9A, payslips, filing</td></tr>
+<tr><td>Management Accounts Package</td><td><strong>7,500</strong></td><td>P&L + BS monthly</td></tr>
+<tr><td>Full-Service Retainer (all above)</td><td><strong>22,000</strong></td><td>Everything included</td></tr>
+<tr><td>Enterprise Retainer (>150 transactions)</td><td><strong>35,000+</strong></td><td>Full-service + weekly KPIs</td></tr>
+</table>
+
+<h3>B. Annual Statutory Services</h3>
+<table>
+<tr><th>Service</th><th>Fee (KES)</th><th>Notes</th></tr>
+<tr><td>Financial Statements (IFRS for SMEs)</td><td><strong>35,000</strong></td><td>Income statement, BS, cash flow, notes</td></tr>
+<tr><td>Corporate Tax Return (IT1C)</td><td><strong>18,000</strong></td><td>Filing + computation</td></tr>
+<tr><td>Personal Tax Return (IT1) — Simple</td><td><strong>3,000</strong></td><td>PAYE only, one employer</td></tr>
+<tr><td>Personal Tax Return (IT1) — With rental/dividends</td><td><strong>6,500</strong></td><td>Multiple sources</td></tr>
+<tr><td>Personal Tax Return (IT1) — Complex</td><td><strong>12,000–18,000</strong></td><td>Multiple employers, foreign income</td></tr>
+<tr><td>KRA eTIMS Setup + Training</td><td><strong>12,000</strong></td><td>One-time setup</td></tr>
+<tr><td>Annual Audit Coordination</td><td><strong>45,000+</strong></td><td>With ICPAK-registered auditor</td></tr>
+</table>
+
+<h3>C. Advisory & Specialist</h3>
+<table>
+<tr><th>Service</th><th>Fee (KES)</th><th>Notes</th></tr>
+<tr><td>Advisory Report (12-sheet Excel)</td><td><strong>25,000–65,000</strong></td><td>Based on business size</td></tr>
+<tr><td>Quarterly Advisory Review</td><td><strong>22,000</strong></td><td>Updated report + 1hr meeting</td></tr>
+<tr><td>Annual Strategic Review (Board)</td><td><strong>65,000</strong></td><td>Full day + presentation</td></tr>
+<tr><td>KRA Audit Defence (per day)</td><td><strong>35,000</strong></td><td>Plus expenses</td></tr>
+<tr><td>Loan Application Package (banks/DFIs)</td><td><strong>28,000</strong></td><td>Financial projections + ratios</td></tr>
+<tr><td>Business Valuation</td><td><strong>85,000</strong></td><td>ICPAK-compliant report</td></tr>
+<tr><td>Investment Readiness (INAA/LHT format)</td><td><strong>55,000</strong></td><td>GIIN IRIS+ + SROI</td></tr>
+<tr><td>Credit Scoring Report (Sydebiz)</td><td><strong>18,000</strong></td><td>5-factor analysis</td></tr>
+</table>
+</div>
+
+<!-- ═══════════ STANDARDS ═══════════ -->
+<div class="panel" id="panel-standards">
+<h2>🏛️ Professional Standards Reference</h2>
+
+<div class="grid2">
+<div class="card">
+  <div class="card-hdr"><div class="card-icon">🌐</div><div><div class="card-title">ACCA — Global Gold Standard</div><div class="card-sub">Association of Chartered Certified Accountants</div></div></div>
+  <p style="font-size:13px;line-height:1.7">Applies IFRS, ISA, ACCA Code of Ethics. This system follows ACCA frameworks for F7 (Financial Reporting), F3 (Financial Accounting), and P3 (Business Analysis) in all ratio calculations and advisory reports.</p>
+  <p style="margin-top:8px;font-size:11px;color:var(--muted)"><strong>www.accaglobal.com</strong></p>
+</div>
+<div class="card">
+  <div class="card-hdr"><div class="card-icon">🇰🇪</div><div><div class="card-title">ICPAK — Kenya Statutory Body</div><div class="card-sub">Institute of Certified Public Accountants of Kenya</div></div></div>
+  <p style="font-size:13px;line-height:1.7">Regulated by CPA Act Cap 531. All ICPAK members file tax returns, prepare financial statements, and conduct audits under Kenya Financial Reporting Standards. Our fees follow ICPAK recommended guidelines.</p>
+  <p style="margin-top:8px;font-size:11px;color:var(--muted)"><strong>www.icpak.com · +254 20 227 6154</strong></p>
+</div>
+<div class="card">
+  <div class="card-hdr"><div class="card-icon">🌍</div><div><div class="card-title">IFAC — Global Federation</div><div class="card-sub">International Federation of Accountants</div></div></div>
+  <p style="font-size:13px;line-height:1.7">Sets International Standards on Auditing (ISA) and IESBA Code of Ethics. This system follows IFAC SME/SMP (Small and Medium Practices) guidance for advisory services and financial analysis.</p>
+  <p style="margin-top:8px;font-size:11px;color:var(--muted)"><strong>www.ifac.org</strong></p>
+</div>
+<div class="card">
+  <div class="card-hdr"><div class="card-icon">🤝</div><div><div class="card-title">INAA — International Network</div><div class="card-sub">Independent Accounting & Advisory Firms</div></div></div>
+  <p style="font-size:13px;line-height:1.7">An international association of independent accounting and advisory firms providing cross-border quality assurance. Advisory reports follow INAA standards for SME financial intelligence reporting.</p>
+  <p style="margin-top:8px;font-size:11px;color:var(--muted)"><strong>www.inaa.org</strong></p>
+</div>
+<div class="card">
+  <div class="card-hdr"><div class="card-icon">📊</div><div><div class="card-title">ReadyRatios — Ratio Methodology</div><div class="card-sub">International Financial Ratio Standards</div></div></div>
+  <p style="font-size:13px;line-height:1.7">All financial ratios (liquidity, profitability, solvency, efficiency) are calculated per ReadyRatios.com methodology — aligned with IFRS. Benchmarks and interpretations follow international standards.</p>
+  <p style="margin-top:8px;font-size:11px;color:var(--muted)"><strong>www.readyratios.com</strong></p>
+</div>
+<div class="card">
+  <div class="card-hdr"><div class="card-icon">⭐</div><div><div class="card-title">Sydebiz — Credit Scoring</div><div class="card-sub">5-Factor SME Credit Risk Framework</div></div></div>
+  <p style="font-size:13px;line-height:1.7">International credit scoring for SMEs: Financial Risk (40%), Business Risk (30%), Management Risk (20%), Industry Risk (10%). Aligned with Kenya Bankers Association SME credit guidelines.</p>
+  <p style="margin-top:8px;font-size:11px;color:var(--muted)"><strong>Sydebiz International Credit Framework</strong></p>
+</div>
+</div>
+
+<h3>📋 PAYE Bands — Finance Act 2024</h3>
+<table>
+<tr><th>Annual Income (KES)</th><th>Monthly Equivalent</th><th>Tax Rate</th></tr>
+<tr><td>First 288,000</td><td>First 24,000</td><td>10%</td></tr>
+<tr><td>Next 100,000 (288K–388K)</td><td>Next 8,333</td><td>25%</td></tr>
+<tr><td>Next 5,612,000 (388K–6M)</td><td>Next 467,667</td><td>30%</td></tr>
+<tr><td>Next 3,600,000 (6M–9.6M)</td><td>Next 300,000</td><td>32.5%</td></tr>
+<tr><td>Above 9,600,000</td><td>Above 800,000</td><td>35%</td></tr>
+</table>
+<p style="font-size:12px;color:var(--muted);margin-top:6px">Personal relief: KES 28,800/year (KES 2,400/month). Insurance relief: KES 60K/year. Mortgage relief: KES 300K/year. Pension: KES 240K/year.</p>
+
+<h3>🏦 Statutory Rates Reference</h3>
+<table>
+<tr><th>Levy</th><th>Rate</th><th>Employee</th><th>Employer</th><th>Due Date</th></tr>
+<tr><td>PAYE</td><td>See bands above</td><td>Full deduction</td><td>None</td><td>9th each month</td></tr>
+<tr><td>NSSF (Tier I)</td><td>6% of KES 6,000 = KES 360/mo</td><td>KES 360</td><td>KES 360</td><td>15th each month</td></tr>
+<tr><td>NSSF (Tier II)</td><td>6% of KES 6,000–18,000</td><td>KES 720 max</td><td>KES 720 max</td><td>15th each month</td></tr>
+<tr><td>SHIF</td><td>2.75% of gross</td><td>2.75%</td><td>2.75%</td><td>9th each month</td></tr>
+<tr><td>AHL</td><td>1.5% of gross</td><td>1.5%</td><td>1.5%</td><td>9th each month</td></tr>
+<tr><td>NITA</td><td>0.5% of gross payroll</td><td>—</td><td>0.5%</td><td>20th each month</td></tr>
+<tr><td>WHT — Consultancy (resident)</td><td>5% of gross payment</td><td>—</td><td>Withhold</td><td>20th next month</td></tr>
+<tr><td>WHT — Rent (resident)</td><td>10% of gross rent</td><td>—</td><td>Withhold</td><td>20th next month</td></tr>
+<tr><td>VAT (standard)</td><td>16% on taxable supplies</td><td>—</td><td>Collect & remit</td><td>20th each month</td></tr>
+<tr><td>Corporate Tax</td><td>30% (standard)</td><td>—</td><td>Annual + instalments</td><td>20 Apr/Jun/Sep/Dec</td></tr>
+<tr><td>Capital Gains Tax</td><td>5% of proceeds</td><td>—</td><td>On exit</td><td>At time of transfer</td></tr>
+</table>
+</div>
+
+<!-- Q-PREDICT PANEL -->
+<div class="panel" id="panel-qpredict">
+<h2>📈 Q-Predict — Tax Intelligence Dashboard</h2>
+<p>Q-Predict is a browser-based analytics platform that reads from TaxBot's expense database. Deploy it once as a single HTML file — no server, no subscription, no cloud storage required.</p>
+
+<h3>🖥️ What Q-Predict shows accountants</h3>
+<table>
+<tr><th>View</th><th>What You Get</th></tr>
+<tr><td><strong>Overview</strong></td><td>YTD expenses, VAT liability, PAYE remitted, receipts processed — live from TaxBot data</td></tr>
+<tr><td><strong>Tax Forecast</strong></td><td>Q1–Q4 VAT / PAYE / Corp Tax breakdown. Interactive PAYE slider with Finance Act 2024 bands. NSSF, SHIF, AHL auto-computed.</td></tr>
+<tr><td><strong>Receipt Analytics</strong></td><td>Category donut chart, monthly trends, top vendors by YTD spend, full receipt transaction log</td></tr>
+<tr><td><strong>KRA Compliance</strong></td><td>All 8 KRA filing types (VAT, PAYE, WHT, NSSF, SHIF, AHL, Installment, Annual) with days-to-deadline badges and amounts</td></tr>
+<tr><td><strong>Client Management</strong></td><td>All registered clients with receipts/month, sector, VAT status, per-client billing</td></tr>
+<tr><td><strong>TaxBot Commands</strong></td><td>All 25 commands with one-click copy — never mistype a client ID again</td></tr>
+<tr><td><strong>Billing</strong></td><td>Current plan breakdown. Interactive calculator: adjust receipts/employees/tax-managed and see fees across all tiers instantly</td></tr>
+</table>
+
+<h3>⏱️ 72-Hour Free Trial Flow</h3>
+<ol style="padding-left:20px;line-height:2">
+  <li>Client visits Q-Predict URL → clicks <strong>Start Free Trial</strong></li>
+  <li>Fills: Company name, KRA PIN, email, sector, chooses tier</li>
+  <li>Full dashboard unlocks immediately — no credit card</li>
+  <li>72-hour countdown visible in sidebar and banner</li>
+  <li>On expiry → Upgrade screen with all plan options (data never deleted)</li>
+</ol>
+
+<h3>💰 Pricing (matches TaxBot billing engine exactly)</h3>
+<table>
+<tr><th>Plan</th><th>Base</th><th>% of Tax Managed</th><th>Receipts</th><th>Clients</th></tr>
+<tr><td>Pay-As-You-Go</td><td>KES 0</td><td>1.25%</td><td>50/mo</td><td>3</td></tr>
+<tr><td>Starter</td><td>KES 2,000</td><td>0.5%</td><td>200/mo</td><td>5</td></tr>
+<tr><td><strong>Professional ⭐</strong></td><td><strong>KES 6,500</strong></td><td><strong>0.75%</strong></td><td><strong>1,000/mo</strong></td><td><strong>20</strong></td></tr>
+<tr><td>Enterprise</td><td>KES 18,000</td><td>1.0%</td><td>Unlimited</td><td>Unlimited</td></tr>
+</table>
+
+<h3>🚀 Accountant Workflow with Q-Predict</h3>
+<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:16px 20px;font-family:monospace;font-size:13px;line-height:1.9">
+  <div style="color:#166534;margin-bottom:8px"># Weekly routine — takes 10 minutes</div>
+  <div>1. Open Q-Predict → KRA Compliance tab</div>
+  <div>2. Check days-remaining on all deadlines</div>
+  <div>3. Open TaxBot Commands tab → copy &amp; run <code>python taxbot.py tax &lt;id&gt;</code></div>
+  <div>4. Review forecast numbers in Tax Forecast tab</div>
+  <div>5. Alert client of amounts due and payment method</div>
+  <div style="margin-top:8px;color:#166534"># Month-end — full close sequence</div>
+  <div>1. Q-Predict Overview → note YTD figures</div>
+  <div>2. Run: <code>python taxbot.py monthly &lt;id&gt;</code></div>
+  <div>3. Run: <code>python taxbot.py kra-input &lt;id&gt;</code> → fill yellow cells → <code>kra-run &lt;id&gt;</code></div>
+  <div>4. Q-Predict Billing tab → confirm monthly fee → issue invoice</div>
+  <div>5. Q-Predict → Analytics tab → export insights for client report</div>
+</div>
+
+<h3>📦 Deploying Q-Predict Free</h3>
+<table>
+<tr><th>Platform</th><th>Steps</th><th>URL</th><th>Cost</th></tr>
+<tr><td>GitHub Pages</td><td>Upload Q_Predict_Platform.html as index.html → enable Pages</td><td>yourusername.github.io/qpredict</td><td>Free forever</td></tr>
+<tr><td>Netlify Drop</td><td>Drag file to app.netlify.com/drop</td><td>random-name.netlify.app</td><td>Free</td></tr>
+<tr><td>Cloudflare Pages</td><td>Connect GitHub repo</td><td>qpredict.pages.dev</td><td>Free</td></tr>
+</table>
+</div>
+
+<!-- PWA PANEL -->
+<div class="panel" id="panel-pwa">
+<h2>📱 Receipt Capture PWA — Client Mobile App</h2>
+<p>A Progressive Web App clients install on their phones. No App Store, no Play Store. Clients snap receipts and email them directly to the accountant's TaxBot-monitored Gmail address.</p>
+
+<h3>📤 How receipts flow from client to TaxBot</h3>
+<table>
+<tr><th>Step</th><th>Action</th><th>Who</th></tr>
+<tr><td>1</td><td>Client opens PWA, taps camera, snaps receipt</td><td>Client on phone</td></tr>
+<tr><td>2</td><td>Fills Vendor, Amount (KES), Date, Payment, Category, Notes</td><td>Client (10 seconds)</td></tr>
+<tr><td>3</td><td>Taps "Email to Accountant" — image downloaded, email client opens pre-filled</td><td>PWA automated</td></tr>
+<tr><td>4</td><td>Client attaches image, taps Send</td><td>Client</td></tr>
+<tr><td>5</td><td>TaxBot scans Gmail, runs OCR + AI, posts to Expenses + Ledger</td><td>TaxBot: <code>scan-gmail</code></td></tr>
+<tr><td>6</td><td>Accountant reviews any REVIEW-flagged rows, runs <code>monthly</code></td><td>Accountant</td></tr>
+</table>
+
+<h3>⚙️ Client setup (60 seconds)</h3>
+<ol style="padding-left:20px;line-height:2">
+  <li>Accountant shares PWA URL with client (WhatsApp or email)</li>
+  <li>Client opens URL on phone → taps Share (iOS) or 3-dot menu (Android) → "Add to Home Screen"</li>
+  <li>Client opens app → taps <strong>Setup tab</strong> → enters:
+    <ul style="margin-top:4px">
+      <li>Company Name (as registered with KRA)</li>
+      <li>KRA PIN</li>
+      <li>Accountant Email (the Gmail TaxBot monitors)</li>
+      <li>Accountant WhatsApp (optional fallback)</li>
+    </ul>
+  </li>
+  <li>Setup persists — client never re-enters these details</li>
+</ol>
+
+<h3>📁 Supported input formats</h3>
+<table>
+<tr><th>Type</th><th>How</th><th>TaxBot processing</th></tr>
+<tr><td>📷 Camera photo</td><td>Live capture → compressed to max 1600px / 75%</td><td>OCR + AI → Expenses sheet</td></tr>
+<tr><td>🖼 Gallery image</td><td>Pick from phone storage</td><td>OCR + AI → Expenses sheet</td></tr>
+<tr><td>📄 PDF invoice</td><td>File picker → PDF</td><td>PyMuPDF text extraction</td></tr>
+<tr><td>📋 CSV / TXT</td><td>File picker → .csv or .txt</td><td>Direct read → Expenses sheet</td></tr>
+</table>
+
+<h3>📶 Offline capability</h3>
+<ul style="padding-left:20px;line-height:2">
+  <li>All captures stored in IndexedDB (survives app close)</li>
+  <li>Online/offline indicator in top bar</li>
+  <li>Queue tab shows Pending / Sent / Failed counts</li>
+  <li>When reconnected, use "Send All" to dispatch queued receipts</li>
+</ul>
+
+<h3>🌐 Deploying the PWA (free)</h3>
+<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:16px 20px;font-family:monospace;font-size:13px;line-height:1.9">
+  <div><strong># GitHub Pages — recommended</strong></div>
+  <div>1. github.com → New repository: "taxbot-pwa"</div>
+  <div>2. Upload TaxBot_Receipt_PWA.html → rename to index.html</div>
+  <div>3. Settings → Pages → Branch: main → Save</div>
+  <div>4. URL: https://yourusername.github.io/taxbot-pwa</div>
+  <div style="margin-top:8px"><strong># Netlify Drop — 30 seconds</strong></div>
+  <div>1. app.netlify.com/drop</div>
+  <div>2. Drag TaxBot_Receipt_PWA.html onto page</div>
+  <div>3. Done — instant HTTPS URL</div>
+</div>
+
+<h3>📧 Accountant checklist — once a week</h3>
+<table>
+<tr><th>Task</th><th>Command</th><th>Time</th></tr>
+<tr><td>Pull all emailed receipts from Gmail</td><td><code>python taxbot.py scan-gmail</code></td><td>30 sec</td></tr>
+<tr><td>Process any manually dropped receipts</td><td><code>python taxbot.py process &lt;id&gt;</code></td><td>1–2 min</td></tr>
+<tr><td>Review REVIEW-flagged rows in Excel</td><td>Open db Excel → filter REVIEW</td><td>5–10 min</td></tr>
+<tr><td>Check Q-Predict for upcoming KRA deadlines</td><td>Open Q-Predict → Compliance tab</td><td>2 min</td></tr>
+</table>
+</div>
+
+</div><!-- wrap -->
+
+<script>
+function show(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
