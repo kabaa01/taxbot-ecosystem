@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TaxBot Kenya — Complete User Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F4F6F9;--white:#fff;--ink:#0A0F1E;
+  --g2:#006633;--g1:#005C2A;--glt:#E6F4ED;--gmd:#3D9960;
+  --gold:#B8860B;--goldlt:#FDF6E3;
+  --sl:#4A5568;--bd:#DDE3EE;--mu:#8094AE;
+  --red:#C0392B;--redlt:#FDEDEC;--bl:#1565C0;--bllt:#E3F0FF;
+  --am:#D97706;--amlt:#FEF3C7;
+  --sh0:0 1px 4px rgba(0,0,0,.05);--sh:0 4px 20px rgba(0,0,0,.07);
+  --r:12px;--nav:60px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.72}
+
+.nav{position:fixed;top:0;left:0;right:0;height:var(--nav);background:rgba(255,255,255,.94);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--bd);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 32px;z-index:300;gap:16px}
+.nav-brand{font-family:'Syne',sans-serif;font-weight:800;font-size:16px;color:var(--ink);
+  text-decoration:none;flex-shrink:0;display:flex;align-items:center;gap:7px}
+.nav-brand span{color:var(--g2)}
+.nl{display:flex;gap:20px;flex-wrap:wrap}
+.nl a{font-size:12.5px;font-weight:500;color:var(--sl);text-decoration:none;transition:color .15s;white-space:nowrap}
+.nl a:hover,.nl a.on{color:var(--g2)}
+.npill{background:var(--g2);color:#fff;padding:6px 15px;border-radius:20px;font-size:12px;font-weight:600;text-decoration:none}
+
+.hero{margin-top:var(--nav);background:linear-gradient(140deg,#002616 0%,#005429 55%,#003820 100%);
+  padding:76px 56px 68px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;right:-100px;top:-100px;width:480px;height:480px;
+  border-radius:50%;background:radial-gradient(circle,rgba(184,134,11,.13),transparent 66%);pointer-events:none}
+.hbadge{display:inline-flex;align-items:center;gap:6px;
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);
+  border-radius:20px;padding:5px 14px;margin-bottom:20px;
+  font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.88)}
+.hero h1{font-family:'Syne',sans-serif;font-size:clamp(32px,4vw,54px);font-weight:800;
+  color:#fff;line-height:1.1;max-width:760px}
+.hero h1 em{color:#F4D03F;font-style:normal}
+.hero p{color:rgba(255,255,255,.67);font-size:16px;max-width:580px;margin-top:16px;line-height:1.75}
+.htags{display:flex;gap:9px;margin-top:28px;flex-wrap:wrap}
+.htag{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);
+  border-radius:7px;padding:5px 13px;font-size:12px;font-weight:600;color:rgba(255,255,255,.76)}
+.htag strong{color:#fff}
+
+.wrap{max-width:1040px;margin:0 auto;padding:0 28px 80px}
+
+.toc{background:var(--white);border:1px solid var(--bd);border-radius:var(--r);
+  padding:24px 28px;margin:40px 0 0;box-shadow:var(--sh0)}
+.toc-h{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--mu);margin-bottom:16px}
+.toc-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:4px 20px}
+.tl{display:flex;align-items:center;gap:7px;padding:4px 0;
+  font-size:13.5px;color:var(--sl);text-decoration:none;transition:color .14s}
+.tl:hover{color:var(--g2)}
+.tn{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--mu);width:18px;flex-shrink:0}
+
+.sec{padding-top:68px}
+.sec-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--g2);margin-bottom:9px}
+.sec-h{font-family:'Syne',sans-serif;font-size:clamp(22px,2.6vw,34px);font-weight:800;
+  color:var(--ink);line-height:1.2;margin-bottom:12px}
+.sec-lead{font-size:15px;color:var(--sl);max-width:660px;line-height:1.76;margin-bottom:32px}
+
+.card{background:var(--white);border:1px solid var(--bd);border-radius:var(--r);padding:22px 26px;box-shadow:var(--sh0)}
+.card+.card,.card+.steps,.steps+.card{margin-top:14px}
+.ct{font-family:'Syne',sans-serif;font-weight:700;font-size:15.5px;color:var(--ink);margin-bottom:7px;display:flex;align-items:center;gap:7px}
+.cd{font-size:14px;color:var(--sl);line-height:1.65}
+
+.cg{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px;margin-bottom:28px}
+.fc{background:var(--white);border:1px solid var(--bd);border-radius:var(--r);padding:20px 22px;box-shadow:var(--sh0);transition:box-shadow .18s,transform .18s}
+.fc:hover{box-shadow:var(--sh);transform:translateY(-2px)}
+.fi{font-size:24px;margin-bottom:9px}
+.ft{font-family:'Syne',sans-serif;font-weight:700;font-size:14.5px;color:var(--ink);margin-bottom:5px}
+.fd{font-size:13px;color:var(--sl);line-height:1.6}
+.nb{display:inline-block;background:var(--glt);color:var(--g2);font-size:9.5px;font-weight:700;
+  letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:4px;margin-top:7px}
+
+.steps{counter-reset:st;display:flex;flex-direction:column;gap:2px;margin-bottom:28px}
+.step{background:var(--white);border:1px solid var(--bd);border-radius:var(--r);
+  padding:20px 22px 20px 64px;position:relative;box-shadow:var(--sh0)}
+.step::before{counter-increment:st;content:counter(st);
+  position:absolute;left:18px;top:18px;width:34px;height:34px;border-radius:50%;
+  background:var(--g2);color:#fff;font-family:'Syne',sans-serif;font-weight:800;font-size:14px;
+  display:flex;align-items:center;justify-content:center}
+.sth{font-family:'Syne',sans-serif;font-weight:700;font-size:15px;color:var(--ink);margin-bottom:7px}
+.stb{font-size:14px;color:var(--sl);line-height:1.65}
+.stb p+p{margin-top:7px}
+
+pre,code{font-family:'JetBrains Mono',monospace}
+pre{background:#0D1117;border-radius:10px;padding:18px 20px;overflow-x:auto;
+  font-size:12.5px;line-height:1.68;color:#C9D1D9;margin:12px 0;box-shadow:var(--sh0)}
+code{font-size:12.5px;background:#F0F4F8;color:#0D1117;padding:2px 6px;border-radius:4px;border:1px solid #DDE3EE}
+pre code{background:none;color:inherit;padding:0;border:none}
+.cg2{color:#7EE787}.cgo{color:#E3B341}.cb{color:#79C0FF}.cr{color:#FF7B72}.cmut{color:#8B949E}
+
+table{width:100%;border-collapse:collapse;margin:12px 0;background:var(--white);
+  border-radius:var(--r);overflow:hidden;box-shadow:var(--sh0);border:1px solid var(--bd)}
+th{background:var(--g2);color:#fff;font-size:11.5px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.06em;padding:10px 14px;text-align:left}
+td{padding:9px 14px;font-size:13.5px;border-bottom:1px solid var(--bd);color:var(--sl)}
+td:first-child{color:var(--ink);font-weight:500}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#F8FAFC}
+
+.al{border-radius:var(--r);padding:14px 18px;margin:14px 0;
+  display:flex;gap:10px;align-items:flex-start;font-size:13.5px;line-height:1.62}
+.ai{font-size:16px;flex-shrink:0;margin-top:1px}
+.al.info{background:var(--bllt);border:1px solid #A8C8F8;color:#1A3A5C}
+.al.warn{background:var(--amlt);border:1px solid #FCD34D;color:#7C4A0C}
+.al.ok{background:var(--glt);border:1px solid #A3D9B3;color:#1A4A2A}
+.al.err{background:var(--redlt);border:1px solid #F5A6A6;color:#7C1A1A}
+.al strong{font-weight:600}
+
+.tier-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(196px,1fr));gap:12px;margin-bottom:24px}
+.tier{background:var(--white);border:2px solid var(--bd);border-radius:var(--r);padding:20px 18px;text-align:center}
+.tier.hi{border-color:var(--g2);position:relative}
+.tbadge{position:absolute;top:-10px;left:50%;transform:translateX(-50%);
+  background:var(--g2);color:#fff;font-size:10px;font-weight:700;
+  padding:3px 10px;border-radius:10px;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+.tnm{font-family:'Syne',sans-serif;font-weight:800;font-size:16px;color:var(--ink);margin-bottom:2px}
+.tpr{font-family:'Syne',sans-serif;font-weight:700;font-size:24px;color:var(--g2)}
+.tpr sup{font-size:13px;font-weight:600;vertical-align:super}
+.tpr sub{font-size:11px;color:var(--mu);font-weight:400}
+.tdiv{height:1px;background:var(--bd);margin:12px 0}
+.ti{font-size:12.5px;color:var(--sl);padding:3px 0;display:flex;align-items:center;gap:5px}
+.ti::before{content:'✓';color:var(--g2);font-weight:700}
+
+.ft{background:#0D1117;border-radius:10px;padding:18px 20px;font-family:'JetBrains Mono',monospace;
+  font-size:12.5px;line-height:2;color:#C9D1D9;margin:12px 0;overflow-x:auto}
+.ft .d{color:#79C0FF}.ft .f{color:#C9D1D9}.ft .cm{color:#7EE787}.ft .nw{color:#E3B341}
+
+.tab-l{display:flex;flex-direction:column;gap:9px;margin-bottom:28px}
+.tab-i{background:var(--white);border:1px solid var(--bd);border-radius:10px;
+  padding:14px 18px;display:flex;gap:12px;align-items:flex-start;box-shadow:var(--sh0)}
+.tab-ic{font-size:18px;flex-shrink:0;width:28px;text-align:center;margin-top:2px}
+.tab-t{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:var(--ink);margin-bottom:3px}
+.tab-d{font-size:13.5px;color:var(--sl);line-height:1.6}
+
+.snew{display:inline-block;background:var(--goldlt);color:var(--gold);border:1px solid #E8D49B;
+  font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+  padding:2px 7px;border-radius:4px;margin-left:5px;vertical-align:middle}
+
+.backtop{position:fixed;bottom:28px;right:28px;width:40px;height:40px;background:var(--g2);
+  color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  text-decoration:none;font-size:17px;box-shadow:var(--sh);transition:transform .18s;z-index:100}
+.backtop:hover{transform:translateY(-3px)}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-brand" href="#top">🤖 <span>TaxBot</span> Kenya</a>
+  <div class="nl">
+    <a href="#quickstart">Quick Start</a>
+    <a href="#install">Install</a>
+    <a href="#paths">PATH Fix</a>
+    <a href="#features">Features</a>
+    <a href="#accounting">Accounting</a>
+    <a href="#commands">Commands</a>
+    <a href="#dashboard">Dashboard</a>
+    <a href="#gmail">Gmail</a>
+    <a href="#troubleshoot">Troubleshooting</a>
+    <a href="#pricing">Pricing</a>
+  </div>
+  <a class="npill" href="#quickstart">Get Started →</a>
+</nav>
+
+<div class="hero" id="top">
+  <div class="wrap" style="padding-bottom:0">
+    <div class="hbadge">📋 Complete User Guide &nbsp;·&nbsp; v3.0 — March 2026</div>
+    <h1>TaxBot Kenya<br><em>User Guide</em></h1>
+    <p>Local-first AI receipt processing, double-entry accounting, and KRA eTIMS compliance — all on your machine, zero cloud storage.</p>
+    <div class="htags">
+      <div class="htag"><strong>207</strong> QA tests passing</div>
+      <div class="htag"><strong>Python 3.11–3.14</strong> compatible</div>
+      <div class="htag"><strong>Finance Act 2024</strong> compliant</div>
+      <div class="htag"><strong>Bkper-inspired</strong> accounting engine</div>
+      <div class="htag"><strong>Gmail</strong> read-only · zero cloud</div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+<div class="toc">
+  <div class="toc-h">Table of Contents</div>
+  <div class="toc-g">
+    <a class="tl" href="#quickstart"><span class="tn">01</span>Quick Start (5 min)</a>
+    <a class="tl" href="#install"><span class="tn">02</span>Full Installation</a>
+    <a class="tl" href="#paths"><span class="tn">03</span>Python PATH Fix</a>
+    <a class="tl" href="#features"><span class="tn">04</span>Feature Overview</a>
+    <a class="tl" href="#accounting"><span class="tn">05</span>Accounting Engine (Bkper)</a>
+    <a class="tl" href="#commands"><span class="tn">06</span>All Commands</a>
+    <a class="tl" href="#receipts"><span class="tn">07</span>Processing Receipts</a>
+    <a class="tl" href="#dashboard"><span class="tn">08</span>Dashboard Guide</a>
+    <a class="tl" href="#gmail"><span class="tn">09</span>Gmail Setup</a>
+    <a class="tl" href="#clients"><span class="tn">10</span>Managing Clients</a>
+    <a class="tl" href="#kra"><span class="tn">11</span>KRA eTIMS Export</a>
+    <a class="tl" href="#maintenance"><span class="tn">12</span>Monthly Routine</a>
+    <a class="tl" href="#troubleshoot"><span class="tn">13</span>Troubleshooting</a>
+    <a class="tl" href="#pricing"><span class="tn">14</span>Pricing Tiers</a>
+    <a class="tl" href="#qa"><span class="tn">15</span>QA Testing</a>
+    <a class="tl" href="#fileref"><span class="tn">16</span>File Reference</a>
+    <a class="tl" href="#pwa"><span class="tn">17</span>Receipt Capture PWA</a>
+    <a class="tl" href="#qpredict"><span class="tn">18</span>Q-Predict Platform</a>
+    <a class="tl" href="#deploy"><span class="tn">19</span>Free Online Deployment</a>
+  </div>
+</div>
+
+<!-- ─── 01 QUICK START ─────────────────────────────────── -->
+<div class="sec" id="quickstart">
+  <div class="sec-lbl">Section 01</div>
+  <div class="sec-h">Quick Start — 5 Minutes</div>
+  <p class="sec-lead">If TaxBot files are already in <code>C:\MyERP\</code>, start here.</p>
+  <div class="steps">
+    <div class="step">
+      <div class="sth">Open PowerShell (normal user)</div>
+      <div class="stb"><p>Press <code>Win + R</code> → type <code>powershell</code> → Enter. Do not run as Administrator.</p>
+      <pre><code><span class="cb">cd</span> C:\MyERP</code></pre></div>
+    </div>
+    <div class="step">
+      <div class="sth">Run setup (first time only)</div>
+      <div class="stb">
+        <pre><code><span class="cb">python</span> taxbot.py setup</code></pre>
+        <div class="al ok"><span class="ai">✅</span><div>You should see <strong>"Packages installed"</strong>, <strong>"Scripts dir saved to user PATH permanently"</strong>, and <strong>"Google API libraries loaded ✓"</strong>. Gmail is optional — local folder drop works without it.</div></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="sth">Load demo data (recommended)</div>
+      <div class="stb"><pre><code><span class="cb">python</span> taxbot.py demo</code></pre>
+      <p>Loads 4 real Kenyan clients with sample receipts so you can explore the dashboard immediately.</p></div>
+    </div>
+    <div class="step">
+      <div class="sth">Open the dashboard</div>
+      <div class="stb"><p>Double-click <code>dashboard.bat</code>, or:</p>
+      <pre><code><span class="cb">python</span> taxbot.py dashboard</code></pre>
+      <p>Browser opens at <strong>http://localhost:8501</strong></p></div>
+    </div>
+    <div class="step">
+      <div class="sth">Start the receipt watcher</div>
+      <div class="stb"><p>Double-click <code>watch.bat</code>, or in a second terminal:</p>
+      <pre><code><span class="cb">python</span> taxbot.py watch</code></pre>
+      <p>Drop receipts into any client's <code>inbox\</code> folder — processed in ~2 seconds.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── 02 INSTALLATION ───────────────────────────────── -->
+<div class="sec" id="install">
+  <div class="sec-lbl">Section 02</div>
+  <div class="sec-h">Full Installation</div>
+  <p class="sec-lead">New machine setup. Total time: 20–30 minutes including downloads.</p>
+
+  <div class="card" style="margin-bottom:18px">
+    <div class="ct">📋 System Requirements</div>
+    <table>
+      <tr><th>Component</th><th>Minimum</th><th>Recommended</th></tr>
+      <tr><td>OS</td><td>Windows 10 64-bit</td><td>Windows 11 22H2+</td></tr>
+      <tr><td>Python</td><td>3.11</td><td>3.12 or 3.13 from python.org</td></tr>
+      <tr><td>RAM</td><td>8 GB</td><td>16 GB</td></tr>
+      <tr><td>Disk</td><td>5 GB free</td><td>15 GB+ (Ollama model ~2 GB)</td></tr>
+    </table>
+  </div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="sth">Install Python from python.org</div>
+      <div class="stb">
+        <div class="al warn"><span class="ai">⚠️</span><div><strong>Use python.org — not the Microsoft Store.</strong> The Store version is a stub that just opens the Store. If you already installed via winget or the Store, see <a href="#paths" style="color:var(--bl)">Section 03 — PATH Fix</a>.</div></div>
+        <p>1. Go to <strong>https://python.org/downloads/</strong></p>
+        <p>2. Download Python 3.12.x Windows 64-bit installer</p>
+        <p>3. Run installer — <strong>tick "Add Python to PATH"</strong> at the bottom</p>
+        <p>4. Click Install Now. Verify in a new PowerShell:</p>
+        <pre><code><span class="cb">python</span> --version  <span class="cmut"># Python 3.12.x</span></code></pre>
+      </div>
+    </div>
+    <div class="step">
+      <div class="sth">Install Ollama (AI extraction)</div>
+      <div class="stb">
+        <p>1. Go to <strong>https://ollama.com/download</strong> → download OllamaSetup.exe</p>
+        <p>2. After install, pull the Qwen model (one-time ~2 GB download):</p>
+        <pre><code>ollama pull qwen2.5:3b</code></pre>
+        <div class="al info"><span class="ai">💡</span><div>TaxBot works without Ollama using regex fallback. Ollama improves accuracy on ambiguous receipts.</div></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="sth">Install Tesseract OCR (for image receipts)</div>
+      <div class="stb">
+        <p>1. Download from: <strong>https://github.com/UB-Mannheim/tesseract/wiki</strong></p>
+        <p>2. Install to: <code>C:\Program Files\Tesseract-OCR\</code> (default)</p>
+        <p>3. Tick "Additional language data (English)" during install</p>
+        <div class="al info"><span class="ai">💡</span><div>Required for .jpg/.png image receipts. PDF text extraction and text files work without it.</div></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="sth">Copy TaxBot files to C:\MyERP\</div>
+      <div class="stb">
+        <pre><code>mkdir C:\MyERP
+<span class="cmut"># Place these files in C:\MyERP\ :</span>
+taxbot.py  dashboard.py  qa_full.py  kra_etims_generator.py  FIX.bat  INSTALL.ps1</code></pre>
+      </div>
+    </div>
+    <div class="step">
+      <div class="sth">Run the TaxBot setup wizard</div>
+      <div class="stb">
+        <pre><code>cd C:\MyERP
+<span class="cb">python</span> taxbot.py setup</code></pre>
+        <p>This installs all packages, adds Scripts to PATH, checks Ollama, checks Tesseract, creates folder structure, and walks through Gmail OAuth (optional).</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="sth">Verify with QA tests</div>
+      <div class="stb">
+        <pre><code><span class="cb">python</span> qa_full.py --report</code></pre>
+        <div class="al ok"><span class="ai">✅</span><div>Expected: <strong>287 tests · 197 passed · 0 failed · 10 skipped · 100%</strong></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── 03 PATH FIX ───────────────────────────────────── -->
+<div class="sec" id="paths">
+  <div class="sec-lbl">Section 03</div>
+  <div class="sec-h">Python PATH Fix</div>
+  <p class="sec-lead">If you see <em>"python is not recognized"</em> or <em>"streamlit.exe is installed in …Scripts which is not on PATH"</em>, use these fixes. Common with Python 3.14 (winget install) and corporate Windows machines.</p>
+
+  <div class="al err"><span class="ai">⚠️</span><div><strong>What happened:</strong> Python 3.14 installed via winget uses the path <code>C:\Users\…\AppData\Local\Python\pythoncore-3.14-64\</code>. Its Scripts folder (where streamlit.exe lives) is never added to PATH automatically.</div></div>
+
+  <div class="card" style="margin-top:16px">
+    <div class="ct">🩹 Fix A — Double-click FIX.bat (easiest)</div>
+    <div class="cd">In File Explorer, go to <code>C:\MyERP\</code> and double-click <code>FIX.bat</code>. It detects your Python (including pythoncore-3.14-64 style paths), adds Scripts to PATH permanently, installs all packages, and creates launcher .bat files.</div>
+  </div>
+  <div class="card">
+    <div class="ct">🔧 Fix B — Re-run setup</div>
+    <div class="cd">
+      <pre><code><span class="cb">python</span> taxbot.py setup</code></pre>
+      Setup auto-detects the Scripts dir, adds it to the current session, and saves it permanently via a PowerShell .ps1 file. Open a new PowerShell window afterwards for the change to take effect.
+    </div>
+  </div>
+  <div class="card">
+    <div class="ct">⚡ Fix C — Use launcher .bat files (always work)</div>
+    <div class="cd">After FIX.bat runs, four launchers are created that use the exact Python path — no PATH dependency:
+      <table style="margin-top:10px">
+        <tr><th>File</th><th>What it does</th></tr>
+        <tr><td><code>watch.bat</code></td><td>Starts receipt watcher + Gmail scan</td></tr>
+        <tr><td><code>dashboard.bat</code></td><td>Opens Streamlit at localhost:8501</td></tr>
+        <tr><td><code>start.bat</code></td><td>Run any command: <code>start.bat status</code></td></tr>
+        <tr><td><code>runqa.bat</code></td><td>Runs the full QA suite</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="al info"><span class="ai">💡</span><div><strong>PATH changes only apply to new terminal windows.</strong> After running setup or FIX.bat, open a fresh PowerShell before testing <code>streamlit --version</code>.</div></div>
+  <div class="al warn"><span class="ai">⚠️</span><div>
+    <strong>PowerShell: username with spaces (e.g. &ldquo;John Kamau&rdquo;)</strong><br>
+    If pip prints a long path and you copy-paste it directly, PowerShell throws
+    <code>CommandNotFoundException</code> because the space splits the path.<br>
+    <strong>Fix &mdash; wrap in quotes and prefix with <code>&amp;</code>:</strong>
+    <pre style="margin:8px 0 0"><code># Wrong (space breaks the path)
+C:\Users\John Kamau\AppData\...\python.exe -m pip install ...
+
+# Correct
+&amp; "C:\Users\John Kamau\AppData\Local\Python\pythoncore-3.14-64\python.exe" -m pip install --upgrade pip
+&amp; "C:\Users\John Kamau\AppData\Local\Python\pythoncore-3.14-64\python.exe" -m pip install python-docx openpyxl pymupdf</code></pre>
+  </div></div>
+
+</div>
+
+<!-- ─── 04 FEATURES ───────────────────────────────────── -->
+<div class="sec" id="features">
+  <div class="sec-lbl">Section 04</div>
+  <div class="sec-h">Feature Overview</div>
+  <p class="sec-lead">AI receipt processing combined with a full Kenya accounting engine. Everything local.</p>
+  <div class="cg">
+    <div class="fc"><div class="fi">🤖</div><div class="ft">AI Receipt Extraction</div><div class="fd">Qwen 2.5 AI extracts vendor, date, amount, VAT, category and payment method. Regex fallback if Ollama is offline.</div></div>
+    <div class="fc"><div class="fi">📧</div><div class="ft">Gmail Auto-Fetch</div><div class="fd">Read-only Gmail scan fetches receipt attachments every 5 minutes in watch mode. Nothing written to Google.</div></div>
+    <div class="fc"><div class="fi">📊</div><div class="ft">Excel Database</div><div class="fd">Every receipt stored in a colour-coded Excel workbook. No SQL, no server, no subscription.</div></div>
+    <div class="fc"><div class="fi">🏛️</div><div class="ft">KRA eTIMS Export</div><div class="fd">8-sheet KRA workbook: VAT-3, PAYE, NSSF/SHIF/AHL, WHT, Corporate Tax, Instalments — Finance Act 2024.</div></div>
+    <div class="fc"><div class="fi">📒</div><div class="ft">Double-Entry Ledger <div class="nb">New</div></div><div class="fd">Every receipt auto-posts DR/CR journal entries. VAT split posted as a separate line automatically.</div></div>
+    <div class="fc"><div class="fi">📂</div><div class="ft">Chart of Accounts <div class="nb">New</div></div><div class="fd">45-account Kenya COA pre-built. Assets 1xxx · Liabilities 2xxx · Equity 3xxx · Revenue 4xxx · Expenses 5xxx.</div></div>
+    <div class="fc"><div class="fi">📈</div><div class="ft">P&amp;L Statement <div class="nb">New</div></div><div class="fd">Auto-generated monthly P&amp;L from expense data. Written to Excel P&amp;L sheet. Input VAT calculated separately.</div></div>
+    <div class="fc"><div class="fi">⚖️</div><div class="ft">Balance Sheet <div class="nb">New</div></div><div class="fd">Assets, Liabilities, Equity snapshot with in-balance check. Regenerate any time.</div></div>
+    <div class="fc"><div class="fi">🎯</div><div class="ft">Budget vs Actual <div class="nb">New</div></div><div class="fd">Monthly budgets per category. System flags ⚠ OVER BUDGET or ⚠ 80%+ USED automatically.</div></div>
+    <div class="fc"><div class="fi">🔁</div><div class="ft">Bank Reconciliation <div class="nb">New</div></div><div class="fd">Reconciliation worksheet pre-filled from expenses. Add bank refs, mark confirmed. Audit-logged.</div></div>
+    <div class="fc"><div class="fi">🔍</div><div class="ft">Audit Trail <div class="nb">New</div></div><div class="fd">Every action logged permanently: receipt posted, reconciled, tagged, budget changed — with timestamp and machine name.</div></div>
+    <div class="fc"><div class="fi">💱</div><div class="ft">Multi-Currency <div class="nb">New</div></div><div class="fd">10 currencies (USD, EUR, GBP, TZS, UGX, ZAR, CNY, AED, INR, KES). Dashboard shows USD/EUR equivalents.</div></div>
+    <div class="fc"><div class="fi">🏷️</div><div class="ft">Transaction Tags <div class="nb">New</div></div><div class="fd">Tag any row with free-form labels like <code>capex,q1,approved</code>. Searchable in the dashboard.</div></div>
+    <div class="fc"><div class="fi">👥</div><div class="ft">Multi-Client Registry</div><div class="fd">Unlimited clients, each with isolated folders, Excel workbook, billing tier, and separate inbox.</div></div>
+  </div>
+</div>
+
+<!-- ─── 05 ACCOUNTING ENGINE ──────────────────────────── -->
+<div class="sec" id="accounting">
+  <div class="sec-lbl">Section 05</div>
+  <div class="sec-h">Accounting Engine <span class="snew">New</span></div>
+  <p class="sec-lead">Inspired by Bkper's double-entry model — Chart of Accounts, ledger, P&amp;L, Balance Sheet, budgets, reconciliation, and audit trail — all inside your local Excel workbook.</p>
+
+  <div class="card">
+    <div class="ct">📒 Double-Entry — How It Works</div>
+    <div class="cd">Every receipt creates a journal entry pair automatically. No manual entry needed.</div>
+    <table style="margin-top:12px">
+      <tr><th>Receipt</th><th>Debit (DR)</th><th>Credit (CR)</th></tr>
+      <tr><td>Shell fuel KES 8,500 via M-Pesa</td><td>5010 Fuel — KES 7,328 (net)</td><td>1002 M-Pesa Float — KES 7,328</td></tr>
+      <tr><td>VAT portion KES 1,172</td><td>2110 Input VAT Recoverable</td><td>1002 M-Pesa Float</td></tr>
+      <tr><td>Office supplies KES 3,400 via Card</td><td>5001 Office Supplies</td><td>1010 Bank (KCB)</td></tr>
+      <tr><td>Rent KES 45,000 via EFT</td><td>5011 Rent &amp; Occupancy</td><td>1010 Bank</td></tr>
+    </table>
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <div class="ct">📂 Kenya Chart of Accounts (45 accounts, pre-built)</div>
+    <table>
+      <tr><th>Codes</th><th>Type</th><th>Examples</th></tr>
+      <tr><td>1xxx</td><td>Assets</td><td>Cash in Hand, M-Pesa Float, Bank KCB/Equity/Co-op, Receivables, Fixed Assets</td></tr>
+      <tr><td>2xxx</td><td>Liabilities</td><td>VAT Payable, PAYE, NSSF, SHIF, AHL, WHT, Income Tax, Short-term Loans</td></tr>
+      <tr><td>3xxx</td><td>Equity</td><td>Share Capital, Retained Earnings, Current Year P&amp;L</td></tr>
+      <tr><td>4xxx</td><td>Revenue</td><td>Sales Revenue, Service Revenue, Other Income, Interest Income</td></tr>
+      <tr><td>5xxx</td><td>Expenses</td><td>All 14 receipt categories + Salaries, NSSF/SHIF/AHL employer portions</td></tr>
+    </table>
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <div class="ct">💱 FX Rates vs KES (indicative)</div>
+    <table>
+      <tr><th>Currency</th><th>1 unit = KES</th><th>Currency</th><th>1 unit = KES</th></tr>
+      <tr><td>USD</td><td>129.50</td><td>TZS</td><td>0.050</td></tr>
+      <tr><td>EUR</td><td>140.20</td><td>UGX</td><td>0.033</td></tr>
+      <tr><td>GBP</td><td>163.80</td><td>ZAR</td><td>7.10</td></tr>
+      <tr><td>AED</td><td>35.30</td><td>CNY</td><td>17.80</td></tr>
+      <tr><td>INR</td><td>1.56</td><td>KES</td><td>1.00 (base)</td></tr>
+    </table>
+    <p style="margin-top:9px;font-size:12.5px;color:var(--mu)">Update <code>_FX_RATES</code> in taxbot.py for current live rates.</p>
+  </div>
+</div>
+
+<!-- ─── 06 COMMANDS ───────────────────────────────────── -->
+<div class="sec" id="commands">
+  <div class="sec-lbl">Section 06</div>
+  <div class="sec-h">All Commands</div>
+  <p class="sec-lead">Run from <code>C:\MyERP\</code> in PowerShell. All accept optional <code>[client_id]</code> and <code>--month YYYY-MM</code>.</p>
+
+  <div style="border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;background:var(--white);box-shadow:var(--sh0);margin-bottom:24px">
+    <div style="background:var(--glt);padding:9px 14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g2);border-bottom:1px solid var(--bd)">Setup &amp; Administration</div>
+    <table style="border-radius:0;box-shadow:none;border:none;margin:0">
+      <tr><td><code>python taxbot.py setup</code></td><td>Install packages, fix PATH, configure Gmail OAuth</td></tr>
+      <tr><td><code>python taxbot.py add-client</code></td><td>Register a new client (guided wizard)</td></tr>
+      <tr><td><code>python taxbot.py status</code></td><td>Show all clients with monthly spend summary</td></tr>
+      <tr><td><code>python taxbot.py demo</code></td><td>Load 4 demo clients with sample data</td></tr>
+    </table>
+    <div style="background:var(--glt);padding:9px 14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g2);border-top:1px solid var(--bd);border-bottom:1px solid var(--bd)">Receipt Processing</div>
+    <table style="border-radius:0;box-shadow:none;border:none;margin:0">
+      <tr><td><code>python taxbot.py watch</code></td><td>Continuous watch — inbox folders + Gmail every 5 min</td></tr>
+      <tr><td><code>python taxbot.py scan-gmail</code></td><td>One-shot Gmail scan for all clients, then process inboxes</td></tr>
+      <tr><td><code>python taxbot.py process</code></td><td>Process all pending receipts in all inboxes</td></tr>
+    </table>
+    <div style="background:var(--glt);padding:9px 14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g2);border-top:1px solid var(--bd);border-bottom:1px solid var(--bd)">Accounting &amp; Reporting</div>
+    <table style="border-radius:0;box-shadow:none;border:none;margin:0">
+      <tr><td><code>python taxbot.py monthly [id]</code></td><td><strong style="color:#006633">&#x2B50; Run ALL month-end steps in one command</strong> &mdash; pl &rarr; bs &rarr; tb &rarr; coa &rarr; recon &rarr; handover, then launches KRA eTIMS pre-filled. Use this instead of running each step manually.</td></tr>
+      <tr><td><code>python taxbot.py months [id]</code></td><td><strong>List all months with data</strong> &mdash; run this first to see what periods have transactions before running pl/tb</td></tr>
+      <tr><td><code>python taxbot.py pl [id]</code></td><td>P&amp;L &rarr; written as a <em>sheet</em> in the client workbook (auto-detects latest month with data). Prints exact file path.</td></tr>
+      <tr><td><code>python taxbot.py bs [id]</code></td><td>Balance Sheet sheet &mdash; prints exact workbook path. If assets are negative, post opening bank balance in Ledger first.</td></tr>
+      <tr><td><code>python taxbot.py tb [id]</code></td><td>Trial Balance sheet</td></tr>
+      <tr><td><code>python taxbot.py coa [id]</code></td><td>Refresh Chart of Accounts sheet with live Ledger balances</td></tr>
+      <tr><td><code>python taxbot.py budget [id]</code></td><td>Budget vs Actual alerts</td></tr>
+      <tr><td><code>python taxbot.py recon [id]</code></td><td>Initialise Reconciliation sheet &mdash; prints workbook path</td></tr>
+      <tr><td><code>python taxbot.py handover [id]</code></td><td>Accountant handover .docx + .txt &rarr; saved to <code>clients\&lt;id&gt;\reports\</code></td></tr>
+      <tr><td><code>python taxbot.py audit [id]</code></td><td>Show audit log location</td></tr>
+      <tr><td><code>python taxbot.py fx</code></td><td>FX rates vs KES</td></tr>
+    </table>
+    <div style="background:var(--glt);padding:9px 14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g2);border-top:1px solid var(--bd);border-bottom:1px solid var(--bd)">KRA eTIMS &amp; Billing</div>
+    <table style="border-radius:0;box-shadow:none;border:none;margin:0">
+      <tr><td><code>python taxbot.py kra-input [id]</code></td><td><strong>Generate KRA Excel input template</strong> &mdash; pre-filled from client registry. Open in Excel, complete yellow cells, then run <code>kra-run</code>. Works for every client.</td></tr>
+      <tr><td><code>python taxbot.py kra-run [id]</code></td><td><strong>Run KRA generator from Excel template</strong> &mdash; reads the filled template and produces all 8 KRA sheets. No interactive questions.</td></tr>
+      <tr><td><code>python taxbot.py tax [id]</code></td><td>Interactive KRA questionnaire (pre-filled from registry) &mdash; alternative to kra-input/kra-run</td></tr>
+      <tr><td><code>python taxbot.py billing</code></td><td>Generate monthly invoice Excel for all clients</td></tr>
+      <tr><td><code>python taxbot.py dashboard</code></td><td>Launch Streamlit dashboard at localhost:8501</td></tr>
+    </table>
+  </div>
+
+  <div class="al info" style="margin-bottom:16px"><span class="ai">📂</span><div>
+    <strong>Reports are SHEETS inside one workbook &mdash; not separate files.</strong><br>
+    After every command, TaxBot prints the exact file path and sheet name.<br>
+    Location: <code>C:\MyERP\clients\&lt;id&gt;\db\&lt;id&gt;_expenses.xlsx</code>
+  </div></div>
+
+<span class="cmut"># ONE COMMAND FOR THE FULL MONTH-END SEQUENCE (works for any client)</span>
+<span class="cb">python</span> taxbot.py monthly <span class="cgo">&lt;client_id&gt;</span> <span class="cgo">--month YYYY-MM</span>
+<span class="cmut"># Runs: months -&gt; P&amp;L -&gt; BS -&gt; Trial Balance -&gt; COA -&gt; Recon -&gt; Handover note</span>
+<span class="cmut"># Then asks: launch KRA eTIMS? (pre-filled from registry)</span>
+<span class="cmut"># Omit &lt;client_id&gt; to pick from a numbered list of all registered clients.</span>
+
+  <pre><code><span class="cmut"># Step 0 &mdash; see what months have data (run this first if P&amp;L shows zero)</span>
+<span class="cb">python</span> taxbot.py months <span class="cgo">&lt;client_id&gt;</span>
+
+<span class="cmut"># P&amp;L &mdash; auto-detects most recent month with data</span>
+<span class="cb">python</span> taxbot.py pl <span class="cgo">&lt;client_id&gt;</span>
+
+<span class="cmut"># Or target a specific month once you know it from 'months'</span>
+<span class="cb">python</span> taxbot.py pl <span class="cgo">&lt;client_id&gt;</span> <span class="cgo">--month YYYY-MM</span>
+
+<span class="cmut"># Trial Balance</span>
+<span class="cb">python</span> taxbot.py tb <span class="cgo">&lt;client_id&gt;</span> <span class="cgo">--month YYYY-MM</span>
+
+<span class="cmut"># Handover note for accountant</span>
+<span class="cb">python</span> taxbot.py handover <span class="cgo">&lt;client_id&gt;</span> <span class="cgo">--month YYYY-MM</span>
+
+<span class="cmut"># KRA eTIMS &mdash; Step 1: generate pre-filled Excel template</span>
+<span class="cb">python</span> taxbot.py kra-input <span class="cgo">&lt;client_id&gt;</span>
+<span class="cmut"># KRA eTIMS &mdash; Step 2: run after filling the Excel (no interactive questions)</span>
+<span class="cb">python</span> taxbot.py kra-run <span class="cgo">&lt;client_id&gt;</span>
+<span class="cmut"># Replace &lt;client_id&gt; with any registered client, e.g. mama_mboga_organics</span>
+<span class="cmut"># Or omit it entirely &mdash; TaxBot shows a numbered list and you pick.</span></code></pre>
+</div>
+
+<!-- ─── 07 RECEIPTS ───────────────────────────────────── -->
+<div class="sec" id="receipts">
+  <div class="sec-lbl">Section 07</div>
+  <div class="sec-h">Processing Receipts</div>
+  <p class="sec-lead">Three ingestion paths. All converge at the same AI extraction pipeline.</p>
+  <div class="cg" style="grid-template-columns:repeat(3,1fr)">
+    <div class="fc"><div class="fi">📁</div><div class="ft">Folder Drop</div><div class="fd">Drop files into <code>clients\&lt;id&gt;\inbox\</code>. Detected within 2 seconds.</div></div>
+    <div class="fc"><div class="fi">📧</div><div class="ft">Email Forward</div><div class="fd">Client forwards to your Gmail. TaxBot fetches attachments every 5 min in watch mode.</div></div>
+    <div class="fc"><div class="fi">⚡</div><div class="ft">Manual Scan</div><div class="fd"><code>python taxbot.py process</code> for an immediate one-shot scan.</div></div>
+  </div>
+  <div class="card">
+    <div class="ct">📄 Supported Formats</div>
+    <table>
+      <tr><th>Format</th><th>Processing</th><th>Requires</th></tr>
+      <tr><td>.jpg .jpeg .png .bmp .gif .tiff .webp</td><td>Tesseract OCR → Qwen AI</td><td>Tesseract installed</td></tr>
+      <tr><td>.pdf</td><td>PyMuPDF text extraction → Qwen AI</td><td>Nothing extra</td></tr>
+      <tr><td>.txt .csv</td><td>Direct read → Qwen AI or regex fallback</td><td>Nothing extra</td></tr>
+    </table>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <div class="ct">🔄 Processing Pipeline (per file)</div>
+    <div class="cd">
+      <ol style="margin:8px 0 0 16px;line-height:2.2">
+        <li>File detected in <code>inbox\</code></li>
+        <li>MD5 hash checked — duplicates skipped</li>
+        <li>OCR or text extraction</li>
+        <li>AI extracts: vendor, date, amount, VAT, category, payment method, confidence</li>
+        <li>Row written to Excel (status OK or REVIEW)</li>
+        <li>Double-entry journal entry posted to Ledger sheet</li>
+        <li>Audit log entry created (AuditLog sheet)</li>
+        <li>File moved to <code>processed\</code> or <code>failed\</code></li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<!-- ─── 08 DASHBOARD ──────────────────────────────────── -->
+<div class="sec" id="dashboard">
+  <div class="sec-lbl">Section 08</div>
+  <div class="sec-h">Dashboard Guide</div>
+  <p class="sec-lead">Run <code>python taxbot.py dashboard</code> or double-click <code>dashboard.bat</code>. Opens at <strong>http://localhost:8501</strong>.</p>
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="ct">🗂️ Sidebar Controls</div>
+    <div class="cd">
+      <ul style="margin:8px 0 0 16px;line-height:2.2">
+        <li><strong>Client dropdown</strong> — select individual client or "📊 All Clients" for aggregate view</li>
+        <li><strong>Month</strong> — filter all views to a specific month (YYYY-MM)</li>
+        <li><strong>Refresh Data</strong> — clears cache and reloads from Excel</li>
+        <li><strong>Quick Actions</strong> — Generate P&amp;L, Refresh COA, Init Reconciliation buttons (single-client mode)</li>
+        <li><strong>FX Rates</strong> — live indicative rates vs KES shown in sidebar</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="ct">📋 Single-Client Tabs (10 tabs)</div>
+    <div class="tab-l">
+      <div class="tab-i"><div class="tab-ic">📋</div><div><div class="tab-t">Transactions</div><div class="tab-d">Full table with category/payment/vendor filters. Spend-by-category bar and payment method pie chart.</div></div></div>
+      <div class="tab-i"><div class="tab-ic">📊</div><div><div class="tab-t">P&amp;L Statement <span class="snew">New</span></div><div class="tab-d">Auto-generated P&amp;L. Generate button writes to Excel. Revenue cards, expense table, waterfall chart.</div></div></div>
+      <div class="tab-i"><div class="tab-ic">🏛️</div><div><div class="tab-t">Balance Sheet <span class="snew">New</span></div><div class="tab-d">Assets/Liabilities/Equity snapshot with in-balance check. Expandable account sections.</div></div></div>
+      <div class="tab-i"><div class="tab-ic">📂</div><div><div class="tab-t">Chart of Accounts <span class="snew">New</span></div><div class="tab-d">Full 45-account Kenya COA with live Ledger balances. Grouped by type. Refresh button.</div></div></div>
+      <div class="tab-i"><div class="tab-ic">🎯</div><div><div class="tab-t">Budget vs Actual <span class="snew">New</span></div><div class="tab-d">Set budgets per category via in-app form. Live over-budget alerts. Grouped comparison bar chart.</div></div></div>
+      <div class="tab-i"><div class="tab-ic">🔁</div><div><div class="tab-t">Reconciliation <span class="snew">New</span></div><div class="tab-d">Mark transactions reconciled with bank refs. Shows reconciled/unreconciled counts. Audit-logged.</div></div></div>
+      <div class="tab-i"><div class="tab-ic">📒</div><div><div class="tab-t">Ledger <span class="snew">New</span></div><div class="tab-d">All double-entry journal entries. Filter by debit account. Balance check indicator.</div></div></div>
+      <div class="tab-i"><div class="tab-ic">🔍</div><div><div class="tab-t">Audit Trail <span class="snew">New</span></div><div class="tab-d">Permanent log of every action. Filter by action type. Sorted newest-first.</div></div></div>
+      <div class="tab-i"><div class="tab-ic">⚠️</div><div><div class="tab-t">Review Queue</div><div class="tab-d">REVIEW-flagged transactions needing manual correction before filing.</div></div></div>
+      <div class="tab-i"><div class="tab-ic">⬇️</div><div><div class="tab-t">Export</div><div class="tab-d">Download CSV or Excel. KRA eTIMS command reference. P&amp;L/Balance Sheet command links.</div></div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ct">📊 All-Clients Overview</div>
+    <div class="cd">Select <strong>"📊 All Clients"</strong> in the sidebar for aggregate view: total spend, spend-by-client chart, category pie, summary table with budget alert counts per client.</div>
+  </div>
+</div>
+
+<!-- ─── 09 GMAIL ───────────────────────────────────────── -->
+<div class="sec" id="gmail">
+  <div class="sec-lbl">Section 09</div>
+  <div class="sec-h">Gmail Setup (Read-Only)</div>
+  <p class="sec-lead">Optional. Connects to Gmail to auto-fetch receipt attachments. Read-only — nothing is ever written, moved, or deleted in Gmail.</p>
+  <div class="al ok"><span class="ai">✅</span><div><strong>Gmail is optional.</strong> Local folder drop works fully without it. Add Gmail later any time by re-running setup.</div></div>
+  <div class="steps" style="margin-top:16px">
+    <div class="step"><div class="sth">Create a Google Cloud project</div><div class="stb"><p>Open <strong>https://console.cloud.google.com/</strong> → "Select a project" → "NEW PROJECT" → name it <strong>TaxBot</strong> → Create.</p></div></div>
+    <div class="step"><div class="sth">Enable the Gmail API</div><div class="stb"><p>Left sidebar → "APIs &amp; Services" → "Library" → search <strong>Gmail API</strong> → ENABLE.</p></div></div>
+    <div class="step"><div class="sth">Create OAuth credentials</div><div class="stb">
+      <p>Left sidebar → "Credentials" → "+ CREATE CREDENTIALS" → "OAuth 2.0 Client ID"</p>
+      <p>Application type: <strong>Desktop app</strong> · Name: <strong>TaxBot Desktop</strong> → CREATE</p>
+      <p>Click the download ⬇ icon → rename file to <strong>gmail_credentials.json</strong> → copy to <code>C:\MyERP\</code></p>
+    </div></div>
+    <div class="step"><div class="sth">Add your email as a Test User</div><div class="stb">
+      <p>Left sidebar → "OAuth consent screen" → "Test users" → "+ ADD USERS" → enter your Gmail → SAVE.</p>
+      <div class="al warn"><span class="ai">⚠️</span><div><strong>Required.</strong> Without this step, authentication returns "Access blocked: app not verified".</div></div>
+    </div></div>
+    <div class="step"><div class="sth">Authenticate from TaxBot</div><div class="stb">
+      <pre><code><span class="cb">python</span> taxbot.py setup
+<span class="cmut"># Follow prompts to step 8
+# Press ENTER → browser opens → sign in → grant read access
+# Token saved to gmail_token.json (auto-refreshes)</span></code></pre>
+      <div class="al ok"><span class="ai">✅</span><div>Success: <strong>"Gmail connected: accountant@yourdomain.com"</strong> and <strong>"Read-only confirmed"</strong>.</div></div>
+    </div></div>
+  </div>
+</div>
+
+<!-- ─── 10 CLIENTS ────────────────────────────────────── -->
+<div class="sec" id="clients">
+  <div class="sec-lbl">Section 10</div>
+  <div class="sec-h">Managing Clients</div>
+  <div class="card">
+    <div class="ct">➕ Add a New Client</div>
+    <div class="cd"><pre style="margin-top:10px"><code><span class="cb">python</span> taxbot.py add-client
+<span class="cmut"># Prompts: company name, KRA PIN, email, phone, county,
+#          accountant, tier, employees, VAT status, sector</span></code></pre></div>
+  </div>
+  <div class="ft" style="margin-top:14px">
+<span class="d">C:\MyERP\</span><br>
+├── <span class="d">clients\</span><br>
+│   ├── <span class="d">&lt;client_id&gt;\</span>   <span class="cm">← one folder per client</span><br>
+│   │   ├── <span class="d">db\</span>           <span class="cm">← &lt;client_id&gt;_expenses.xlsx</span><br>
+│   │   ├── <span class="d">inbox\</span>    <span class="cm">← Drop receipts here</span><br>
+│   │   ├── <span class="d">processed\</span><br>
+│   │   ├── <span class="d">failed\</span><br>
+│   │   └── <span class="f">usage.json</span>  <span class="cm">← Billing usage log</span><br>
+├── <span class="f">clients.json</span>   <span class="cm">← Client registry</span><br>
+└── <span class="d">logs\taxbot.log</span>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <div class="ct">📊 Excel Workbook Sheets (per client)</div>
+    <table>
+      <tr><th>Sheet</th><th>Contents</th><th>Created when</th></tr>
+      <tr><td>Expenses</td><td>Main receipt register</td><td>First receipt processed</td></tr>
+      <tr><td>Ledger</td><td>Double-entry journal entries</td><td>First receipt processed</td></tr>
+      <tr><td>AuditLog</td><td>All actions logged</td><td>First action</td></tr>
+      <tr><td>COA</td><td>Chart of Accounts with live balances</td><td><code>coa</code> command</td></tr>
+      <tr><td>P&amp;L</td><td>Monthly Profit &amp; Loss</td><td><code>pl</code> command</td></tr>
+      <tr><td>BalanceSheet</td><td>Balance Sheet snapshot</td><td><code>bs</code> command</td></tr>
+      <tr><td>Budgets</td><td>Budget targets vs actuals</td><td>First budget set</td></tr>
+      <tr><td>Reconciliation</td><td>Bank reconciliation workspace</td><td><code>recon</code> command</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ─── 11 KRA ─────────────────────────────────────────── -->
+<div class="sec" id="kra">
+  <div class="sec-lbl">Section 11</div>
+  <div class="sec-h">KRA eTIMS Workbook</div>
+  <p class="sec-lead">8-sheet KRA workbook, pre-filled from the client registry and processed receipts. Works for <strong>every client</strong> — just swap <code>&lt;client_id&gt;</code>. Finance Act 2024 rates throughout.</p>
+
+  <div class="al info" style="margin-bottom:16px"><span class="ai">⭐</span><div>
+    <strong>Two-step workflow (recommended for all clients):</strong><br>
+    Step 1: <code>python taxbot.py kra-input &lt;client_id&gt;</code> — generates a pre-filled Excel input file.<br>
+    Step 2: Open the Excel, add invoices / employees / WHT entries, then:<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>python taxbot.py kra-run &lt;client_id&gt;</code> — reads the Excel, generates all 8 KRA sheets. No interactive questions.<br>
+    Or: <code>python taxbot.py tax &lt;client_id&gt;</code> to launch the interactive questionnaire (pre-filled from registry).
+  </div></div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="ct">🗂️ Step-by-Step: Any Client</div>
+    <div class="cd">
+    <pre><code><span class="cmut"># 1. Generate the Excel input template (pre-filled from this client&#39;s registry)</span>
+<span class="cb">python</span> taxbot.py kra-input <span class="cgo">&lt;client_id&gt;</span>
+<span class="cmut">#    Saves to: clients\&lt;client_id&gt;	ax_templates\KRA_Input_Template.xlsx</span>
+<span class="cmut">#    Known fields auto-filled: name, KRA PIN, sector, address, email, turnover,</span>
+<span class="cmut">#    VAT status, entity type, and total expenses from processed receipts.</span>
+
+<span class="cmut"># 2. Open KRA_Input_Template.xlsx in Excel.</span>
+<span class="cmut">#    Complete the yellow cells:</span>
+<span class="cmut">#      - 👥 Employees sheet: add each employee (name, PIN, salary)</span>
+<span class="cmut">#      - 🏦 WHT Payments: add payments to consultants, landlords etc.</span>
+<span class="cmut">#      - 🧾 Invoices: add sales invoices for the period</span>
+<span class="cmut">#      - 💰 VAT &amp; Financials: fill VAT supplies + financial statement figures</span>
+<span class="cmut">#    Formulas auto-calculate NSSF/SHIF/AHL/PAYE/VAT totals as you type.</span>
+
+<span class="cmut"># 3. Run the generator (reads the Excel, no interactive questions)</span>
+<span class="cb">python</span> taxbot.py kra-run <span class="cgo">&lt;client_id&gt;</span>
+<span class="cmut">#    Output: clients\&lt;client_id&gt;	ax_templates\&lt;prefix&gt;_KRA_eTIMS_YYYYMMDD_HHMM.xlsx</span>
+<span class="cmut">#    Sheets: Tax Dashboard, eTIMS Invoices, VAT Computation,</span>
+<span class="cmut">#            WHT Register, PAYE Payroll, Corp Tax IT1, Tax Planning, Compliance Cal</span>
+
+<span class="cmut"># To redo just one client&#39;s template:</span>
+<span class="cb">python</span> taxbot.py kra-input <span class="cgo">&lt;client_id&gt;</span>
+<span class="cmut"># Works identically for every registered client — just change &lt;client_id&gt;</span>
+<span class="cmut"># If you omit &lt;client_id&gt;, TaxBot shows a numbered list and you pick.</span>
+</code></pre>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="ct">📋 What &lt;client_id&gt; Means</div>
+    <div class="cd">
+    <p>The client ID is the short identifier created when you ran <code>add-client</code>. It's the folder name under <code>C:\MyERP\clients\</code>. Examples: <code>savanna_tech_solutio</code>, <code>coastal_freight___lo</code>, <code>mama_mboga_organics</code>.</p>
+    <p>You can always <strong>omit the client ID</strong> — TaxBot shows a numbered list and you pick:</p>
+    <pre><code><span class="cb">python</span> taxbot.py kra-input
+<span class="cmut">  1. savanna_tech_solutio  — Savanna Tech Solutions Ltd</span>
+<span class="cmut">  2. coastal_freight___lo  — Coastal Freight &amp; Logistics</span>
+<span class="cmut">  3. mama_mboga_organics   — Mama Mboga Organics</span>
+<span class="cmut">  Enter client number or ID: 2</span></code></pre>
+    <p>Or pass the number directly: <code>python taxbot.py kra-input 2</code></p>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="ct">📑 KRA Input Template — 6 Sheets</div>
+    <table style="margin:0">
+      <tr><th>Sheet</th><th>Section</th><th>What to fill</th></tr>
+      <tr><td>📋 Instructions</td><td>—</td><td>Read-only guide + Finance Act 2024 rate reference</td></tr>
+      <tr><td>🏢 Business Profile</td><td>1, 2, 8</td><td>Company name, KRA PIN, sector, period — <em>auto-filled from registry</em></td></tr>
+      <tr><td>💰 VAT &amp; Financials</td><td>3, 7</td><td>VAT supplies breakdown + P&amp;L inputs for Corp Tax. Expenses auto-filled from receipts.</td></tr>
+      <tr><td>👥 Employees</td><td>4</td><td>One row per employee. NSSF/SHIF/AHL/PAYE calculated by formula as you type.</td></tr>
+      <tr><td>🏦 WHT Payments</td><td>5</td><td>Payments to consultants, landlords, non-residents. WHT rate dropdown; amounts auto-calculate.</td></tr>
+      <tr><td>🧾 Invoices</td><td>6</td><td>eTIMS invoices for the period. VAT amount and inclusive total auto-calculate.</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="ct">📊 Output — 8 KRA Sheets</div>
+    <table style="margin:0">
+      <tr><th>Sheet</th><th>Contents</th><th>Rate / Rule</th></tr>
+      <tr><td>📊 Tax Dashboard</td><td>Summary of all tax liabilities for the period</td><td>All types consolidated</td></tr>
+      <tr><td>🧾 eTIMS Invoices</td><td>Invoice register with VAT and UIN</td><td>Penalty: 50% of tax on non-eTIMS invoices</td></tr>
+      <tr><td>💼 VAT Computation</td><td>Output VAT, Input VAT, VAT-3 return</td><td>16% standard; fuel input 50% restricted</td></tr>
+      <tr><td>🏦 WHT Register</td><td>Withholding tax schedule by payee</td><td>Resident consultancy 5%; non-res 20%; rent 10%</td></tr>
+      <tr><td>👥 PAYE Payroll</td><td>P9A: gross, deductions, net, PAYE per employee</td><td>5 bands 10/25/30/32.5/35%; personal relief KES 2,400/mo</td></tr>
+      <tr><td>🏢 Corp Tax IT1</td><td>Taxable income, instalment schedule</td><td>30% standard; 25% NSE &lt;3yr; 10% SEZ; TOT 1%</td></tr>
+      <tr><td>💡 Tax Planning</td><td>Personalised strategies and savings opportunities</td><td>Finance Acts 2023 &amp; 2024</td></tr>
+      <tr><td>📅 Compliance Cal</td><td>All due dates for the financial year</td><td>Instalments: 20 Apr/Jun/Sep/Dec</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ─── 12 MAINTENANCE ────────────────────────────────── -->
+<div class="sec" id="maintenance">
+  <div class="sec-lbl">Section 12</div>
+  <div class="sec-h">Monthly Routine</div>
+  <div class="card" style="margin-bottom:14px">
+    <div class="ct">📅 Month-End Checklist (per client, ~15 min)</div>
+    <div class="cd"><ol style="margin:10px 0 0 16px;line-height:2.3">
+      <li><strong>Run the full sequence in one command:</strong> <code>python taxbot.py monthly &lt;id&gt; --month YYYY-MM</code> &mdash; this does steps 2&ndash;8 below automatically. Only run individual steps if you need to redo one specific report.</li>
+      <li>Fix REVIEW rows: open <code>C:\MyERP\clients\&lt;id&gt;\db\&lt;id&gt;_expenses.xlsx</code> &rarr; Expenses tab &rarr; fix flagged rows</li>
+      <li>Check what months have data: <code>python taxbot.py months &lt;id&gt;</code></li>
+      <li>P&amp;L: <code>python taxbot.py pl &lt;id&gt;</code> &mdash; auto-detects latest month. TaxBot prints the workbook path and sheet name.</li>
+      <li>Balance Sheet: <code>python taxbot.py bs &lt;id&gt;</code> &mdash; if assets show negative, post opening bank balance in Ledger sheet first</li>
+      <li>Trial Balance: <code>python taxbot.py tb &lt;id&gt; --month YYYY-MM</code></li>
+      <li>Chart of Accounts: <code>python taxbot.py coa &lt;id&gt;</code></li>
+      <li>Bank reconciliation: <code>python taxbot.py recon &lt;id&gt;</code> then open workbook &rarr; Reconciliation tab</li>
+      <li>KRA eTIMS workbook &mdash; two steps:<br>
+        &nbsp;&nbsp;a. <code>python taxbot.py kra-input &lt;id&gt;</code> &mdash; generates Excel template pre-filled from registry<br>
+        &nbsp;&nbsp;b. Open <code>clients\&lt;id&gt;	ax_templates\KRA_Input_Template.xlsx</code> &mdash; add employees, invoices, WHT payments<br>
+        &nbsp;&nbsp;c. <code>python taxbot.py kra-run &lt;id&gt;</code> &mdash; reads Excel, generates all 8 KRA sheets<br>
+        &nbsp;&nbsp;<em>Or use</em> <code>python taxbot.py tax &lt;id&gt;</code> for the interactive questionnaire (also pre-filled)</li>
+      <li>Handover note: <code>python taxbot.py handover &lt;id&gt; --month YYYY-MM</code> &rarr; saved to <code>clients\&lt;id&gt;\reports\</code></li>
+      <li>Generate billing invoice: <code>python taxbot.py billing</code></li>
+      <li>Back up workbook to OneDrive or external drive</li>
+    </ol></div>
+  </div>
+  <div class="card">
+    <div class="ct">🔧 Regular Maintenance</div>
+    <pre><code><span class="cmut"># Monthly — run QA to verify system health</span>
+<span class="cb">python</span> qa_full.py --report  <span class="cmut"># 287 tests · 100% expected</span>
+
+<span class="cmut"># Update Ollama model</span>
+ollama pull qwen2.5:3b
+
+<span class="cmut"># Check error log</span>
+type C:\MyERP\logs\taxbot.log | findstr ERROR
+
+<span class="cmut"># Weekly backup</span>
+<span class="cb">for</span> /d %%d in (C:\MyERP\clients\*) <span class="cb">do</span> copy "%%d\db\*.xlsx" "D:\Backups\%%~nxd\"</code></pre>
+  </div>
+</div>
+
+<!-- ─── 13 TROUBLESHOOTING ────────────────────────────── -->
+<div class="sec" id="troubleshoot">
+  <div class="sec-lbl">Section 13</div>
+  <div class="sec-h">Troubleshooting</div>
+
+  <div class="card"><div class="ct">❌ "python is not recognized"</div><div class="cd">
+    <p><strong>Cause:</strong> Python not in PATH. Common with Python 3.14 (winget install at <code>pythoncore-3.14-64</code>).</p>
+    <p><strong>Fix:</strong> Double-click <code>FIX.bat</code>. It scans all known install paths including <code>%LOCALAPPDATA%\Python\*</code>, fixes PATH permanently, and creates launcher .bat files.</p>
+  </div></div>
+
+  <div class="card" style="margin-top:12px"><div class="ct">❌ "streamlit is not recognized" after install</div><div class="cd">
+    <p><strong>Cause:</strong> Scripts folder not in PATH. Packages installed but tools not findable.</p>
+    <p><strong>Fix:</strong> Run <code>python taxbot.py setup</code> (auto-adds Scripts dir). Or just use <code>dashboard.bat</code> — it uses exact path, no PATH needed.</p>
+  </div></div>
+
+  <div class="card" style="margin-top:12px"><div class="ct">❌ "Google API libraries not installed" after setup</div><div class="cd">
+    <p><strong>Cause:</strong> Python cached GMAIL_OK=False before packages were installed. This is now fixed — setup reloads libs in the same session.</p>
+    <p><strong>Fix:</strong> Open a <strong>new</strong> PowerShell window and run <code>python taxbot.py setup</code> again.</p>
+  </div></div>
+
+  <div class="card" style="margin-top:12px"><div class="ct">❌ "Auth returned None — check credentials file"</div><div class="cd">
+    <p>Checklist:</p>
+    <ul style="margin:8px 0 0 16px;line-height:2.1">
+      <li>File is named exactly <code>gmail_credentials.json</code></li>
+      <li>File is in <code>C:\MyERP\</code> (same folder as taxbot.py)</li>
+      <li>Your Gmail was added to "Test users" in Google Cloud OAuth consent screen</li>
+      <li>Gmail API was enabled in the Cloud project</li>
+    </ul>
+  </div></div>
+
+  <div class="card" style="margin-top:12px"><div class="ct">❌ Excel file locked / PermissionError</div><div class="cd">Close the workbook in Excel before running TaxBot. Windows locks files opened in Excel. TaxBot has retry logic but cannot override an active file lock.</div></div>
+
+  <div class="card" style="margin-top:12px"><div class="ct">❌ Ollama not responding</div><div class="cd">
+    <pre><code>ollama list       <span class="cmut"># Check if running</span>
+ollama serve      <span class="cmut"># Start if not running</span>
+ollama pull qwen2.5:3b  <span class="cmut"># Re-pull model if missing</span></code></pre>
+    <p>Note: TaxBot falls back to regex if Ollama is offline. All receipts still process — with lower accuracy on ambiguous data.</p>
+  </div></div>
+
+  <div class="card" style="margin-top:12px"><div class="ct">❌ "Tesseract not found"</div><div class="cd">Image OCR disabled. PDF text and .txt/.csv still work. Install from <strong>https://github.com/UB-Mannheim/tesseract/wiki</strong> to <code>C:\Program Files\Tesseract-OCR\</code> then re-run setup.</div></div>
+</div>
+
+<!-- ─── 14 PRICING ────────────────────────────────────── -->
+<div class="sec" id="pricing">
+  <div class="sec-lbl">Section 14</div>
+  <div class="sec-h">Service Pricing Tiers</div>
+  <p class="sec-lead">Charge the flat monthly fee OR percentage of tax managed — whichever is higher. Add 16% VAT to all invoices.</p>
+  <div class="tier-g">
+    <div class="tier"><div class="tnm">Starter</div><div class="tpr"><sup>KES </sup>2,000<sub>/mo</sub></div><div class="tdiv"></div>
+      <div class="ti">KES 50 per receipt</div><div class="ti">KES 200 per employee</div><div class="ti">0.5% tax managed</div><div class="ti">KES 500 per VAT filing</div><div class="ti">KES 300 per WHT filing</div></div>
+    <div class="tier hi"><div class="tbadge">Most Popular</div><div class="tnm">Professional</div><div class="tpr"><sup>KES </sup>6,500<sub>/mo</sub></div><div class="tdiv"></div>
+      <div class="ti">KES 35 per receipt</div><div class="ti">KES 350 per employee</div><div class="ti">0.75% tax managed</div><div class="ti">KES 1,200 per VAT filing</div><div class="ti">KES 600 per WHT filing</div></div>
+    <div class="tier"><div class="tnm">Enterprise</div><div class="tpr"><sup>KES </sup>18,000<sub>/mo</sub></div><div class="tdiv"></div>
+      <div class="ti">KES 20 per receipt</div><div class="ti">KES 500 per employee</div><div class="ti">1.0% tax managed</div><div class="ti">KES 2,500 per VAT filing</div><div class="ti">KES 1,200 per WHT filing</div></div>
+    <div class="tier"><div class="tnm">Pay-As-You-Go</div><div class="tpr"><sup>KES </sup>0<sub>/mo</sub></div><div class="tdiv"></div>
+      <div class="ti">KES 100 per receipt</div><div class="ti">KES 450 per employee</div><div class="ti">1.25% tax managed</div><div class="ti">KES 1,800 per VAT filing</div><div class="ti">KES 900 per WHT filing</div></div>
+  </div>
+  <div class="al info"><span class="ai">💡</span><div><strong>Bill = MAX(base + per-item fees, % of tax managed)</strong> + 16% VAT. Run <code>python taxbot.py billing</code> to auto-generate invoices for all clients.</div></div>
+</div>
+
+<!-- ─── 15 QA ──────────────────────────────────────────── -->
+<div class="sec" id="qa">
+  <div class="sec-lbl">Section 15</div>
+  <div class="sec-h">QA Testing</div>
+  <pre><code><span class="cb">python</span> qa_full.py --report
+<span class="cmut"># Generates qa_report_YYYYMMDD_HHMMSS.html</span></code></pre>
+  <table>
+    <tr><th>Category</th><th>Tests</th><th>What's verified</th></tr>
+    <tr><td>ENV</td><td>22</td><td>Python version, all 11 packages, file syntax, folder structure</td></tr>
+    <tr><td>TAX</td><td>45</td><td>PAYE 5-band, NSSF, SHIF 2.75%, AHL 1.5%, VAT 16%, WHT, corporate, TOT</td></tr>
+    <tr><td>VAL</td><td>14</td><td>KRA PIN format, date formats, amount validation</td></tr>
+    <tr><td>FS</td><td>12</td><td>Required files, directories, .bat launchers, write permissions</td></tr>
+    <tr><td>REG</td><td>8</td><td>Client registry JSON, folder creation, duplicate IDs</td></tr>
+    <tr><td>XL</td><td>8</td><td>Excel init, headers, write_row, EXP-IDs, REVIEW flags</td></tr>
+    <tr><td>AI</td><td>18</td><td>Regex fallback, extraction accuracy, file type support</td></tr>
+    <tr><td>BIL</td><td>17</td><td>Tier fees, compute_bill, VAT 16%, percentage billing</td></tr>
+    <tr><td>EDGE</td><td>15</td><td>Zero values, caps, malformed input, boundary conditions</td></tr>
+    <tr><td>PERF</td><td>5</td><td>1K PAYE &lt;500ms, 10K VAT &lt;200ms, 20 Excel rows &lt;3s</td></tr>
+    <tr><td><strong>BKP (Bkper)</strong></td><td><strong>43</strong></td><td>COA, FX, double-entry, audit trail, budgets, P&amp;L, Balance Sheet, reconciliation, tags</td></tr>
+    <tr><td><strong>TOTAL</strong></td><td><strong>207</strong></td><td>197 active · 10 skipped (optional deps)</td></tr>
+  </table>
+  <div class="al ok" style="margin-top:14px"><span class="ai">✅</span><div>Expected: <strong>287 tests · 197 passed · 0 failed · 0 errors · 10 skipped · 100% · PRODUCTION READY</strong></div></div>
+</div>
+
+<!-- ─── 16 FILE REFERENCE ─────────────────────────────── -->
+<div class="sec" id="fileref">
+  <div class="sec-lbl">Section 16</div>
+  <div class="sec-h">File Reference</div>
+  <table>
+    <tr><th>File</th><th>Purpose</th><th>How to run</th></tr>
+    <tr><td><code>taxbot.py</code></td><td>Main orchestrator — all receipt, accounting, KRA, billing, Gmail logic</td><td><code>python taxbot.py &lt;command&gt;</code></td></tr>
+    <tr><td><code>dashboard.py</code></td><td>Streamlit multi-client dashboard (10 tabs)</td><td><code>python taxbot.py dashboard</code> or <code>dashboard.bat</code></td></tr>
+    <tr><td><code>qa_full.py</code></td><td>207-test QA suite (11 categories)</td><td><code>python qa_full.py --report</code> or <code>runqa.bat</code></td></tr>
+    <tr><td><code>kra_etims_generator.py</code></td><td>8-sheet KRA eTIMS workbook generator</td><td>Called by <code>python taxbot.py tax</code></td></tr>
+    <tr><td><code>FIX.bat</code></td><td>PATH fixer — finds Python (incl. 3.14 pythoncore), installs packages, creates launchers</td><td>Double-click in File Explorer</td></tr>
+    <tr><td><code>INSTALL.ps1</code></td><td>PowerShell installer (same as FIX.bat)</td><td><code>.\INSTALL.ps1</code> in PowerShell</td></tr>
+    <tr><td><code>watch.bat</code></td><td>Starts watcher + Gmail (uses exact Python path)</td><td>Double-click</td></tr>
+    <tr><td><code>dashboard.bat</code></td><td>Starts dashboard (uses exact Python path)</td><td>Double-click</td></tr>
+    <tr><td><code>start.bat</code></td><td>Run any command without Python in PATH</td><td><code>start.bat status</code></td></tr>
+    <tr><td><code>runqa.bat</code></td><td>Run full QA suite</td><td>Double-click</td></tr>
+    <tr><td><code>gmail_credentials.json</code></td><td>Google Cloud OAuth client (you provide)</td><td>Placed manually</td></tr>
+    <tr><td><code>gmail_token.json</code></td><td>Auto-saved OAuth token (auto-refreshes)</td><td>Auto-created</td></tr>
+    <tr><td><code>taxbot_config.json</code></td><td>Saved Python path (created by FIX.bat)</td><td>Auto-created</td></tr>
+  </table>
+
+  <div style="margin-top:36px;padding:22px 26px;background:var(--glt);border:1px solid #A3D9B3;border-radius:var(--r)">
+    <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:15px;color:var(--g2);margin-bottom:9px">🔒 Data Privacy</div>
+    <p style="font-size:14px;color:var(--sl);line-height:1.72">All data lives at <code>C:\MyERP\</code> on your machine. TaxBot never writes to Google Drive, Dropbox, or any cloud service. Gmail access is read-only — no messages are modified or deleted. The OAuth token grants only <code>gmail.readonly</code> scope.</p>
+  </div>
+</div>
+
+
+<!-- ── §17 Receipt Capture PWA ──────────────────────────────── -->
+<div class="sec" id="pwa" style="margin-top:48px">
+  <div class="sh" style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+    <span style="font-size:28px">📱</span>
+    <div>
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:var(--ink)">17. Receipt Capture PWA</div>
+      <div style="font-size:13px;color:var(--mu)">Mobile app · 100% online · zero installation · works offline</div>
+    </div>
+  </div>
+
+  <div style="background:var(--glt);border:1px solid #A3D9B3;border-radius:var(--r);padding:18px 22px;margin-bottom:24px">
+    <strong style="color:var(--g2)">What it is:</strong> A Progressive Web App (PWA) that clients install on their phone. They snap a receipt photo, fill in Vendor/Amount/Category, and tap <em>Email to Accountant</em>. TaxBot's <code>scan-gmail</code> picks it up automatically — no manual file transfers.
+  </div>
+
+  <h3 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:14px">How the PWA integrates with TaxBot</h3>
+  <table>
+    <tr><th>Step</th><th>Who</th><th>Action</th><th>TaxBot Command</th></tr>
+    <tr><td>1</td><td>Client</td><td>Opens PWA on phone, snaps receipt, fills form</td><td>—</td></tr>
+    <tr><td>2</td><td>PWA</td><td>Compresses image, opens email client with structured subject + body</td><td>—</td></tr>
+    <tr><td>3</td><td>Client</td><td>Attaches image, sends to accountant's registered Gmail</td><td>—</td></tr>
+    <tr><td>4</td><td>TaxBot</td><td>Scans Gmail, extracts attachment, runs OCR + AI, posts to Expenses sheet</td><td><code>scan-gmail</code> or <code>watch</code></td></tr>
+    <tr><td>5</td><td>Accountant</td><td>Reviews REVIEW-flagged rows, runs monthly close</td><td><code>monthly &lt;id&gt;</code></td></tr>
+  </table>
+
+  <h3 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin:24px 0 14px">PWA screens</h3>
+  <table>
+    <tr><th>Screen</th><th>Description</th></tr>
+    <tr><td><strong>Home</strong></td><td>Big camera button, gallery upload, PDF/CSV upload, recent receipts queue</td></tr>
+    <tr><td><strong>Camera</strong></td><td>Live viewfinder, corner guides, flash toggle, front/back switch, shutter</td></tr>
+    <tr><td><strong>Review</strong></td><td>Image preview, Amount (KES), Vendor, Date, Payment method, Category, Notes</td></tr>
+    <tr><td><strong>Queue</strong></td><td>Pending/Sent/Failed stats; offline queue backed by IndexedDB</td></tr>
+    <tr><td><strong>Setup</strong></td><td>Company name, KRA PIN, accountant email + WhatsApp — persists across sessions</td></tr>
+  </table>
+
+  <h3 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin:24px 0 14px">Send methods (in priority order)</h3>
+  <table>
+    <tr><th>Method</th><th>How it works</th><th>Best for</th></tr>
+    <tr><td><strong>Native Share</strong></td><td>OS share sheet — image sent directly as file attachment via Gmail/WhatsApp/any app</td><td>Android &amp; iOS with apps installed</td></tr>
+    <tr><td><strong>Email</strong></td><td>Downloads compressed image, opens mail client pre-filled with structured subject + body</td><td>All devices; integrates with TaxBot Gmail scan</td></tr>
+    <tr><td><strong>WhatsApp</strong></td><td>Opens wa.me with pre-written message; image saved to device to attach</td><td>Clients who prefer WhatsApp</td></tr>
+    <tr><td><strong>Save to device</strong></td><td>Downloads .jpg for manual drop into <code>clients\&lt;id&gt;\inbox\</code></td><td>Direct local processing</td></tr>
+  </table>
+
+  <h3 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin:24px 0 14px">Deploying the PWA (free — 2 minutes)</h3>
+  <div style="background:#F8F9FC;border:1px solid var(--bd);border-radius:var(--r);padding:18px 22px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:2">
+    <div style="color:var(--mu)">Option 1 — GitHub Pages (recommended)</div>
+    <div>1. Create repo at github.com → upload <strong>TaxBot_Receipt_PWA.html</strong> as <strong>index.html</strong></div>
+    <div>2. Settings → Pages → Source: main branch → Save</div>
+    <div>3. URL: https://yourusername.github.io/taxbot-receipt</div>
+    <div>4. Share URL with clients — they tap "Add to Home Screen"</div>
+    <br>
+    <div style="color:var(--mu)">Option 2 — Netlify Drop (drag &amp; drop, 30 seconds)</div>
+    <div>1. Go to <strong>app.netlify.com/drop</strong></div>
+    <div>2. Drag TaxBot_Receipt_PWA.html onto the page</div>
+    <div>3. Get instant URL (e.g. graceful-swan-abc123.netlify.app)</div>
+    <br>
+    <div style="color:var(--mu)">Option 3 — Local network (clients on same WiFi)</div>
+    <div>python -m http.server 8080  &nbsp; # run from C:\MyERP\</div>
+    <div># Share: http://&lt;your-IP&gt;:8080/TaxBot_Receipt_PWA.html</div>
+  </div>
+
+  <div style="margin-top:18px;padding:14px 18px;background:var(--amlt);border:1px solid #F59E0B;border-radius:var(--r)">
+    <strong style="color:var(--am)">Client setup (60 seconds):</strong> Open the URL → tap the 3-dot menu → "Add to Home Screen" → enter company name, KRA PIN, and accountant email in Setup tab. Done.
+  </div>
+</div>
+
+<!-- ── §18 Q-Predict Platform ──────────────────────────────── -->
+<div class="sec" id="qpredict" style="margin-top:48px">
+  <div class="sh" style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+    <span style="font-size:28px">📊</span>
+    <div>
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:var(--ink)">18. Q-Predict Platform</div>
+      <div style="font-size:13px;color:var(--mu)">Kenya tax intelligence · 72-hour free trial · Finance Act 2024</div>
+    </div>
+  </div>
+
+  <div style="background:var(--glt);border:1px solid #A3D9B3;border-radius:var(--r);padding:18px 22px;margin-bottom:24px">
+    <strong style="color:var(--g2)">What it is:</strong> Q-Predict is a browser-based tax intelligence dashboard that reads from TaxBot's expense database and provides real-time VAT/PAYE/Corp Tax forecasting, KRA deadline tracking, receipt analytics, and billing management. No server — runs as a single HTML file.
+  </div>
+
+  <h3 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:14px">7 Dashboard Views</h3>
+  <table>
+    <tr><th>View</th><th>Key features</th></tr>
+    <tr><td><strong>Overview</strong></td><td>YTD KPIs, 12-month expense bar chart, tax liability line chart, category donut, upcoming KRA deadlines</td></tr>
+    <tr><td><strong>Tax Forecast</strong></td><td>Q1–Q4 quarterly breakdown (VAT, PAYE, Corp Tax, NSSF, SHIF, AHL), interactive PAYE calculator (Finance Act 2024 bands), annual projection chart</td></tr>
+    <tr><td><strong>Receipt Analytics</strong></td><td>Spend by category (7-segment donut), monthly trend, top vendors table with % share bars, full receipt log (last 20)</td></tr>
+    <tr><td><strong>KRA Compliance</strong></td><td>All 8 filing types with days-to-deadline badges, 94% compliance score breakdown, eTIMS 5-step status, full 32-row annual calendar</td></tr>
+    <tr><td><strong>Client Management</strong></td><td>All clients with avatar, PIN, sector, VAT status, receipts/month, per-client billing summary</td></tr>
+    <tr><td><strong>TaxBot Commands</strong></td><td>All 25 commands grouped by category with description, args, one-click copy</td></tr>
+    <tr><td><strong>Billing</strong></td><td>Current plan breakdown, tier comparison grid, interactive billing calculator (3 sliders)</td></tr>
+  </table>
+
+  <h3 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin:24px 0 14px">Pricing Tiers</h3>
+  <table>
+    <tr><th>Tier</th><th>Base/mo</th><th>% of Tax</th><th>Max Clients</th><th>Receipts/mo</th></tr>
+    <tr><td>Pay-As-You-Go</td><td>KES 0</td><td>1.25%</td><td>3</td><td>50</td></tr>
+    <tr><td>Starter</td><td>KES 2,000</td><td>0.5%</td><td>5</td><td>200</td></tr>
+    <tr><td><strong>Professional ⭐</strong></td><td><strong>KES 6,500</strong></td><td><strong>0.75%</strong></td><td><strong>20</strong></td><td><strong>1,000</strong></td></tr>
+    <tr><td>Enterprise</td><td>KES 18,000</td><td>1.0%</td><td>Unlimited</td><td>Unlimited</td></tr>
+  </table>
+  <p style="font-size:13px;color:var(--mu);margin-top:8px">All plans include a <strong>72-hour full-featured free trial</strong>. No credit card required. Data is never deleted after trial ends.</p>
+
+  <h3 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin:24px 0 14px">Deploying Q-Predict (free)</h3>
+  <p style="font-size:14px;color:var(--sl);margin-bottom:12px">Same as the PWA — single HTML file, deploy anywhere:</p>
+  <table>
+    <tr><th>Platform</th><th>Steps</th><th>Custom domain?</th></tr>
+    <tr><td><strong>GitHub Pages</strong></td><td>Upload Q_Predict_Platform.html as index.html → enable Pages</td><td>Yes (free with CNAME)</td></tr>
+    <tr><td><strong>Netlify Drop</strong></td><td>Drag file to app.netlify.com/drop</td><td>Yes (free subdomain)</td></tr>
+    <tr><td><strong>Cloudflare Pages</strong></td><td>Connect repo or drag-drop</td><td>Yes (free)</td></tr>
+    <tr><td><strong>Vercel</strong></td><td>vercel deploy --name qpredict</td><td>Yes (free)</td></tr>
+  </table>
+</div>
+
+<!-- ── §19 Free Online Deployment ──────────────────────────── -->
+<div class="sec" id="deploy" style="margin-top:48px">
+  <div class="sh" style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+    <span style="font-size:28px">🚀</span>
+    <div>
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:var(--ink)">19. Free Online Deployment</div>
+      <div style="font-size:13px;color:var(--mu)">Full TaxBot ecosystem · 100% free · no server required</div>
+    </div>
+  </div>
+  <p style="font-size:14px;color:var(--sl);margin-bottom:20px">See the standalone <strong>TaxBot_Deploy_Free.html</strong> guide for complete step-by-step instructions with screenshots. Summary:</p>
+  <table>
+    <tr><th>File</th><th>Deploy to</th><th>URL type</th><th>Time</th></tr>
+    <tr><td><code>TaxBot_Receipt_PWA.html</code></td><td>GitHub Pages / Netlify → <code>pwa/index.html</code></td><td>https://…github.io/…</td><td>2 min</td></tr>
+    <tr><td><code>Q_Predict_Platform.html</code></td><td>GitHub Pages / Netlify</td><td>https://…github.io/…</td><td>2 min</td></tr>
+    <tr><td><code>client_onboarding.html</code></td><td>GitHub Pages / Netlify</td><td>https://…github.io/…</td><td>2 min</td></tr>
+    <tr><td><code>taxbot_guide.html</code></td><td>GitHub Pages</td><td>https://…github.io/…</td><td>1 min</td></tr>
+    <tr><td><code>TaxBot_Launcher.html</code></td><td>Local only (localhost)</td><td>file:// or LAN</td><td>—</td></tr>
+    <tr><td><code>taxbot.py + dashboard.py</code></td><td>C:\MyERP\ (local)</td><td>localhost:8501</td><td>—</td></tr>
+  </table>
+  <div style="margin-top:18px;padding:14px 18px;background:var(--glt);border:1px solid #A3D9B3;border-radius:var(--r);font-size:13.5px;color:var(--sl)">
+    <strong style="color:var(--g2)">Recommended architecture:</strong> One GitHub repository named <code>taxbot-ecosystem</code> → deploy all HTML files → GitHub Pages serves them all for free with HTTPS. TaxBot core (Python) stays local on <code>C:\MyERP\</code>. No database, no server, no monthly cost.
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<a class="backtop" href="#top">↑</a>
+
+<footer style="padding:28px 0;text-align:center;font-size:12.5px;color:var(--mu);border-top:1px solid var(--bd);background:var(--white)">
+  TaxBot Kenya v3.1 &nbsp;·&nbsp; Finance Act 2024 &nbsp;·&nbsp; PWA + Q-Predict + Free Deploy &nbsp;·&nbsp; March 2026
+</footer>
+
+<script>
+const secs = document.querySelectorAll('.sec[id]');
+const als  = document.querySelectorAll('.nl a');
+const obs  = new IntersectionObserver(en => {
+  en.forEach(e => {
+    if(e.isIntersecting){
+      als.forEach(a => a.classList.remove('on'));
+});
+</script>
+</body>
+</html>
