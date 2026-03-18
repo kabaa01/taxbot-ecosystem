@@ -1,0 +1,1605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0D1A0D">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="TaxBot">
+<meta name="description" content="TaxBot Kenya Receipt Capture — snap, confirm, send">
+<title>TaxBot Receipt</title>
+
+<!-- Inline PWA Manifest -->
+<script>
+(function(){
+  var manifest = {
+    name: "TaxBot Receipt Capture",
+    short_name: "TaxBot",
+    description: "Snap receipts, send to your accountant instantly",
+    start_url: ".",
+    display: "standalone",
+    background_color: "#0D1A0D",
+    theme_color: "#0D1A0D",
+    orientation: "portrait-primary",
+    icons: [
+      { src: "data:image/svg+xml;base64," + btoa('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect width="192" height="192" rx="32" fill="#1B4332"/><text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" fill="#C8952A" font-family="monospace" font-weight="bold" font-size="80">₿</text></svg>'), sizes: "192x192", type: "image/svg+xml" },
+      { src: "data:image/svg+xml;base64," + btoa('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="80" fill="#1B4332"/><text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" fill="#C8952A" font-family="monospace" font-weight="bold" font-size="220">T</text></svg>'), sizes: "512x512", type: "image/svg+xml", purpose: "any maskable" }
+    ]
+  };
+  var blob = new Blob([JSON.stringify(manifest)], {type: 'application/manifest+json'});
+  var link = document.createElement('link');
+  link.rel = 'manifest'; link.href = URL.createObjectURL(blob);
+  document.head.appendChild(link);
+})();
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=Karla:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+
+<style>
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ TOKENS */
+:root {
+  --forest:  #0D1A0D;
+  --deep:    #111F11;
+  --panel:   #162016;
+  --raised:  #1C2A1C;
+  --border:  #243324;
+  --border2: #2E432E;
+  --green:   #1B4332;
+  --mint:    #2D6A4F;
+  --sage:    #52B788;
+  --lime:    #95D5B2;
+  --gold:    #C8952A;
+  --amber:   #F0B429;
+  --amber2:  #FDD663;
+  --cream:   #F2EDE4;
+  --text:    #D4E8D0;
+  --muted:   #5C7A5C;
+  --dim:     #3A4E3A;
+  --red:     #E05252;
+  --blue:    #52A8E0;
+  --ff:      'Karla', system-ui, sans-serif;
+  --fd:      'Syne', sans-serif;
+  --fm:      'DM Mono', monospace;
+  --safe-top:    env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --r:       12px;
+  --r2:      20px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html { height: 100%; overscroll-behavior: none; }
+body {
+  font-family: var(--ff);
+  background: var(--forest);
+  color: var(--text);
+  height: 100%;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ APP SHELL */
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  height: 100dvh;
+  max-width: 480px;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+}
+
+/* subtle grain */
+#app::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 0;
+  mix-blend-mode: overlay;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ VIEWS */
+.view {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  transition: transform 0.38s cubic-bezier(0.32, 0, 0.28, 1),
+              opacity 0.38s ease;
+}
+.view.hidden        { transform: translateX(100%); opacity: 0; pointer-events: none; }
+.view.slide-left    { transform: translateX(-40%); opacity: 0; pointer-events: none; }
+.view.active        { transform: translateX(0); opacity: 1; }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ TOP BAR */
+.topbar {
+  display: flex; align-items: center;
+  padding: calc(var(--safe-top) + 12px) 20px 12px;
+  background: linear-gradient(180deg, var(--deep) 0%, transparent 100%);
+  flex-shrink: 0; z-index: 10; gap: 8px;
+}
+.topbar-logo {
+  font-family: var(--fd);
+  font-size: 17px; font-weight: 800;
+  color: var(--sage); letter-spacing: -.01em;
+  flex: 1;
+}
+.topbar-logo span { color: var(--amber); }
+.topbar-badge {
+  font-family: var(--fm); font-size: 10px;
+  background: var(--raised);
+  border: 1px solid var(--border2);
+  border-radius: 20px; padding: 3px 9px;
+  color: var(--muted);
+}
+.topbar-badge.live { color: var(--sage); border-color: var(--mint); }
+.back-btn {
+  width: 36px; height: 36px;
+  background: var(--raised); border: 1px solid var(--border2);
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 16px; cursor: pointer; transition: all .18s; color: var(--text);
+  flex-shrink: 0;
+}
+.back-btn:active { background: var(--border2); transform: scale(0.92); }
+.topbar-title {
+  font-family: var(--fd); font-size: 15px; font-weight: 700;
+  flex: 1; color: var(--text);
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ HOME */
+#view-home { background: var(--forest); }
+.home-body {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  padding: 0 20px calc(var(--safe-bottom) + 24px);
+  display: flex; flex-direction: column; gap: 24px;
+}
+.home-body::-webkit-scrollbar { display: none; }
+
+/* Hero capture button */
+.capture-hero {
+  margin: 4px 0 0;
+  background: linear-gradient(145deg, var(--green) 0%, #0A2B1A 100%);
+  border: 1.5px solid var(--mint);
+  border-radius: var(--r2);
+  padding: 28px 24px;
+  display: flex; align-items: center; gap: 20px;
+  cursor: pointer; transition: all .22s;
+  position: relative; overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,.35), inset 0 1px 0 rgba(82,183,136,.15);
+}
+.capture-hero::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(circle at 80% 50%, rgba(200,149,42,.08) 0%, transparent 60%);
+}
+.capture-hero:active { transform: scale(0.975); box-shadow: 0 4px 16px rgba(0,0,0,.35); }
+.ch-icon {
+  width: 64px; height: 64px; flex-shrink: 0;
+  background: var(--gold);
+  border-radius: 18px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px;
+  box-shadow: 0 4px 20px rgba(200,149,42,.4);
+}
+.ch-text {}
+.ch-title {
+  font-family: var(--fd); font-size: 20px; font-weight: 800;
+  color: #fff; line-height: 1.1; margin-bottom: 5px;
+}
+.ch-sub { font-size: 12.5px; color: rgba(255,255,255,.5); line-height: 1.5; }
+.ch-arrow { margin-left: auto; font-size: 22px; color: var(--gold); flex-shrink: 0; transition: transform .2s; }
+.capture-hero:active .ch-arrow { transform: translateX(4px); }
+
+/* Upload strip */
+.upload-strip {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.upload-btn {
+  background: var(--panel);
+  border: 1.5px dashed var(--border2);
+  border-radius: var(--r);
+  padding: 16px 14px;
+  display: flex; align-items: center; gap: 10px;
+  cursor: pointer; transition: all .18s;
+}
+.upload-btn:active { background: var(--raised); border-style: solid; }
+.ub-icon { font-size: 20px; flex-shrink: 0; }
+.ub-text {}
+.ub-label { font-size: 11.5px; font-weight: 600; color: var(--text); }
+.ub-sub { font-size: 10px; color: var(--muted); margin-top: 1px; }
+
+/* Section label */
+.sec-label {
+  font-family: var(--fm); font-size: 9.5px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: .14em;
+  color: var(--muted);
+  display: flex; align-items: center; gap: 8px;
+}
+.sec-label::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+
+/* Queue cards */
+.queue-empty {
+  text-align: center; padding: 28px 0;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+}
+.qe-icon { font-size: 40px; opacity: .35; }
+.qe-text { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+.receipt-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px;
+  cursor: pointer; transition: all .18s;
+  position: relative; overflow: hidden;
+}
+.receipt-card:active { background: var(--raised); }
+.rc-thumb {
+  width: 52px; height: 52px; border-radius: 8px;
+  object-fit: cover; flex-shrink: 0;
+  background: var(--raised);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+}
+.rc-thumb img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
+.rc-body { flex: 1; min-width: 0; }
+.rc-vendor { font-size: 14px; font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rc-meta { font-family: var(--fm); font-size: 10.5px; color: var(--muted); margin-top: 3px; }
+.rc-amount { font-family: var(--fm); font-size: 15px; font-weight: 500; color: var(--amber); }
+.rc-status {
+  position: absolute; top: 10px; right: 12px;
+  font-family: var(--fm); font-size: 9px; font-weight: 500;
+  padding: 2px 7px; border-radius: 20px;
+  text-transform: uppercase; letter-spacing: .06em;
+}
+.rc-status.pending { background: rgba(200,149,42,.15); color: var(--amber); }
+.rc-status.sent    { background: rgba(82,183,136,.12); color: var(--sage); }
+.rc-status.fail    { background: rgba(224,82,82,.12);  color: var(--red); }
+
+/* Bottom nav */
+.bottom-nav {
+  display: flex;
+  padding: 8px 16px calc(var(--safe-bottom) + 8px);
+  background: var(--deep);
+  border-top: 1px solid var(--border);
+  flex-shrink: 0; gap: 4px;
+}
+.bn-btn {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 8px 4px; border-radius: 10px; cursor: pointer; transition: all .18s;
+  background: none; border: none;
+}
+.bn-btn.active .bn-icon { color: var(--sage); }
+.bn-btn.active .bn-lbl  { color: var(--sage); }
+.bn-btn:active { background: var(--raised); }
+.bn-icon { font-size: 20px; color: var(--muted); transition: color .18s; }
+.bn-lbl { font-family: var(--fm); font-size: 9px; color: var(--muted); letter-spacing: .05em; transition: color .18s; }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ CAPTURE VIEW */
+#view-capture { background: #000; }
+.camera-area {
+  flex: 1; position: relative; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+#camera-video {
+  width: 100%; height: 100%;
+  object-fit: cover; display: block;
+}
+.camera-overlay {
+  position: absolute; inset: 0;
+  pointer-events: none;
+}
+/* corner guides */
+.camera-overlay::before,
+.camera-overlay::after {
+  content: '';
+  position: absolute;
+  width: 60px; height: 60px;
+  border-color: rgba(200,149,42,.7);
+  border-style: solid;
+}
+.camera-overlay::before { top: 20%; left: 12%; border-width: 2.5px 0 0 2.5px; }
+.camera-overlay::after  { bottom: 20%; right: 12%; border-width: 0 2.5px 2.5px 0; }
+
+.camera-bar {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 24px 32px calc(var(--safe-bottom) + 24px);
+  background: linear-gradient(0deg, rgba(0,0,0,.8) 0%, transparent 100%);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.cam-hint {
+  font-family: var(--fm); font-size: 10px; color: rgba(255,255,255,.5);
+  max-width: 80px; text-align: center; line-height: 1.4;
+}
+.shutter {
+  width: 72px; height: 72px; border-radius: 50%;
+  border: 3px solid #fff;
+  background: rgba(255,255,255,.15);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all .15s;
+  backdrop-filter: blur(8px);
+}
+.shutter-inner {
+  width: 56px; height: 56px; border-radius: 50%;
+  background: #fff; transition: all .15s;
+}
+.shutter:active .shutter-inner { transform: scale(0.88); }
+
+.cam-switch {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: rgba(255,255,255,.12); backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; cursor: pointer; transition: all .18s; color: #fff;
+}
+.cam-switch:active { background: rgba(255,255,255,.22); }
+
+.camera-top {
+  position: absolute; top: 0; left: 0; right: 0;
+  padding: calc(var(--safe-top) + 12px) 20px 12px;
+  display: flex; align-items: center; justify-content: space-between;
+  background: linear-gradient(180deg, rgba(0,0,0,.7) 0%, transparent 100%);
+}
+.cam-close {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(0,0,0,.4); backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; cursor: pointer; color: #fff; transition: .18s;
+}
+.cam-close:active { background: rgba(255,255,255,.2); }
+.cam-title { font-family: var(--fd); font-size: 15px; color: #fff; font-weight: 600; }
+.cam-flash {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(0,0,0,.4); backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; cursor: pointer; color: rgba(255,255,255,.5); transition: .18s;
+}
+.cam-flash.on { color: var(--amber); }
+
+/* no camera fallback */
+.no-camera {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 16px; padding: 40px 32px; text-align: center;
+}
+.nc-icon { font-size: 52px; opacity: .4; }
+.nc-text { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ REVIEW VIEW */
+#view-review { background: var(--forest); }
+.review-body {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  padding: 0 20px calc(var(--safe-bottom) + 100px);
+}
+.review-body::-webkit-scrollbar { display: none; }
+
+.preview-container {
+  position: relative; margin: 8px 0 20px;
+  border-radius: var(--r2); overflow: hidden;
+  border: 1px solid var(--border2);
+}
+.preview-img {
+  width: 100%; max-height: 260px;
+  object-fit: cover; display: block;
+}
+.preview-retake {
+  position: absolute; bottom: 12px; right: 12px;
+  background: rgba(0,0,0,.65); backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 20px; padding: 6px 14px;
+  font-size: 12px; color: #fff; cursor: pointer; transition: .18s;
+}
+.preview-retake:active { background: rgba(255,255,255,.2); }
+
+/* Amount hero */
+.amount-hero {
+  background: linear-gradient(135deg, var(--green) 0%, var(--deep) 100%);
+  border: 1.5px solid var(--border2);
+  border-radius: var(--r);
+  padding: 16px 18px; margin-bottom: 20px;
+  display: flex; align-items: center; gap: 12px;
+}
+.ah-label { font-family: var(--fm); font-size: 9px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: 4px; }
+.ah-input {
+  font-family: var(--fm); font-size: 28px; font-weight: 500;
+  color: var(--amber); background: none; border: none; outline: none;
+  width: 100%; padding: 0; color: var(--amber2);
+  -webkit-appearance: none;
+}
+.ah-input::placeholder { color: var(--dim); }
+.ah-currency {
+  font-family: var(--fm); font-size: 13px;
+  color: var(--muted); margin-left: 4px;
+}
+
+/* Form fields */
+.field-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+.field {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r); padding: 13px 16px;
+  transition: border-color .18s;
+}
+.field:focus-within { border-color: var(--mint); }
+.field-label { font-family: var(--fm); font-size: 9px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: 5px; }
+.field-input, .field-select {
+  width: 100%; background: none; border: none; outline: none;
+  font-family: var(--ff); font-size: 14.5px; color: var(--text);
+  padding: 0; -webkit-appearance: none;
+}
+.field-select { cursor: pointer; }
+.field-select option { background: #1B2B1B; color: var(--text); }
+.field-input::placeholder { color: var(--dim); }
+
+/* Row of fields */
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ SEND PANEL */
+.send-panel {
+  position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 100%; max-width: 480px;
+  background: linear-gradient(0deg, var(--deep) 80%, transparent 100%);
+  padding: 20px 20px calc(var(--safe-bottom) + 16px);
+  z-index: 100;
+}
+.send-methods { display: flex; flex-direction: column; gap: 8px; }
+.send-btn {
+  width: 100%; padding: 14px 18px;
+  border: none; border-radius: var(--r);
+  font-family: var(--fd); font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: all .18s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  letter-spacing: .02em;
+}
+.send-btn.primary {
+  background: var(--gold);
+  color: var(--forest);
+  box-shadow: 0 4px 20px rgba(200,149,42,.35);
+}
+.send-btn.primary:active { transform: scale(0.97); box-shadow: none; }
+.send-btn.secondary {
+  background: var(--raised); color: var(--text);
+  border: 1px solid var(--border2);
+}
+.send-btn.secondary:active { background: var(--border2); }
+.send-btn.green {
+  background: var(--green); color: #fff;
+  border: 1px solid var(--mint);
+}
+.send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ SETTINGS VIEW */
+#view-settings { background: var(--forest); }
+.settings-body {
+  flex: 1; overflow-y: auto;
+  padding: 0 20px calc(var(--safe-bottom) + 24px);
+  display: flex; flex-direction: column; gap: 24px;
+}
+.settings-body::-webkit-scrollbar { display: none; }
+.settings-section {}
+.settings-section-title {
+  font-family: var(--fm); font-size: 9.5px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: .14em; color: var(--muted);
+  margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
+}
+.settings-section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.settings-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+.settings-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.settings-row:last-child { border-bottom: none; }
+.sr-icon { font-size: 18px; flex-shrink: 0; width: 24px; text-align: center; }
+.sr-body { flex: 1; min-width: 0; }
+.sr-label { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
+.sr-hint  { font-size: 11px; color: var(--muted); }
+.sr-input {
+  font-family: var(--ff); font-size: 13px;
+  background: none; border: none; outline: none;
+  color: var(--sage); text-align: right; width: 140px;
+  padding: 0; -webkit-appearance: none;
+}
+.sr-input::placeholder { color: var(--dim); }
+.sr-input.mono { font-family: var(--fm); font-size: 12px; }
+.sr-value { font-family: var(--fm); font-size: 11.5px; color: var(--muted); }
+
+/* toggle switch */
+.toggle {
+  width: 44px; height: 26px; position: relative; flex-shrink: 0; cursor: pointer;
+}
+.toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+.toggle-track {
+  position: absolute; inset: 0;
+  background: var(--border2); border-radius: 13px;
+  transition: background .2s;
+}
+.toggle input:checked + .toggle-track { background: var(--mint); }
+.toggle-thumb {
+  position: absolute; top: 3px; left: 3px;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--muted); transition: all .2s;
+}
+.toggle input:checked ~ .toggle-thumb { left: 21px; background: #fff; }
+
+/* Install prompt */
+.install-banner {
+  background: linear-gradient(135deg, var(--green) 0%, #0C1F0C 100%);
+  border: 1.5px solid var(--mint);
+  border-radius: var(--r);
+  padding: 14px 16px;
+  display: flex; align-items: center; gap: 12px;
+  cursor: pointer; transition: all .2s;
+}
+.install-banner:active { transform: scale(0.98); }
+.ib-icon { font-size: 24px; flex-shrink: 0; }
+.ib-body { flex: 1; }
+.ib-title { font-size: 13.5px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+.ib-sub { font-size: 11px; color: var(--muted); }
+.ib-btn {
+  font-family: var(--fd); font-size: 12px; font-weight: 700;
+  background: var(--gold); color: var(--forest);
+  border: none; border-radius: 8px; padding: 7px 14px;
+  cursor: pointer; flex-shrink: 0; transition: .18s;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ QUEUE VIEW */
+#view-queue { background: var(--forest); }
+.queue-body {
+  flex: 1; overflow-y: auto;
+  padding: 0 20px calc(var(--safe-bottom) + 24px);
+  display: flex; flex-direction: column; gap: 10px;
+}
+.queue-body::-webkit-scrollbar { display: none; }
+.queue-stats {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px; padding: 4px 0 8px;
+}
+.qs-card {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 12px 10px; text-align: center;
+}
+.qs-num { font-family: var(--fm); font-size: 22px; font-weight: 500; color: var(--sage); }
+.qs-lbl { font-size: 10px; color: var(--muted); margin-top: 2px; }
+.qs-num.amber { color: var(--amber); }
+.qs-num.green { color: var(--sage); }
+.qs-num.red   { color: var(--red); }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ TOAST */
+.toast {
+  position: fixed; bottom: calc(var(--safe-bottom) + 80px); left: 50%;
+  transform: translateX(-50%) translateY(12px);
+  background: var(--raised); border: 1px solid var(--border2);
+  border-radius: 20px; padding: 10px 18px;
+  font-size: 13px; color: var(--text);
+  box-shadow: 0 8px 32px rgba(0,0,0,.4);
+  white-space: nowrap; z-index: 9999;
+  opacity: 0; transition: all .28s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none;
+}
+.toast.show {
+  opacity: 1; transform: translateX(-50%) translateY(0);
+}
+.toast.success { border-color: var(--mint); color: var(--sage); }
+.toast.error   { border-color: var(--red);  color: var(--red); }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ SEND SUCCESS OVERLAY */
+.success-overlay {
+  position: fixed; inset: 0; z-index: 500;
+  background: rgba(13,26,13,.92); backdrop-filter: blur(12px);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 20px; padding: 40px;
+  opacity: 0; pointer-events: none;
+  transition: opacity .4s;
+}
+.success-overlay.show { opacity: 1; pointer-events: all; }
+.so-icon {
+  width: 100px; height: 100px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--green), #0C2E1C);
+  border: 2px solid var(--sage);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 48px;
+  animation: so-pop .5s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+@keyframes so-pop { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.so-title { font-family: var(--fd); font-size: 26px; font-weight: 800; color: #fff; text-align: center; }
+.so-sub { font-size: 14px; color: var(--muted); text-align: center; line-height: 1.6; max-width: 280px; }
+.so-close {
+  margin-top: 12px;
+  background: var(--mint); color: #fff;
+  border: none; border-radius: var(--r); padding: 14px 32px;
+  font-family: var(--fd); font-size: 15px; font-weight: 700;
+  cursor: pointer; transition: .18s;
+  box-shadow: 0 4px 20px rgba(45,106,79,.4);
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ LOADING SPINNER */
+.spin {
+  display: inline-block; width: 18px; height: 18px;
+  border: 2px solid rgba(255,255,255,.3);
+  border-top-color: #fff; border-radius: 50%;
+  animation: spin .6s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ HIDDEN INPUTS */
+#file-upload { display: none; }
+#canvas-work { display: none; }
+
+/* Stagger animation on home load */
+@keyframes fade-up { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+.fade-in { animation: fade-up .4s ease both; }
+.fade-in:nth-child(1) { animation-delay: .05s; }
+.fade-in:nth-child(2) { animation-delay: .12s; }
+.fade-in:nth-child(3) { animation-delay: .18s; }
+.fade-in:nth-child(4) { animation-delay: .24s; }
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ════════════════════════════════════════ HOME -->
+  <div class="view active" id="view-home">
+    <div class="topbar">
+      <div class="topbar-logo">Tax<span>Bot</span></div>
+      <div class="topbar-badge" id="online-badge">● offline</div>
+      <div class="topbar-badge live" id="count-badge" style="display:none">0 pending</div>
+    </div>
+    <div class="home-body">
+      <div class="capture-hero fade-in" onclick="openCapture()">
+        <div class="ch-icon">📷</div>
+        <div class="ch-text">
+          <div class="ch-title">Snap a Receipt</div>
+          <div class="ch-sub">Camera opens instantly.<br>Works offline — syncs when connected.</div>
+        </div>
+        <div class="ch-arrow">›</div>
+      </div>
+      <div class="upload-strip fade-in">
+        <div class="upload-btn" onclick="triggerUpload('image/*')">
+          <div class="ub-icon">🖼</div>
+          <div class="ub-text"><div class="ub-label">Gallery</div><div class="ub-sub">Choose photo</div></div>
+        </div>
+        <div class="upload-btn" onclick="triggerUpload('.pdf,.txt,.csv')">
+          <div class="ub-icon">📄</div>
+          <div class="ub-text"><div class="ub-label">File</div><div class="ub-sub">PDF / TXT / CSV</div></div>
+        </div>
+      </div>
+      <div class="sec-label fade-in">Recent captures</div>
+      <div id="home-queue-list" class="fade-in">
+        <div class="queue-empty">
+          <div class="qe-icon">🧾</div>
+          <div class="qe-text">No receipts yet.<br>Tap the camera to capture your first one.</div>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <button class="bn-btn active" id="bn-home" onclick="showView('home')">
+        <div class="bn-icon">🏠</div><div class="bn-lbl">HOME</div>
+      </button>
+      <button class="bn-btn" id="bn-queue" onclick="showView('queue')">
+        <div class="bn-icon">📋</div><div class="bn-lbl">QUEUE</div>
+      </button>
+      <button class="bn-btn" id="bn-settings" onclick="showView('settings')">
+        <div class="bn-icon">⚙️</div><div class="bn-lbl">SETUP</div>
+      </button>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ CAPTURE -->
+  <div class="view hidden" id="view-capture">
+    <div class="camera-area" id="camera-area">
+      <video id="camera-video" autoplay playsinline muted></video>
+      <div class="camera-overlay"></div>
+      <div class="camera-top">
+        <div class="cam-close" onclick="closeCamera()">✕</div>
+        <div class="cam-title">Aim at receipt</div>
+        <div class="cam-flash" id="cam-flash-btn" onclick="toggleFlash()">⚡</div>
+      </div>
+      <div class="camera-bar">
+        <div class="cam-hint">Tap shutter to capture</div>
+        <div class="shutter" onclick="takePhoto()">
+          <div class="shutter-inner"></div>
+        </div>
+        <div class="cam-switch" onclick="switchCamera()">🔄</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ REVIEW -->
+  <div class="view hidden" id="view-review">
+    <div class="topbar">
+      <div class="back-btn" onclick="goBack()">‹</div>
+      <div class="topbar-title">Confirm Receipt</div>
+      <div style="width:36px"></div>
+    </div>
+    <div class="review-body" id="review-body">
+      <div class="preview-container">
+        <img class="preview-img" id="preview-img" src="" alt="Receipt preview">
+        <div class="preview-retake" onclick="goBack()">↺ Retake</div>
+      </div>
+
+      <div class="amount-hero">
+        <div style="flex:1">
+          <div class="ah-label">Amount Paid</div>
+          <div style="display:flex;align-items:baseline;gap:4px">
+            <input class="ah-input" id="f-amount" type="number" inputmode="decimal" placeholder="0.00" step="0.01">
+            <span class="ah-currency">KES</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <div class="field">
+          <div class="field-label">Vendor / Payee</div>
+          <input class="field-input" id="f-vendor" type="text" placeholder="e.g. Safaricom, Java House…" autocomplete="off">
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <div class="field-label">Date</div>
+            <input class="field-input" id="f-date" type="date">
+          </div>
+          <div class="field">
+            <div class="field-label">Payment</div>
+            <select class="field-select" id="f-payment">
+              <option value="M-Pesa">M-Pesa</option>
+              <option value="Cash">Cash</option>
+              <option value="Card">Card</option>
+              <option value="EFT">EFT</option>
+              <option value="Cheque">Cheque</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">Category</div>
+          <select class="field-select" id="f-category">
+            <option value="">— auto-detect —</option>
+            <option>Office Supplies</option><option>Meals &amp; Entertainment</option>
+            <option>Travel &amp; Transport</option><option>Software &amp; Tech</option>
+            <option>Utilities</option><option>Healthcare</option>
+            <option>Marketing &amp; Ads</option><option>Professional Services</option>
+            <option>Education &amp; Training</option><option>Fuel</option>
+            <option>Rent &amp; Occupancy</option><option>Equipment &amp; Machinery</option>
+            <option>Bank Charges</option><option>Clothing &amp; Uniforms</option>
+            <option>Salaries &amp; Wages</option><option>Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <div class="field-label">Notes (optional)</div>
+          <input class="field-input" id="f-notes" type="text" placeholder="Invoice ref, project code…" autocomplete="off">
+        </div>
+      </div>
+    </div>
+
+    <!-- sticky send panel -->
+    <div class="send-panel">
+      <div class="send-methods">
+        <button class="send-btn primary" id="btn-email-send" onclick="sendViaEmail()">
+          📧 &nbsp;Email to Accountant
+        </button>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <button class="send-btn green" onclick="sendViaWhatsApp()">💬 WhatsApp</button>
+          <button class="send-btn secondary" onclick="saveToDevice()">💾 Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ QUEUE -->
+  <div class="view hidden" id="view-queue">
+    <div class="topbar">
+      <div class="topbar-logo">Queue</div>
+      <button onclick="sendAllPending()" style="background:var(--mint);border:none;border-radius:8px;padding:7px 14px;font-family:var(--fd);font-size:12px;font-weight:700;color:#fff;cursor:pointer">Send All</button>
+    </div>
+    <div class="queue-body">
+      <div class="queue-stats">
+        <div class="qs-card"><div class="qs-num amber" id="qs-pending">0</div><div class="qs-lbl">Pending</div></div>
+        <div class="qs-card"><div class="qs-num green" id="qs-sent">0</div><div class="qs-lbl">Sent</div></div>
+        <div class="qs-card"><div class="qs-num red"   id="qs-fail">0</div><div class="qs-lbl">Failed</div></div>
+      </div>
+      <div id="queue-list"></div>
+    </div>
+    <div class="bottom-nav">
+      <button class="bn-btn" id="bn-home2" onclick="showView('home')">
+        <div class="bn-icon">🏠</div><div class="bn-lbl">HOME</div>
+      </button>
+      <button class="bn-btn active" id="bn-queue2" onclick="showView('queue')">
+        <div class="bn-icon">📋</div><div class="bn-lbl">QUEUE</div>
+      </button>
+      <button class="bn-btn" id="bn-settings2" onclick="showView('settings')">
+        <div class="bn-icon">⚙️</div><div class="bn-lbl">SETUP</div>
+      </button>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ SETTINGS -->
+  <div class="view hidden" id="view-settings">
+    <div class="topbar">
+      <div class="topbar-logo">Setup</div>
+    </div>
+    <div class="settings-body">
+
+      <div id="install-banner-wrap"></div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">Your Details</div>
+        <div class="settings-card">
+          <div class="settings-row">
+            <div class="sr-icon">🏢</div>
+            <div class="sr-body"><div class="sr-label">Company Name</div><div class="sr-hint">As registered with KRA</div></div>
+            <input class="sr-input" id="s-company" placeholder="Your company" oninput="saveSettings()">
+          </div>
+          <div class="settings-row">
+            <div class="sr-icon">📌</div>
+            <div class="sr-body"><div class="sr-label">KRA PIN</div><div class="sr-hint">A000000000A format</div></div>
+            <input class="sr-input mono" id="s-pin" placeholder="A000000000A" maxlength="11" oninput="saveSettings()">
+          </div>
+          <div class="settings-row">
+            <div class="sr-icon">📱</div>
+            <div class="sr-body"><div class="sr-label">Your Phone</div><div class="sr-hint">For WhatsApp sharing</div></div>
+            <input class="sr-input mono" id="s-phone" type="tel" placeholder="+254700000000" oninput="saveSettings()">
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">Accountant / TaxBot</div>
+        <div class="settings-card">
+          <div class="settings-row">
+            <div class="sr-icon">📧</div>
+            <div class="sr-body"><div class="sr-label">Accountant Email</div><div class="sr-hint">TaxBot scans this inbox for receipt attachments</div></div>
+            <input class="sr-input" id="s-acct-email" type="email" placeholder="accountant@gmail.com" oninput="saveSettings()">
+          </div>
+          <div class="settings-row">
+            <div class="sr-icon">💬</div>
+            <div class="sr-body"><div class="sr-label">Accountant WhatsApp</div><div class="sr-hint">For WhatsApp delivery</div></div>
+            <input class="sr-input mono" id="s-acct-wa" type="tel" placeholder="+254700000000" oninput="saveSettings()">
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">Capture Options</div>
+        <div class="settings-card">
+          <div class="settings-row">
+            <div class="sr-icon">🗜</div>
+            <div class="sr-body"><div class="sr-label">Compress Images</div><div class="sr-hint">Reduces file size before sending</div></div>
+            <label class="toggle">
+              <input type="checkbox" id="s-compress" checked onchange="saveSettings()">
+              <div class="toggle-track"></div>
+              <div class="toggle-thumb"></div>
+            </label>
+          </div>
+          <div class="settings-row">
+            <div class="sr-icon">⚡</div>
+            <div class="sr-body"><div class="sr-label">Auto-Send When Online</div><div class="sr-hint">Queued receipts send automatically</div></div>
+            <label class="toggle">
+              <input type="checkbox" id="s-autosend" checked onchange="saveSettings()">
+              <div class="toggle-track"></div>
+              <div class="toggle-thumb"></div>
+            </label>
+          </div>
+          <div class="settings-row">
+            <div class="sr-icon">📁</div>
+            <div class="sr-body"><div class="sr-label">Queue Size</div><div class="sr-hint">Receipts stored locally</div></div>
+            <div class="sr-value" id="s-queue-size">0 receipts</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">How It Works</div>
+        <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:16px 16px;font-size:12.5px;color:var(--muted);line-height:1.8;">
+          <p>1. 📷 Snap receipt → confirms details → taps <strong style="color:var(--text)">Email to Accountant</strong></p>
+          <p>2. 📧 Receipt image lands in accountant's Gmail inbox</p>
+          <p>3. 🤖 TaxBot's <code style="color:var(--sage);font-family:var(--fm)">scan-gmail</code> picks it up, runs OCR + AI, posts to Expenses + Ledger</p>
+          <p>4. ✅ Zero cloud storage — everything stays local on the accountant's machine</p>
+          <p style="margin-top:10px;color:var(--dim)">If email isn't available, use <strong style="color:var(--text)">WhatsApp</strong> or <strong style="color:var(--text)">Save</strong> to drop the file manually in the client inbox folder.</p>
+        </div>
+      </div>
+
+      <div style="height: 20px"></div>
+    </div>
+    <div class="bottom-nav">
+      <button class="bn-btn" id="bn-home3" onclick="showView('home')">
+        <div class="bn-icon">🏠</div><div class="bn-lbl">HOME</div>
+      </button>
+      <button class="bn-btn" id="bn-queue3" onclick="showView('queue')">
+        <div class="bn-icon">📋</div><div class="bn-lbl">QUEUE</div>
+      </button>
+      <button class="bn-btn active" id="bn-settings3" onclick="showView('settings')">
+        <div class="bn-icon">⚙️</div><div class="bn-lbl">SETUP</div>
+      </button>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ OVERLAYS -->
+  <div class="success-overlay" id="success-overlay">
+    <div class="so-icon">✓</div>
+    <div class="so-title" id="so-title">Receipt Sent!</div>
+    <div class="so-sub" id="so-sub">Your accountant will receive it shortly.<br>TaxBot will process it automatically.</div>
+    <button class="so-close" onclick="afterSend()">Done  →</button>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <input id="file-upload" type="file" accept="image/*" capture="environment">
+  <canvas id="canvas-work"></canvas>
+</div>
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ JS -->
+<script>
+'use strict';
+
+// ── State ─────────────────────────────────────────────────────────────────────
+var currentView  = 'home';
+var prevView     = 'home';
+var mediaStream  = null;
+var facingMode   = 'environment';
+var currentBlob  = null;
+var currentDataUrl = null;
+var deferredPrompt = null;
+
+var DB_NAME = 'taxbot-receipts';
+var DB_VER  = 1;
+var db      = null;
+
+// ── Settings ──────────────────────────────────────────────────────────────────
+var settings = {
+  company:    '',
+  pin:        '',
+  phone:      '',
+  acctEmail:  '',
+  acctWa:     '',
+  compress:   true,
+  autosend:   true,
+};
+
+function loadSettings() {
+  try {
+    var s = JSON.parse(localStorage.getItem('taxbot-settings') || '{}');
+    Object.assign(settings, s);
+  } catch(e) {}
+  applySettingsToUI();
+}
+
+function applySettingsToUI() {
+  setVal('s-company',   settings.company);
+  setVal('s-acct-email',settings.acctEmail);
+  setVal('s-acct-wa',   settings.acctWa);
+  setVal('s-pin',       settings.pin);
+  setVal('s-phone',     settings.phone);
+  setChk('s-compress',  settings.compress);
+  setChk('s-autosend',  settings.autosend);
+}
+
+function saveSettings() {
+  settings.company   = getVal('s-company');
+  settings.acctEmail = getVal('s-acct-email');
+  settings.acctWa    = getVal('s-acct-wa');
+  settings.pin       = getVal('s-pin');
+  settings.phone     = getVal('s-phone');
+  settings.compress  = getChk('s-compress');
+  settings.autosend  = getChk('s-autosend');
+  localStorage.setItem('taxbot-settings', JSON.stringify(settings));
+}
+
+function getVal(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
+function setVal(id, v) { var el = document.getElementById(id); if(el) el.value = v || ''; }
+function getChk(id) { var el = document.getElementById(id); return el ? el.checked : false; }
+function setChk(id, v) { var el = document.getElementById(id); if(el) el.checked = !!v; }
+
+// ── IndexedDB ─────────────────────────────────────────────────────────────────
+function initDB() {
+  return new Promise(function(res, rej) {
+    var req = indexedDB.open(DB_NAME, DB_VER);
+    req.onupgradeneeded = function(e) {
+      var d = e.target.result;
+      if (!d.objectStoreNames.contains('receipts')) {
+        var store = d.createObjectStore('receipts', { keyPath: 'id', autoIncrement: true });
+        store.createIndex('status', 'status', { unique: false });
+      }
+    };
+    req.onsuccess = function(e) { db = e.target.result; res(db); };
+    req.onerror   = function(e) { console.warn('IDB error', e); res(null); };
+  });
+}
+
+function dbPut(record) {
+  return new Promise(function(res, rej) {
+    if (!db) { res(null); return; }
+    var tx = db.transaction('receipts', 'readwrite');
+    var req = tx.objectStore('receipts').add(record);
+    req.onsuccess = function(e) { res(e.target.result); };
+    req.onerror   = function(e) { rej(e); };
+  });
+}
+
+function dbGetAll() {
+  return new Promise(function(res) {
+    if (!db) { res([]); return; }
+    var tx = db.transaction('receipts', 'readonly');
+    var req = tx.objectStore('receipts').getAll();
+    req.onsuccess = function(e) { res(e.target.result || []); };
+    req.onerror   = function()  { res([]); };
+  });
+}
+
+function dbUpdate(id, updates) {
+  return new Promise(function(res) {
+    if (!db) { res(); return; }
+    var tx = db.transaction('receipts', 'readwrite');
+    var store = tx.objectStore('receipts');
+    var req = store.get(id);
+    req.onsuccess = function(e) {
+      var rec = e.target.result;
+      if (rec) { Object.assign(rec, updates); store.put(rec); }
+      res();
+    };
+  });
+}
+
+// ── View navigation ───────────────────────────────────────────────────────────
+function showView(name, direction) {
+  var prev = document.getElementById('view-' + currentView);
+  var next = document.getElementById('view-' + name);
+  if (!next || currentView === name) return;
+
+  // Update bottom nav
+  updateNav(name);
+  prev.classList.remove('active');
+  prev.classList.add(direction === 'back' ? 'hidden' : 'slide-left');
+
+  next.classList.remove('hidden', 'slide-left');
+  next.classList.add('active');
+
+  prevView = currentView;
+  currentView = name;
+
+  // View-specific init
+  if (name === 'queue')    refreshQueueView();
+  if (name === 'settings') refreshSettingsView();
+  if (name === 'home')     refreshHomeQueue();
+}
+
+function goBack() {
+  if (currentView === 'capture') { closeCamera(); return; }
+  showView(prevView || 'home', 'back');
+}
+
+function updateNav(name) {
+  ['home','queue','settings'].forEach(function(n) {
+    var suffix = ['','2','3'];
+    suffix.forEach(function(s) {
+      var btn = document.getElementById('bn-' + n + s);
+      if (btn) { btn.classList.toggle('active', n === name); }
+    });
+  });
+}
+
+// ── Camera ────────────────────────────────────────────────────────────────────
+function openCapture() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    triggerUpload('image/*');
+    return;
+  }
+  showView('capture');
+  startCamera();
+}
+
+function startCamera() {
+  stopCamera();
+  var constraints = { video: { facingMode: facingMode, width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: false };
+  navigator.mediaDevices.getUserMedia(constraints)
+    .then(function(stream) {
+      mediaStream = stream;
+      var video = document.getElementById('camera-video');
+      video.srcObject = stream;
+    })
+    .catch(function(err) {
+      console.warn('Camera error:', err);
+      // Fallback to file input
+      stopCamera();
+      triggerUpload('image/*');
+      showView('home', 'back');
+    });
+}
+
+function stopCamera() {
+  if (mediaStream) {
+    mediaStream.getTracks().forEach(function(t) { t.stop(); });
+    mediaStream = null;
+  }
+  var video = document.getElementById('camera-video');
+  if (video) { video.srcObject = null; }
+}
+
+function closeCamera() {
+  stopCamera();
+  showView(prevView || 'home', 'back');
+}
+
+function switchCamera() {
+  facingMode = facingMode === 'environment' ? 'user' : 'environment';
+  startCamera();
+}
+
+function toggleFlash() {
+  var btn = document.getElementById('cam-flash-btn');
+  if (!btn) return;
+  btn.classList.toggle('on');
+  // Flash control via track
+  if (mediaStream) {
+    var track = mediaStream.getVideoTracks()[0];
+    if (track && track.getCapabilities && track.getCapabilities().torch) {
+      track.applyConstraints({ advanced: [{ torch: btn.classList.contains('on') }] }).catch(function(){});
+    }
+  }
+}
+
+function takePhoto() {
+  var video = document.getElementById('camera-video');
+  if (!video || !mediaStream) return;
+  var canvas = document.getElementById('canvas-work');
+  canvas.width  = video.videoWidth  || 1280;
+  canvas.height = video.videoHeight || 720;
+  var ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+  var quality = settings.compress ? 0.75 : 0.92;
+  currentDataUrl = canvas.toDataURL('image/jpeg', quality);
+  canvas.toBlob(function(blob) { currentBlob = blob; }, 'image/jpeg', quality);
+
+  stopCamera();
+  openReview(currentDataUrl);
+}
+
+// ── File upload ───────────────────────────────────────────────────────────────
+function triggerUpload(accept) {
+  var inp = document.getElementById('file-upload');
+  inp.accept = accept;
+  inp.value = '';
+  inp.onchange = handleFileUpload;
+  inp.click();
+}
+
+function handleFileUpload(e) {
+  var file = e.target.files[0];
+  if (!file) return;
+
+  if (file.type.startsWith('image/')) {
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+      currentDataUrl = ev.target.result;
+      // Compress if needed
+      if (settings.compress) {
+        compressImage(currentDataUrl, function(blob, dataUrl) {
+          currentBlob = blob;
+          currentDataUrl = dataUrl;
+          openReview(currentDataUrl);
+        });
+      } else {
+        currentBlob = file;
+        openReview(currentDataUrl);
+      }
+    };
+    reader.readAsDataURL(file);
+  } else {
+    // PDF/TXT/CSV — use as blob directly
+    currentBlob = file;
+    currentDataUrl = null;
+    openReview(null, file.name);
+  }
+}
+
+function compressImage(dataUrl, cb) {
+  var img = new Image();
+  img.onload = function() {
+    var canvas = document.getElementById('canvas-work');
+    var max = 1600;
+    var w = img.width, h = img.height;
+    if (w > max) { h = Math.round(h * max / w); w = max; }
+    if (h > max) { w = Math.round(w * max / h); h = max; }
+    canvas.width = w; canvas.height = h;
+    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+    var quality = 0.75;
+    var out = canvas.toDataURL('image/jpeg', quality);
+    canvas.toBlob(function(blob) { cb(blob, out); }, 'image/jpeg', quality);
+  };
+  img.src = dataUrl;
+}
+
+// ── Review ────────────────────────────────────────────────────────────────────
+function openReview(imgDataUrl, fileName) {
+  var img = document.getElementById('preview-img');
+  if (imgDataUrl) {
+    img.src = imgDataUrl;
+    img.style.display = 'block';
+  } else {
+    img.style.display = 'none';
+  }
+  // Set today's date
+  var today = new Date().toISOString().slice(0,10);
+  setVal('f-date', today);
+  setVal('f-vendor', '');
+  setVal('f-amount', '');
+  setVal('f-notes', '');
+  document.getElementById('f-category').value = '';
+  document.getElementById('f-payment').value  = 'M-Pesa';
+
+  // Try basic amount detection from image EXIF/filename
+  if (fileName) { setVal('f-vendor', fileName.replace(/\.[^.]+$/, '').replace(/[_-]/g,' ')); }
+
+  showView('review');
+}
+
+// ── Sending ────────────────────────────────────────────────────────────────────
+function buildReceiptRecord() {
+  return {
+    vendor:   getVal('f-vendor') || 'Unknown',
+    amount:   parseFloat(getVal('f-amount')) || 0,
+    date:     getVal('f-date')   || new Date().toISOString().slice(0,10),
+    payment:  getVal('f-payment') || 'M-Pesa',
+    category: getVal('f-category') || '',
+    notes:    getVal('f-notes')  || '',
+    company:  settings.company || 'Client',
+    pin:      settings.pin || '',
+    dataUrl:  currentDataUrl,
+    fileName: 'receipt_' + new Date().toISOString().replace(/[:.]/g,'-').slice(0,19) + '.jpg',
+    status:   'pending',
+    capturedAt: new Date().toISOString(),
+  };
+}
+
+function sendViaEmail() {
+  var email = settings.acctEmail;
+  if (!email) {
+    toast('⚙️ Set accountant email in Setup first', 'error');
+    setTimeout(function(){ showView('settings'); }, 1200);
+    return;
+  }
+
+  var rec = buildReceiptRecord();
+  var subject = encodeURIComponent(
+    '[RECEIPT] ' + rec.company + ' | KES ' + (rec.amount||'?') + ' | ' + rec.date
+  );
+  var body = encodeURIComponent(
+    'TaxBot Receipt Submission\n' +
+    '─────────────────────────\n' +
+    'Company:  ' + rec.company + '\n' +
+    'KRA PIN:  ' + (rec.pin || 'N/A') + '\n' +
+    'Vendor:   ' + rec.vendor + '\n' +
+    'Amount:   KES ' + (rec.amount || '0') + '\n' +
+    'Date:     ' + rec.date + '\n' +
+    'Payment:  ' + rec.payment + '\n' +
+    'Category: ' + (rec.category || 'auto-detect') + '\n' +
+    'Notes:    ' + (rec.notes || '—') + '\n\n' +
+    'Sent via TaxBot Receipt Capture PWA\n' +
+    'Receipt image is attached to this email.'
+  );
+
+  // Save to queue first
+  saveToQueue(rec, 'sent').then(function() { refreshHomeQueue(); });
+
+  // For image — download first, then open email client
+  if (currentBlob) {
+    var url = URL.createObjectURL(currentBlob);
+    var a = document.createElement('a');
+    a.href = url; a.download = rec.fileName; a.click();
+    setTimeout(function() { URL.revokeObjectURL(url); }, 2000);
+    setTimeout(function() {
+      window.location.href = 'mailto:' + email + '?subject=' + subject + '&body=' + body;
+    }, 800);
+    showSuccess(
+      'Receipt Ready to Send!',
+      'The receipt image was saved to your device.\n' +
+      'Attach it to the email that just opened — then hit Send. ' +
+      'TaxBot will pick it up automatically.'
+    );
+  } else {
+    window.location.href = 'mailto:' + email + '?subject=' + subject + '&body=' + body;
+    showSuccess('Email Draft Opened', 'Fill in the email and attach the receipt file manually.');
+  }
+}
+
+function sendViaWhatsApp() {
+  var wa = settings.acctWa.replace(/\D/g,'');
+  if (!wa) {
+    toast('⚙️ Set accountant WhatsApp number in Setup first', 'error');
+    setTimeout(function(){ showView('settings'); }, 1200);
+    return;
+  }
+
+  var rec = buildReceiptRecord();
+  var msg = encodeURIComponent(
+    '🧾 *Receipt from ' + rec.company + '*\n' +
+    'Vendor: ' + rec.vendor + '\n' +
+    'Amount: KES ' + (rec.amount || '?') + '\n' +
+    'Date: '   + rec.date + '\n' +
+    'Payment: ' + rec.payment + '\n' +
+    (rec.notes ? 'Notes: ' + rec.notes + '\n' : '') +
+    '\n_Sent via TaxBot Receipt PWA_'
+  );
+
+  // Download image first
+  if (currentBlob) {
+    var url = URL.createObjectURL(currentBlob);
+    var a = document.createElement('a');
+    a.href = url; a.download = rec.fileName; a.click();
+    setTimeout(function() { URL.revokeObjectURL(url); }, 2000);
+  }
+
+  saveToQueue(rec, 'sent').then(function(){ refreshHomeQueue(); });
+
+  var waUrl = 'https://wa.me/' + wa + '?text=' + msg;
+  window.open(waUrl, '_blank');
+  showSuccess('Sharing via WhatsApp', 'Attach the saved receipt image in the WhatsApp window.');
+}
+
+function saveToDevice() {
+  var rec = buildReceiptRecord();
+  if (currentBlob) {
+    var url = URL.createObjectURL(currentBlob);
+    var a = document.createElement('a');
+    a.href = url; a.download = rec.fileName; a.click();
+    setTimeout(function() { URL.revokeObjectURL(url); }, 2000);
+  } else {
+    toast('No image to save', 'error'); return;
+  }
+  saveToQueue(rec, 'saved').then(function(){ refreshHomeQueue(); });
+  showSuccess('Saved to Device', 'Drop the file in C:\\MyERP\\clients\\<id>\\inbox\\ for automatic processing.');
+}
+
+// Web Share API (when available — best on mobile)
+function tryNativeShare() {
+  if (!navigator.share) return false;
+  var rec = buildReceiptRecord();
+  if (currentBlob) {
+    var file = new File([currentBlob], rec.fileName, { type: 'image/jpeg' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      navigator.share({
+        title: 'Receipt: ' + rec.vendor,
+        text: 'KES ' + rec.amount + ' — ' + rec.date,
+        files: [file]
+      }).then(function() {
+        saveToQueue(rec, 'sent').then(function(){ refreshHomeQueue(); });
+        showSuccess('Shared!', 'Receipt sent via your chosen app.');
+      }).catch(function(){});
+      return true;
+    }
+  }
+  return false;
+}
+
+// Intercept email button — try native share first on mobile
+document.getElementById('btn-email-send').addEventListener('click', function(e) {
+  e.stopPropagation();
+  if (tryNativeShare()) return; // native share handled it
+  sendViaEmail();
+}, true);
+
+// Override onclick — remove it since we use addEventListener
+document.getElementById('btn-email-send').removeAttribute('onclick');
+
+// ── Queue management ──────────────────────────────────────────────────────────
+function saveToQueue(rec, status) {
+  rec.status = status || 'pending';
+  return dbPut(rec).catch(function(){ return null; });
+}
+
+function sendAllPending() {
+  toast('✉️ Opening email client...', 'success');
+  sendViaEmail();
+}
+
+// ── UI refresh ────────────────────────────────────────────────────────────────
+function refreshHomeQueue() {
+  dbGetAll().then(function(recs) {
+    var pending = recs.filter(function(r){ return r.status === 'pending'; });
+    var badge = document.getElementById('count-badge');
+    if (pending.length > 0) {
+      badge.textContent = pending.length + ' pending';
+      badge.style.display = '';
+    } else {
+      badge.style.display = 'none';
+    }
+
+    var list = document.getElementById('home-queue-list');
+    var recent = recs.slice(-5).reverse();
+    if (recent.length === 0) {
+      list.innerHTML = '<div class="queue-empty"><div class="qe-icon">🧾</div><div class="qe-text">No receipts yet.<br>Tap the camera to capture your first one.</div></div>';
+      return;
+    }
+    list.innerHTML = recent.map(function(r) {
+      var thumb = r.dataUrl
+        ? '<img src="' + r.dataUrl + '" alt="">'
+        : '<span style="font-size:22px">📄</span>';
+      return '<div class="receipt-card">' +
+        '<div class="rc-thumb">' + thumb + '</div>' +
+        '<div class="rc-body">' +
+          '<div class="rc-vendor">' + esc(r.vendor || 'Unknown') + '</div>' +
+          '<div class="rc-meta">' + r.date + ' · ' + (r.payment||'') + '</div>' +
+        '</div>' +
+        '<div class="rc-amount">KES ' + ((r.amount||0).toLocaleString()) + '</div>' +
+        '<div class="rc-status ' + (r.status||'pending') + '">' + (r.status||'pending') + '</div>' +
+      '</div>';
+    }).join('');
+  });
+}
+
+function refreshQueueView() {
+  dbGetAll().then(function(recs) {
+    var pending = recs.filter(function(r){ return r.status==='pending'; }).length;
+    var sent    = recs.filter(function(r){ return r.status==='sent'||r.status==='saved'; }).length;
+    var fail    = recs.filter(function(r){ return r.status==='failed'; }).length;
+    document.getElementById('qs-pending').textContent = pending;
+    document.getElementById('qs-sent').textContent    = sent;
+    document.getElementById('qs-fail').textContent    = fail;
+
+    var list = document.getElementById('queue-list');
+    if (recs.length === 0) {
+      list.innerHTML = '<div class="queue-empty"><div class="qe-icon">📭</div><div class="qe-text">Queue is empty</div></div>';
+      return;
+    }
+    list.innerHTML = recs.slice().reverse().map(function(r) {
+      var thumb = r.dataUrl
+        ? '<img src="' + r.dataUrl + '" alt="">'
+        : '<span style="font-size:22px">📄</span>';
+      return '<div class="receipt-card" style="margin-bottom:8px">' +
+        '<div class="rc-thumb">' + thumb + '</div>' +
+        '<div class="rc-body">' +
+          '<div class="rc-vendor">' + esc(r.vendor||'Unknown') + '</div>' +
+          '<div class="rc-meta">' + r.date + ' · KES ' + ((r.amount||0).toLocaleString()) + '</div>' +
+        '</div>' +
+        '<div class="rc-status ' + (r.status||'pending') + '">' + (r.status||'pending') + '</div>' +
+      '</div>';
+    }).join('');
+  });
+}
+
+function refreshSettingsView() {
+  dbGetAll().then(function(recs) {
+    var el = document.getElementById('s-queue-size');
+    if (el) el.textContent = recs.length + ' receipt' + (recs.length===1?'':'s');
+  });
+}
+
+// ── Success overlay ───────────────────────────────────────────────────────────
+function showSuccess(title, msg) {
+  document.getElementById('so-title').textContent = title;
+  document.getElementById('so-sub').textContent   = msg;
+  document.getElementById('success-overlay').classList.add('show');
+}
+
+function afterSend() {
+  document.getElementById('success-overlay').classList.remove('show');
+  currentBlob = null; currentDataUrl = null;
+  showView('home');
+  refreshHomeQueue();
+}
+
+// ── Toast ─────────────────────────────────────────────────────────────────────
+var toastTimer;
+function toast(msg, type) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show' + (type ? ' ' + type : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ el.classList.remove('show'); }, 2800);
+}
+
+// ── Escape HTML ───────────────────────────────────────────────────────────────
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Online status ─────────────────────────────────────────────────────────────
+function updateOnline() {
+  var badge = document.getElementById('online-badge');
+  if (navigator.onLine) {
+    badge.textContent = '● online';
+    badge.classList.add('live');
+  } else {
+    badge.textContent = '● offline';
+    badge.classList.remove('live');
+  }
+}
+window.addEventListener('online',  updateOnline);
+window.addEventListener('offline', updateOnline);
+
+// ── PWA Install ───────────────────────────────────────────────────────────────
+window.addEventListener('beforeinstallprompt', function(e) {
+  e.preventDefault();
+  deferredPrompt = e;
+  showInstallBanner();
+});
+
+function showInstallBanner() {
+  var wrap = document.getElementById('install-banner-wrap');
+  if (!wrap || !deferredPrompt) return;
+  wrap.innerHTML = '<div class="install-banner fade-in" onclick="installPWA()">' +
+    '<div class="ib-icon">📲</div>' +
+    '<div class="ib-body"><div class="ib-title">Install TaxBot App</div><div class="ib-sub">Add to Home Screen for instant access</div></div>' +
+    '<button class="ib-btn" onclick="event.stopPropagation();installPWA()">Install</button>' +
+  '</div>';
+}
+
+function installPWA() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(function(r) {
+    if (r.outcome === 'accepted') {
+      document.getElementById('install-banner-wrap').innerHTML = '';
+      toast('✓ TaxBot installed!', 'success');
+    }
+    deferredPrompt = null;
+  });
+}
+
+// iOS add-to-home-screen hint
+function showIOSHint() {
+  var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.navigator.standalone;
+  if (!isIOS) return;
+  var wrap = document.getElementById('install-banner-wrap');
+  if (!wrap) return;
+  wrap.innerHTML = '<div class="install-banner fade-in">' +
+    '<div class="ib-icon">📲</div>' +
+    '<div class="ib-body"><div class="ib-title">Add to Home Screen</div><div class="ib-sub">Tap Share (□↑) then "Add to Home Screen"</div></div>' +
+  '</div>';
+}
+
+// ── Service Worker (inline blob technique) ────────────────────────────────────
+function registerSW() {
+  if (!('serviceWorker' in navigator)) return;
+  var sw = `
+const CACHE = 'taxbot-pwa-v1';
+self.addEventListener('install', e => e.waitUntil(
+  caches.open(CACHE).then(c => c.addAll([]))
+));
+self.addEventListener('fetch', e => {
+  if (e.request.method !== 'GET') return;
+  e.respondWith(
+    fetch(e.request).catch(() => caches.match(e.request))
+  );
+});
+`;
+  try {
+    var blob = new Blob([sw], { type: 'application/javascript' });
+    var url  = URL.createObjectURL(blob);
+    navigator.serviceWorker.register(url).catch(function(){});
+  } catch(e) {}
+}
+
+// ── File upload input handler ─────────────────────────────────────────────────
+document.getElementById('file-upload').addEventListener('change', handleFileUpload);
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+  loadSettings();
+  updateOnline();
+  initDB().then(function() {
+    refreshHomeQueue();
+  });
+  registerSW();
+  showIOSHint();
+
+  // First-run: if no email set, nudge to settings
+  setTimeout(function() {
+    if (!settings.acctEmail) {
+      toast('⚙️ Tap Setup to enter your accountant\'s email', '');
+    }
+  }, 1500);
+});
+</script>
+</body>
+</html>
