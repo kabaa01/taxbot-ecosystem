@@ -1,0 +1,2083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#08100A">
+<meta name="description" content="Q-Predict Kenya — AI-powered tax intelligence platform. Forecast, comply, optimise.">
+<title>Q-Predict — Kenya Tax Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Karla:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+/* ── TOKENS ───────────────────────────────────────────────────── */
+:root{
+  --bg:#08100A; --deep:#0C160D; --panel:#101A10; --raised:#152015;
+  --border:#1C2E1C; --border2:#243824; --green:#1B4332; --mint:#2D6A4F;
+  --sage:#52B788; --lime:#95D5B2; --gold:#C8952A; --amber:#F0B429;
+  --cream:#F5EFE4; --text:#BDD6B8; --muted:#4E6A4E; --dim:#2E4230;
+  --red:#E05555; --blue:#52A8D5; --sky:#89C4E1; --purple:#9B7EC8;
+  --ff:'Karla',system-ui,sans-serif;
+  --fd:'Syne',sans-serif;
+  --fm:'IBM Plex Mono',monospace;
+  --r:10px; --r2:16px; --r3:24px;
+  --sb:200px; /* sidebar width */
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{height:100%;font-size:15px;scroll-behavior:smooth}
+body{font-family:var(--ff);background:var(--bg);color:var(--text);
+     min-height:100%;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+button,input,select,textarea{font-family:inherit}
+/* scrollbar */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--panel)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+/* ── NOISE OVERLAY ───────────────────────────────────────────── */
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  mix-blend-mode:overlay}
+
+/* ── SCREENS ─────────────────────────────────────────────────── */
+.screen{display:none}
+.screen.active{display:block}
+#s-app{display:none;flex-direction:column;min-height:100vh}
+#s-app.active{display:flex}
+
+/* ── TYPOGRAPHY ──────────────────────────────────────────────── */
+h1,h2,h3,h4{font-family:var(--fd);line-height:1.15;letter-spacing:-.02em}
+.mono{font-family:var(--fm)}
+
+/* ── ANIMATIONS ──────────────────────────────────────────────── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes blink{0%,100%{opacity:1}49%{opacity:1}50%,99%{opacity:0}}
+.fade-in{animation:fadeUp .5s ease both}
+.fade-in-d1{animation-delay:.08s}.fade-in-d2{animation-delay:.16s}
+.fade-in-d3{animation-delay:.24s}.fade-in-d4{animation-delay:.32s}
+
+/* ══════════════════════════════════════════ LANDING ════════════ */
+#s-landing{background:var(--bg);overflow-x:hidden}
+
+/* NAV */
+.lnav{position:sticky;top:0;z-index:100;
+  display:flex;align-items:center;padding:0 clamp(20px,5vw,80px);height:64px;
+  background:rgba(8,16,10,.85);backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border)}
+.lnav-logo{font-family:var(--fd);font-size:18px;font-weight:800;color:#fff;flex:1}
+.lnav-logo span{color:var(--gold)}
+.lnav-links{display:flex;align-items:center;gap:32px}
+.lnav-link{font-size:13px;color:var(--muted);cursor:pointer;transition:.18s}
+.lnav-link:hover{color:var(--text)}
+.lnav-cta{font-family:var(--fd);font-size:13px;font-weight:700;
+  background:var(--gold);color:var(--bg);border:none;border-radius:8px;
+  padding:8px 20px;cursor:pointer;transition:.18s}
+.lnav-cta:hover{background:var(--amber)}
+
+/* HERO */
+.hero{position:relative;padding:clamp(60px,12vh,120px) clamp(20px,5vw,80px);
+  display:flex;flex-direction:column;align-items:flex-start;
+  max-width:1200px;margin:0 auto;gap:0}
+.hero-eyebrow{font-family:var(--fm);font-size:11px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--gold);margin-bottom:20px;
+  display:flex;align-items:center;gap:8px}
+.hero-eyebrow::before{content:'';width:32px;height:1px;background:var(--gold)}
+.hero-h1{font-size:clamp(36px,6vw,80px);font-weight:800;color:#fff;
+  max-width:10em;line-height:1.05;margin-bottom:24px}
+.hero-h1 span{color:var(--gold);position:relative}
+.hero-sub{font-size:clamp(14px,1.5vw,18px);color:var(--muted);
+  max-width:520px;line-height:1.75;margin-bottom:40px}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:60px}
+.btn-hero-primary{font-family:var(--fd);font-size:15px;font-weight:700;
+  background:var(--gold);color:var(--bg);border:none;border-radius:10px;
+  padding:14px 32px;cursor:pointer;transition:all .2s;
+  box-shadow:0 4px 24px rgba(200,149,42,.35)}
+.btn-hero-primary:hover{background:var(--amber);transform:translateY(-1px)}
+.btn-hero-ghost{font-family:var(--fd);font-size:15px;font-weight:600;
+  background:transparent;color:var(--text);
+  border:1px solid var(--border2);border-radius:10px;
+  padding:14px 28px;cursor:pointer;transition:.18s}
+.btn-hero-ghost:hover{border-color:var(--sage);color:var(--sage)}
+.hero-trust{font-family:var(--fm);font-size:11px;color:var(--muted);
+  display:flex;align-items:center;gap:16px}
+.trust-dot{width:6px;height:6px;border-radius:50%;background:var(--sage)}
+
+/* Hero dashboard preview */
+.hero-preview{
+  width:100%;max-width:900px;margin:0 auto 0;
+  background:var(--panel);border:1px solid var(--border2);
+  border-radius:var(--r3);overflow:hidden;
+  box-shadow:0 32px 80px rgba(0,0,0,.6);
+  position:relative}
+.hero-preview::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.preview-bar{display:flex;align-items:center;gap:8px;padding:12px 16px;
+  background:var(--raised);border-bottom:1px solid var(--border)}
+.preview-dot{width:10px;height:10px;border-radius:50%}
+.preview-title{font-family:var(--fm);font-size:11px;color:var(--muted);margin-left:4px}
+.preview-body{padding:20px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.preview-kpi{background:var(--raised);border:1px solid var(--border);border-radius:var(--r);
+  padding:12px;display:flex;flex-direction:column;gap:4px}
+.preview-kpi-v{font-family:var(--fm);font-size:16px;color:var(--amber)}
+.preview-kpi-l{font-size:10px;color:var(--muted)}
+.preview-chart-row{grid-column:1/-1;background:var(--raised);border:1px solid var(--border);
+  border-radius:var(--r);padding:14px 16px;height:90px;overflow:hidden}
+.preview-chart-label{font-family:var(--fm);font-size:9px;color:var(--muted);margin-bottom:8px}
+
+/* STATS BAR */
+.stats-bar{background:var(--raised);border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border)}
+.stats-inner{max-width:1200px;margin:0 auto;padding:0 clamp(20px,5vw,80px);
+  display:grid;grid-template-columns:repeat(4,1fr)}
+.stat-item{padding:28px 0;border-right:1px solid var(--border);text-align:center}
+.stat-item:last-child{border-right:none}
+.stat-n{font-family:var(--fd);font-size:clamp(24px,3vw,38px);font-weight:800;color:var(--amber)}
+.stat-l{font-size:12px;color:var(--muted);margin-top:4px}
+
+/* FEATURES */
+.section{max-width:1200px;margin:0 auto;padding:clamp(60px,10vh,100px) clamp(20px,5vw,80px)}
+.section-eyebrow{font-family:var(--fm);font-size:10.5px;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--gold);margin-bottom:16px}
+.section-title{font-size:clamp(24px,3vw,42px);font-weight:800;color:#fff;margin-bottom:16px}
+.section-sub{font-size:14px;color:var(--muted);max-width:500px;line-height:1.7;margin-bottom:48px}
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+.feat-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--r2);
+  padding:28px;transition:all .25s;cursor:default;position:relative;overflow:hidden}
+.feat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:0;transition:.25s}
+.feat-card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.feat-card:hover::before{opacity:1}
+.feat-icon{font-size:28px;margin-bottom:16px}
+.feat-title{font-family:var(--fd);font-size:16px;font-weight:700;color:#fff;margin-bottom:8px}
+.feat-desc{font-size:13px;color:var(--muted);line-height:1.7}
+.feat-tag{margin-top:12px;display:inline-block;font-family:var(--fm);font-size:10px;
+  background:rgba(200,149,42,.1);color:var(--gold);border:1px solid rgba(200,149,42,.2);
+  border-radius:20px;padding:3px 10px}
+
+/* PRICING */
+.pricing-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.price-card{background:var(--panel);border:1px solid var(--border);
+  border-radius:var(--r2);padding:28px;position:relative;overflow:hidden;transition:.25s}
+.price-card.popular{border-color:var(--gold);background:linear-gradient(145deg,var(--panel),rgba(200,149,42,.04))}
+.price-card.popular::before{content:'MOST POPULAR';position:absolute;top:16px;right:16px;
+  font-family:var(--fm);font-size:9px;letter-spacing:.1em;color:var(--gold);
+  background:rgba(200,149,42,.12);border:1px solid rgba(200,149,42,.25);
+  border-radius:20px;padding:3px 10px}
+.price-tier{font-family:var(--fm);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:12px}
+.price-amount{font-family:var(--fd);font-size:32px;font-weight:800;color:#fff;margin-bottom:4px}
+.price-amount span{font-size:14px;font-weight:400;color:var(--muted);margin-left:2px}
+.price-sub{font-family:var(--fm);font-size:11px;color:var(--gold);margin-bottom:20px}
+.price-features{display:flex;flex-direction:column;gap:8px;margin-bottom:24px}
+.price-feat{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:8px}
+.price-feat::before{content:'✓';color:var(--sage);font-weight:600;flex-shrink:0}
+.price-btn{width:100%;padding:12px;border:1px solid var(--border2);border-radius:var(--r);
+  font-family:var(--fd);font-size:13px;font-weight:700;cursor:pointer;transition:.18s;
+  background:transparent;color:var(--text)}
+.price-btn.gold{background:var(--gold);color:var(--bg);border-color:var(--gold)}
+.price-btn:hover{opacity:.85;transform:scale(.99)}
+
+/* HOW IT WORKS */
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:24px;
+  counter-reset:step}
+.step{position:relative;counter-increment:step}
+.step::before{content:counter(step,'0' decimal);
+  font-family:var(--fm);font-size:40px;font-weight:600;color:var(--border2);
+  position:absolute;top:-12px;left:0;line-height:1}
+.step-body{padding-top:32px}
+.step-title{font-family:var(--fd);font-size:15px;font-weight:700;color:#fff;margin-bottom:8px}
+.step-desc{font-size:13px;color:var(--muted);line-height:1.65}
+
+/* FOOTER */
+footer{background:var(--panel);border-top:1px solid var(--border);
+  padding:40px clamp(20px,5vw,80px)}
+.footer-inner{max-width:1200px;margin:0 auto;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px}
+.footer-logo{font-family:var(--fd);font-size:16px;font-weight:800;color:var(--text)}
+.footer-logo span{color:var(--gold)}
+.footer-copy{font-family:var(--fm);font-size:11px;color:var(--muted)}
+.footer-links{display:flex;gap:24px}
+.footer-link{font-size:12px;color:var(--muted);cursor:pointer;transition:.18s}
+.footer-link:hover{color:var(--text)}
+
+/* ══════════════════════════════════════════ SIGNUP ═════════════ */
+#s-signup{min-height:100vh;display:none;flex-direction:column;
+  align-items:center;justify-content:center;padding:40px 20px;background:var(--bg)}
+#s-signup.active{display:flex}
+.signup-container{width:100%;max-width:480px}
+.signup-back{font-family:var(--fm);font-size:12px;color:var(--muted);cursor:pointer;
+  display:flex;align-items:center;gap:6px;margin-bottom:32px;transition:.18s}
+.signup-back:hover{color:var(--text)}
+.signup-logo{font-family:var(--fd);font-size:22px;font-weight:800;color:#fff;
+  margin-bottom:8px}
+.signup-logo span{color:var(--gold)}
+.signup-headline{font-family:var(--fd);font-size:26px;font-weight:800;color:#fff;
+  margin-bottom:8px;line-height:1.2}
+.signup-sub{font-size:13.5px;color:var(--muted);margin-bottom:32px;line-height:1.6}
+.trial-badge{display:inline-flex;align-items:center;gap:8px;
+  background:rgba(82,183,136,.1);border:1px solid rgba(82,183,136,.25);
+  border-radius:20px;padding:6px 14px;margin-bottom:24px}
+.trial-badge-icon{font-size:14px}
+.trial-badge-text{font-family:var(--fm);font-size:11px;color:var(--sage)}
+.signup-form{display:flex;flex-direction:column;gap:16px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-label{font-family:var(--fm);font-size:10px;text-transform:uppercase;
+  letter-spacing:.1em;color:var(--muted)}
+.form-input,.form-select{
+  background:var(--panel);border:1px solid var(--border);border-radius:var(--r);
+  padding:12px 14px;font-size:14px;color:var(--text);outline:none;
+  transition:border-color .18s;width:100%;-webkit-appearance:none}
+.form-input::placeholder{color:var(--dim)}
+.form-input:focus,.form-select:focus{border-color:var(--mint)}
+.form-select option{background:var(--panel)}
+.tier-selector{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tier-option{background:var(--panel);border:1.5px solid var(--border);
+  border-radius:var(--r);padding:12px 14px;cursor:pointer;transition:.18s;
+  position:relative}
+.tier-option.selected{border-color:var(--gold);background:rgba(200,149,42,.05)}
+.tier-option-popular{position:absolute;top:8px;right:8px;
+  font-family:var(--fm);font-size:8px;color:var(--gold)}
+.tier-option-name{font-family:var(--fd);font-size:13px;font-weight:700;color:#fff;margin-bottom:3px}
+.tier-option-price{font-family:var(--fm);font-size:11px;color:var(--muted)}
+.tier-option.selected .tier-option-price{color:var(--gold)}
+.btn-start-trial{width:100%;padding:16px;background:var(--gold);color:var(--bg);
+  border:none;border-radius:var(--r);font-family:var(--fd);font-size:16px;font-weight:800;
+  cursor:pointer;transition:all .2s;margin-top:8px;
+  box-shadow:0 4px 24px rgba(200,149,42,.3)}
+.btn-start-trial:hover{background:var(--amber);transform:translateY(-1px)}
+.signup-fine{font-size:11px;color:var(--muted);text-align:center;margin-top:12px;line-height:1.6}
+.signup-fine b{color:var(--text)}
+
+/* ══════════════════════════════════════════ APP ════════════════ */
+#s-app{flex-direction:row;align-items:stretch}
+
+/* SIDEBAR */
+.sidebar{
+  width:var(--sb);min-height:100vh;
+  background:var(--panel);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  position:sticky;top:0;height:100vh;overflow-y:auto;flex-shrink:0}
+.sidebar::-webkit-scrollbar{width:3px}
+.sb-logo{padding:20px 20px 16px;border-bottom:1px solid var(--border)}
+.sb-logo-text{font-family:var(--fd);font-size:16px;font-weight:800;color:#fff}
+.sb-logo-text span{color:var(--gold)}
+.sb-company{font-family:var(--fm);font-size:10px;color:var(--muted);margin-top:3px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-trial-bar{margin:12px 16px;background:rgba(82,183,136,.08);
+  border:1px solid rgba(82,183,136,.2);border-radius:var(--r);padding:10px 12px}
+.sb-trial-label{font-family:var(--fm);font-size:9px;color:var(--sage);letter-spacing:.08em;
+  text-transform:uppercase;margin-bottom:4px}
+.sb-trial-time{font-family:var(--fm);font-size:16px;color:#fff}
+.sb-trial-sub{font-size:10px;color:var(--muted);margin-top:2px}
+.sb-nav{flex:1;padding:8px 0}
+.sb-section{font-family:var(--fm);font-size:9px;text-transform:uppercase;
+  letter-spacing:.12em;color:var(--dim);padding:16px 20px 6px}
+.sb-item{display:flex;align-items:center;gap:10px;
+  padding:10px 20px;cursor:pointer;transition:.15s;
+  font-size:13px;color:var(--muted);border-radius:0}
+.sb-item:hover{background:var(--raised);color:var(--text)}
+.sb-item.active{color:var(--sage);background:rgba(82,183,136,.07);
+  border-right:2px solid var(--sage)}
+.sb-item-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0}
+.sb-item-badge{margin-left:auto;font-family:var(--fm);font-size:9px;
+  background:var(--gold);color:var(--bg);border-radius:10px;padding:1px 7px}
+.sb-footer{padding:16px 20px;border-top:1px solid var(--border)}
+.sb-footer-user{font-family:var(--fm);font-size:10px;color:var(--muted)}
+.sb-footer-logout{font-family:var(--fm);font-size:10px;color:var(--dim);
+  cursor:pointer;margin-top:4px;transition:.15s}
+.sb-footer-logout:hover{color:var(--red)}
+
+/* MAIN CONTENT */
+.app-main{flex:1;min-width:0;display:flex;flex-direction:column}
+.app-topbar{display:flex;align-items:center;padding:0 28px;height:56px;
+  background:var(--panel);border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:50;gap:16px}
+.topbar-title{font-family:var(--fd);font-size:17px;font-weight:700;color:#fff;flex:1}
+.topbar-time{font-family:var(--fm);font-size:11px;color:var(--muted)}
+.topbar-online{display:flex;align-items:center;gap:5px;
+  font-family:var(--fm);font-size:10px;color:var(--sage)}
+.topbar-online::before{content:'';width:6px;height:6px;border-radius:50%;
+  background:var(--sage);flex-shrink:0;animation:pulse 2s infinite}
+.topbar-upgrade{font-family:var(--fd);font-size:12px;font-weight:700;
+  background:var(--gold);color:var(--bg);border:none;border-radius:6px;
+  padding:6px 14px;cursor:pointer;transition:.18s}
+.topbar-upgrade:hover{background:var(--amber)}
+
+/* TRIAL BANNER */
+.trial-banner{
+  background:linear-gradient(90deg,rgba(200,149,42,.08),rgba(200,149,42,.04));
+  border-bottom:1px solid rgba(200,149,42,.2);
+  padding:10px 28px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.tb-text{font-size:13px;color:var(--text)}.tb-text b{color:var(--amber)}
+.tb-clock{font-family:var(--fm);font-size:13px;color:var(--amber);margin-left:auto}
+.tb-upgrade{font-family:var(--fd);font-size:12px;font-weight:700;
+  background:var(--gold);color:var(--bg);border:none;border-radius:6px;
+  padding:6px 16px;cursor:pointer;transition:.18s}
+.tb-upgrade:hover{background:var(--amber)}
+
+/* VIEW CONTAINER */
+.view{display:none;padding:28px;max-width:1200px;margin:0 auto;width:100%}
+.view.active{display:block}
+.view-title{font-family:var(--fd);font-size:22px;font-weight:800;color:#fff;margin-bottom:4px}
+.view-sub{font-size:13px;color:var(--muted);margin-bottom:28px}
+
+/* ── CARDS ────────────────────────────────────────────────────── */
+.card{background:var(--panel);border:1px solid var(--border);border-radius:var(--r2);padding:20px 22px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.card-title{font-family:var(--fd);font-size:14px;font-weight:700;color:#fff}
+.card-sub{font-family:var(--fm);font-size:10px;color:var(--muted);margin-top:2px}
+.card-action{font-family:var(--fm);font-size:10px;color:var(--sage);cursor:pointer;transition:.15s}
+.card-action:hover{color:var(--lime)}
+
+/* ── KPI GRID ─────────────────────────────────────────────────── */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:24px}
+.kpi-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--r2);
+  padding:18px 20px;position:relative;overflow:hidden;transition:.2s}
+.kpi-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px}
+.kpi-card.gold::after{background:var(--gold)}.kpi-card.sage::after{background:var(--sage)}
+.kpi-card.red::after{background:var(--red)}.kpi-card.blue::after{background:var(--blue)}
+.kpi-card.purple::after{background:var(--purple)}
+.kpi-label{font-family:var(--fm);font-size:9.5px;text-transform:uppercase;
+  letter-spacing:.1em;color:var(--muted);margin-bottom:8px}
+.kpi-value{font-family:var(--fm);font-size:clamp(18px,2vw,26px);font-weight:600;color:#fff;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi-trend{font-family:var(--fm);font-size:11px;color:var(--muted);margin-top:6px;
+  display:flex;align-items:center;gap:5px}
+.kpi-trend.up{color:var(--sage)}.kpi-trend.down{color:var(--red)}.kpi-trend.warn{color:var(--amber)}
+.kpi-icon{position:absolute;top:16px;right:16px;font-size:20px;opacity:.35}
+
+/* ── GRID LAYOUTS ─────────────────────────────────────────────── */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.grid-3{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:16px}
+.grid-4{display:grid;grid-template-columns:3fr 1fr;gap:16px;margin-bottom:16px}
+@media(max-width:900px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}}
+
+/* ── CHART CONTAINERS ─────────────────────────────────────────── */
+.chart-wrap{overflow:hidden;width:100%}
+.chart-label-row{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px}
+.chart-main-title{font-family:var(--fm);font-size:11px;color:var(--muted)}
+.chart-main-value{font-family:var(--fm);font-size:13px;color:var(--amber)}
+.chart-legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
+.chart-legend-item{display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:10px;color:var(--muted)}
+.chart-legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* ── TABLE ────────────────────────────────────────────────────── */
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{font-family:var(--fm);font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--muted);padding:8px 12px;text-align:left;border-bottom:1px solid var(--border)}
+.tbl td{font-size:13px;padding:11px 12px;border-bottom:1px solid var(--border);color:var(--text)}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:rgba(255,255,255,.02)}
+.tbl .mono{font-family:var(--fm);font-size:12px}
+.tbl .green{color:var(--sage)}.tbl .red{color:var(--red)}.tbl .amber{color:var(--amber)}
+.tbl .muted{color:var(--muted)}
+
+/* ── BADGES ───────────────────────────────────────────────────── */
+.badge{display:inline-block;font-family:var(--fm);font-size:10px;
+  border-radius:20px;padding:2px 9px;font-weight:500}
+.badge-green{background:rgba(82,183,136,.12);color:var(--sage);border:1px solid rgba(82,183,136,.2)}
+.badge-amber{background:rgba(200,149,42,.12);color:var(--amber);border:1px solid rgba(200,149,42,.2)}
+.badge-red  {background:rgba(224,85,85,.12);color:var(--red);border:1px solid rgba(224,85,85,.2)}
+.badge-blue {background:rgba(82,168,213,.12);color:var(--blue);border:1px solid rgba(82,168,213,.2)}
+.badge-dim  {background:var(--raised);color:var(--muted);border:1px solid var(--border)}
+
+/* ── PROGRESS BAR ─────────────────────────────────────────────── */
+.progress-track{height:5px;background:var(--raised);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;border-radius:3px;transition:width .8s cubic-bezier(.34,1.56,.64,1)}
+
+/* ── COMPLIANCE ITEMS ─────────────────────────────────────────── */
+.compliance-item{display:flex;align-items:flex-start;gap:14px;
+  padding:14px 0;border-bottom:1px solid var(--border)}
+.compliance-item:last-child{border-bottom:none}
+.ci-icon{width:36px;height:36px;border-radius:10px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:16px}
+.ci-icon.green{background:rgba(82,183,136,.12)}
+.ci-icon.amber{background:rgba(200,149,42,.12)}
+.ci-icon.red  {background:rgba(224,85,85,.12)}
+.ci-body{flex:1}
+.ci-title{font-size:13.5px;font-weight:500;color:#fff;margin-bottom:3px}
+.ci-sub  {font-size:12px;color:var(--muted)}
+.ci-right{text-align:right;flex-shrink:0}
+.ci-amount{font-family:var(--fm);font-size:13px;color:var(--amber)}
+.ci-date  {font-family:var(--fm);font-size:10px;color:var(--muted);margin-top:2px}
+.ci-status{font-family:var(--fm);font-size:10px;color:var(--muted);margin-top:2px}
+
+/* ── FORECAST ROWS ────────────────────────────────────────────── */
+.forecast-quarter{margin-bottom:20px}
+.fq-header{display:flex;align-items:center;gap:12px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.fq-label{font-family:var(--fd);font-size:15px;font-weight:700;color:#fff}
+.fq-period{font-family:var(--fm);font-size:10px;color:var(--muted);margin-left:auto}
+.fq-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.fq-cell{background:var(--raised);border:1px solid var(--border);border-radius:var(--r);padding:12px}
+.fq-cell-label{font-family:var(--fm);font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:5px}
+.fq-cell-value{font-family:var(--fm);font-size:16px;font-weight:600;color:var(--amber)}
+.fq-cell-note{font-size:10px;color:var(--muted);margin-top:3px}
+
+/* ── CLIENTS ──────────────────────────────────────────────────── */
+.client-row{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)}
+.client-row:last-child{border-bottom:none}
+.client-avatar{width:40px;height:40px;border-radius:12px;background:var(--green);
+  display:flex;align-items:center;justify-content:center;font-family:var(--fd);
+  font-size:14px;font-weight:800;color:#fff;flex-shrink:0}
+.client-name{font-size:14px;font-weight:500;color:#fff}
+.client-meta{font-family:var(--fm);font-size:10.5px;color:var(--muted);margin-top:2px}
+.client-receipts{font-family:var(--fm);font-size:11px;color:var(--muted);text-align:right}
+.client-receipts b{color:var(--sage);display:block;font-size:13px}
+
+/* ── BILLING CALC ─────────────────────────────────────────────── */
+.billing-calc{display:flex;flex-direction:column;gap:10px}
+.bc-row{display:flex;align-items:center;justify-content:space-between;
+  padding:10px 0;border-bottom:1px solid var(--border);font-size:13px}
+.bc-row:last-child{border-bottom:none;padding-top:14px;margin-top:4px}
+.bc-row.total{font-family:var(--fm);font-size:16px;font-weight:600}
+.bc-label{color:var(--muted)}.bc-value{color:var(--text);font-family:var(--fm)}
+.bc-value.gold{color:var(--amber)}
+.bc-input{background:var(--raised);border:1px solid var(--border);border-radius:6px;
+  padding:6px 10px;width:90px;font-family:var(--fm);font-size:12px;
+  color:var(--text);outline:none;text-align:right;transition:.18s}
+.bc-input:focus{border-color:var(--mint)}
+
+/* TIER COMPARISON */
+.tier-compare{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.tc-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--r2);
+  padding:18px 14px;text-align:center;transition:.2s}
+.tc-card.active{border-color:var(--gold);background:rgba(200,149,42,.04)}
+.tc-card.active .tc-name{color:var(--amber)}
+.tc-name{font-family:var(--fd);font-size:13px;font-weight:700;color:var(--muted);margin-bottom:8px}
+.tc-price{font-family:var(--fm);font-size:20px;color:#fff;margin-bottom:4px}
+.tc-pct{font-family:var(--fm);font-size:10px;color:var(--gold);margin-bottom:16px}
+.tc-features{text-align:left;display:flex;flex-direction:column;gap:6px}
+.tc-feat{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.tc-feat::before{content:'✓';color:var(--sage)}
+.tc-btn{width:100%;margin-top:16px;padding:9px;border:1px solid var(--border2);
+  border-radius:var(--r);font-family:var(--fd);font-size:12px;font-weight:700;
+  background:transparent;color:var(--text);cursor:pointer;transition:.18s}
+.tc-btn.gold{background:var(--gold);color:var(--bg);border-color:var(--gold)}
+.tc-btn:hover{opacity:.85}
+
+/* ── BUTTONS ──────────────────────────────────────────────────── */
+.btn{font-family:var(--fd);font-size:13px;font-weight:700;border-radius:var(--r);
+  padding:10px 20px;border:none;cursor:pointer;transition:all .18s;display:inline-flex;
+  align-items:center;gap:7px}
+.btn-primary{background:var(--gold);color:var(--bg);box-shadow:0 2px 12px rgba(200,149,42,.25)}
+.btn-primary:hover{background:var(--amber)}
+.btn-secondary{background:var(--raised);color:var(--text);border:1px solid var(--border2)}
+.btn-secondary:hover{background:var(--border2)}
+.btn-danger{background:rgba(224,85,85,.1);color:var(--red);border:1px solid rgba(224,85,85,.2)}
+.btn-sm{padding:7px 14px;font-size:12px}
+.btn:active{transform:scale(.97)}
+
+/* ── INPUT RANGE ─────────────────────────────────────────────── */
+input[type=range]{-webkit-appearance:none;width:100%;height:4px;
+  background:var(--border2);border-radius:2px;outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;
+  border-radius:50%;background:var(--gold);cursor:pointer}
+
+/* ── TOAST ────────────────────────────────────────────────────── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(10px);
+  background:var(--raised);border:1px solid var(--border2);border-radius:20px;
+  padding:10px 20px;font-size:13px;z-index:9998;opacity:0;
+  transition:all .28s cubic-bezier(.34,1.56,.64,1);pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.success{border-color:var(--mint);color:var(--sage)}
+.toast.error{border-color:var(--red);color:var(--red)}
+
+/* ── MOBILE ───────────────────────────────────────────────────── */
+@media(max-width:768px){
+  :root{--sb:0px}
+  .sidebar{display:none}
+  .lnav-links{display:none}
+  .stats-inner{grid-template-columns:1fr 1fr}
+  .stat-item:nth-child(2){border-right:none}
+  .stat-item:nth-child(3){border-top:1px solid var(--border)}
+  .pricing-grid{grid-template-columns:1fr}
+  .tier-compare{grid-template-columns:1fr 1fr}
+  .fq-grid{grid-template-columns:1fr}
+  .app-topbar{padding:0 16px}
+  .view{padding:16px}
+  .grid-2,.grid-3,.grid-4{grid-template-columns:1fr}
+  .form-row{grid-template-columns:1fr}
+  .tier-selector{grid-template-columns:1fr 1fr}
+  .mobile-nav{display:flex}
+  .kpi-grid{grid-template-columns:1fr 1fr}
+}
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;
+  background:var(--panel);border-top:1px solid var(--border);
+  padding:8px 0 20px;z-index:100;gap:0}
+.mob-nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:8px 4px;cursor:pointer;background:none;border:none}
+.mob-nav-icon{font-size:20px}
+.mob-nav-lbl{font-family:var(--fm);font-size:9px;color:var(--muted)}
+.mob-nav-btn.active .mob-nav-lbl{color:var(--sage)}
+
+/* ── EXPIRED SCREEN ───────────────────────────────────────────── */
+#s-expired{min-height:100vh;display:none;flex-direction:column;align-items:center;
+  justify-content:center;padding:40px 20px;background:var(--bg);text-align:center}
+#s-expired.active{display:flex}
+.expired-icon{font-size:64px;margin-bottom:24px;opacity:.7}
+.expired-title{font-family:var(--fd);font-size:32px;font-weight:800;color:#fff;margin-bottom:12px}
+.expired-sub{font-size:15px;color:var(--muted);max-width:480px;line-height:1.7;margin-bottom:32px}
+.expired-plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:14px;width:100%;max-width:800px;margin:0 auto 32px}
+
+/* ── SEPARATOR ────────────────────────────────────────────────── */
+.sep{height:1px;background:var(--border);margin:20px 0}
+.sep-label{text-align:center;position:relative;margin:20px 0}
+.sep-label::before{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:var(--border)}
+.sep-label span{position:relative;background:var(--panel);padding:0 12px;
+  font-family:var(--fm);font-size:10px;color:var(--muted)}
+
+/* ── SCROLLABLE TABLE WRAPPER ─────────────────────────────────── */
+.tbl-wrap{overflow-x:auto}
+.tbl-wrap::-webkit-scrollbar{height:3px}
+
+/* ── NUMBER FORMAT ────────────────────────────────────────────── */
+.num-pos{color:var(--sage)}.num-neg{color:var(--red)}.num-warn{color:var(--amber)}
+
+/* ── EMPTY STATE ─────────────────────────────────────────────── */
+.empty-state{text-align:center;padding:40px 20px;color:var(--muted)}
+.empty-icon{font-size:40px;margin-bottom:12px;opacity:.4}
+.empty-text{font-size:13px;line-height:1.6}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════ LANDING ════════════════════════ -->
+<div id="s-landing" class="screen active">
+  <nav class="lnav">
+    <div class="lnav-logo">Q‑<span>Predict</span></div>
+    <div class="lnav-links">
+      <div class="lnav-link" onclick="scrollTo('#features')">Features</div>
+      <div class="lnav-link" onclick="scrollTo('#pricing')">Pricing</div>
+      <div class="lnav-link" onclick="scrollTo('#how-it-works')">How It Works</div>
+    </div>
+    <button class="lnav-cta" onclick="showSignup()">Start Free Trial →</button>
+  </nav>
+
+  <div class="hero">
+    <div class="hero-eyebrow fade-in">Kenya Tax Intelligence Platform</div>
+    <h1 class="hero-h1 fade-in fade-in-d1">Predict Tax.<br>Never Miss<br>a <span>KRA Deadline</span>.</h1>
+    <p class="hero-sub fade-in fade-in-d2">Q-Predict gives accountants and businesses real-time tax forecasting, automatic VAT &amp; PAYE computation, and KRA eTIMS compliance tracking — all powered by Finance Act 2024 rules.</p>
+    <div class="hero-actions fade-in fade-in-d3">
+      <button class="btn-hero-primary" onclick="showSignup()">Start 72-Hour Free Trial</button>
+      <button class="btn-hero-ghost" onclick="showSignup('professional')">See Demo Dashboard</button>
+    </div>
+    <div class="hero-trust fade-in fade-in-d4">
+      <div class="trust-dot"></div>
+      <span>No credit card</span>
+      <div class="trust-dot"></div>
+      <span>Finance Act 2024 compliant</span>
+      <div class="trust-dot"></div>
+      <span>Works with TaxBot Kenya</span>
+    </div>
+
+    <div class="hero-preview fade-in fade-in-d4" style="margin-top:48px">
+      <div class="preview-bar">
+        <div class="preview-dot" style="background:#FF5F56"></div>
+        <div class="preview-dot" style="background:#FFBD2E"></div>
+        <div class="preview-dot" style="background:#27C93F"></div>
+        <div class="preview-title">Q-Predict Dashboard — Savanna Supplies Ltd · FY 2025</div>
+      </div>
+      <div class="preview-body">
+        <div class="preview-kpi"><div class="preview-kpi-v">KES 4.2M</div><div class="preview-kpi-l">Total Expenses YTD</div></div>
+        <div class="preview-kpi"><div class="preview-kpi-v">KES 187K</div><div class="preview-kpi-l">VAT Liability (Mar)</div></div>
+        <div class="preview-kpi"><div class="preview-kpi-v">KES 92K</div><div class="preview-kpi-l">PAYE Due 9 Apr</div></div>
+        <div class="preview-kpi"><div class="preview-kpi-v">94%</div><div class="preview-kpi-l">Compliance Score</div></div>
+        <div class="preview-chart-row">
+          <div class="preview-chart-label">MONTHLY EXPENSE TREND — KES</div>
+          <div id="preview-sparkline"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stats-inner">
+      <div class="stat-item"><div class="stat-n">Finance Act<br>2024</div><div class="stat-l">Fully Compliant</div></div>
+      <div class="stat-item"><div class="stat-n">16%</div><div class="stat-l">VAT Auto-Calc</div></div>
+      <div class="stat-item"><div class="stat-n">25+</div><div class="stat-l">TaxBot Commands</div></div>
+      <div class="stat-item"><div class="stat-n">8</div><div class="stat-l">KRA eTIMS Sheets</div></div>
+    </div>
+  </div>
+
+  <div class="section" id="features">
+    <div class="section-eyebrow">Platform Features</div>
+    <h2 class="section-title">Everything your accountant needs</h2>
+    <p class="section-sub">Built specifically for Kenya's tax regime. Every calculation uses the latest Finance Act 2024 rates.</p>
+    <div class="features-grid">
+      <div class="feat-card"><div class="feat-icon">📊</div><div class="feat-title">Tax Forecast Engine</div><div class="feat-desc">Quarterly VAT, PAYE, WHT, and Corporation Tax projections using real Kenya 2024 bands. Installment tax deadlines automatically computed.</div><div class="feat-tag">Finance Act 2024</div></div>
+      <div class="feat-card"><div class="feat-icon">🧾</div><div class="feat-title">Receipt Analytics</div><div class="feat-desc">Expense categorisation, vendor pattern analysis, spend-by-category donut charts. Connects directly with TaxBot's processed receipt database.</div><div class="feat-tag">Auto-categorise</div></div>
+      <div class="feat-card"><div class="feat-icon">📅</div><div class="feat-title">KRA Compliance Calendar</div><div class="feat-desc">Never miss a VAT return (20th), PAYE filing (9th), WHT remittance, or annual return. Days-to-deadline alerts with amount estimates.</div><div class="feat-tag">Zero penalties</div></div>
+      <div class="feat-card"><div class="feat-icon">🤖</div><div class="feat-title">TaxBot Integration</div><div class="feat-desc">Reads directly from TaxBot's expense database. Runs any of 25+ commands including monthly close, KRA eTIMS generation, handover reports.</div><div class="feat-tag">Native integration</div></div>
+      <div class="feat-card"><div class="feat-icon">💹</div><div class="feat-title">P&amp;L Intelligence</div><div class="feat-desc">Auto-generated Profit &amp; Loss, Balance Sheet, and Trial Balance with year-on-year comparison. Budget vs actuals variance analysis.</div><div class="feat-tag">IFRS-aligned</div></div>
+      <div class="feat-card"><div class="feat-icon">🏦</div><div class="feat-title">Multi-Client Hub</div><div class="feat-desc">Manage up to 20 clients (Professional tier) from one dashboard. Per-client compliance scores, deadlines, and billing summaries.</div><div class="feat-tag">Accountant-first</div></div>
+    </div>
+  </div>
+
+  <div style="background:var(--panel);border-top:1px solid var(--border);border-bottom:1px solid var(--border)" id="pricing">
+    <div class="section">
+      <div class="section-eyebrow">Transparent Pricing</div>
+      <h2 class="section-title">Simple, usage-based pricing</h2>
+      <p class="section-sub">Base fee covers your fixed costs. The small % of tax managed aligns our incentives with yours — we succeed when you save more.</p>
+      <div class="pricing-grid">
+        <div class="price-card">
+          <div class="price-tier">Pay-As-You-Go</div>
+          <div class="price-amount">KES 0<span>/mo</span></div>
+          <div class="price-sub">+ 1.25% of tax managed</div>
+          <div class="price-features">
+            <div class="price-feat">Up to 3 clients</div>
+            <div class="price-feat">50 receipts/month</div>
+            <div class="price-feat">KES 1,800 VAT filing</div>
+            <div class="price-feat">Basic compliance calendar</div>
+          </div>
+          <button class="price-btn" onclick="showSignup('payg')">Start Free Trial</button>
+        </div>
+        <div class="price-card">
+          <div class="price-tier">Starter</div>
+          <div class="price-amount">KES 2,000<span>/mo</span></div>
+          <div class="price-sub">+ 0.5% of tax managed</div>
+          <div class="price-features">
+            <div class="price-feat">Up to 5 clients</div>
+            <div class="price-feat">200 receipts/month</div>
+            <div class="price-feat">KES 500 VAT filing</div>
+            <div class="price-feat">Full compliance calendar</div>
+            <div class="price-feat">P&amp;L + Balance Sheet</div>
+          </div>
+          <button class="price-btn" onclick="showSignup('starter')">Start Free Trial</button>
+        </div>
+        <div class="price-card popular">
+          <div class="price-tier">Professional</div>
+          <div class="price-amount">KES 6,500<span>/mo</span></div>
+          <div class="price-sub">+ 0.75% of tax managed</div>
+          <div class="price-features">
+            <div class="price-feat">Up to 20 clients</div>
+            <div class="price-feat">1,000 receipts/month</div>
+            <div class="price-feat">KES 1,200 VAT filing</div>
+            <div class="price-feat">All reports &amp; forecasts</div>
+            <div class="price-feat">Priority support</div>
+          </div>
+          <button class="price-btn gold" onclick="showSignup('professional')">Start Free Trial</button>
+        </div>
+        <div class="price-card">
+          <div class="price-tier">Enterprise</div>
+          <div class="price-amount">KES 18,000<span>/mo</span></div>
+          <div class="price-sub">+ 1.0% of tax managed</div>
+          <div class="price-features">
+            <div class="price-feat">Unlimited clients</div>
+            <div class="price-feat">Unlimited receipts</div>
+            <div class="price-feat">KES 2,500 VAT filing</div>
+            <div class="price-feat">Custom integrations</div>
+            <div class="price-feat">Dedicated account manager</div>
+          </div>
+          <button class="price-btn" onclick="showSignup('enterprise')">Start Free Trial</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" id="how-it-works">
+    <div class="section-eyebrow">Getting Started</div>
+    <h2 class="section-title">Up and running in 5 minutes</h2>
+    <p class="section-sub">No server setup. No credit card. Just your company details and you're live.</p>
+    <div class="steps">
+      <div class="step"><div class="step-body"><div class="step-title">Sign up for your trial</div><div class="step-desc">Enter your company name, KRA PIN, and email. Choose a tier. Your 72-hour full-featured trial starts immediately.</div></div></div>
+      <div class="step"><div class="step-body"><div class="step-title">Connect TaxBot data</div><div class="step-desc">Q-Predict reads directly from your TaxBot Kenya expense database. Run <code style="font-family:var(--fm);color:var(--sage);font-size:11px">python taxbot.py monthly</code> to sync.</div></div></div>
+      <div class="step"><div class="step-body"><div class="step-title">Review your tax position</div><div class="step-desc">Instant dashboard with VAT, PAYE, and Corp Tax estimates. Compliance calendar shows every KRA deadline with amounts due.</div></div></div>
+      <div class="step"><div class="step-body"><div class="step-title">Stay ahead of KRA</div><div class="step-desc">Get alerted before deadlines. Generate KRA eTIMS workbooks. Export handover packs for your clients — all in one click.</div></div></div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div><div class="footer-logo">Q‑<span>Predict</span></div><div class="footer-copy" style="margin-top:6px">© 2025 BellTower. Powered by TaxBot Kenya.</div></div>
+      <div class="footer-links">
+        <div class="footer-link">Privacy</div>
+        <div class="footer-link">Terms</div>
+        <div class="footer-link" onclick="showSignup()">Start Trial</div>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- ════════════════════════════ SIGNUP ═════════════════════════ -->
+<div id="s-signup" class="screen">
+  <div class="signup-container">
+    <div class="signup-back" onclick="showLanding()">← Back to Q-Predict</div>
+    <div class="signup-logo">Q‑<span>Predict</span></div>
+    <h2 class="signup-headline">Start your free trial</h2>
+    <p class="signup-sub">Full access to all features. No credit card required.</p>
+    <div class="trial-badge">
+      <div class="trial-badge-icon">⏱</div>
+      <div class="trial-badge-text">72-hour full-featured trial · No payment details needed</div>
+    </div>
+    <div class="signup-form">
+      <div class="form-row">
+        <div class="form-group">
+          <div class="form-label">Company Name *</div>
+          <input class="form-input" id="su-company" placeholder="Savanna Supplies Ltd" autocomplete="organization">
+        </div>
+        <div class="form-group">
+          <div class="form-label">KRA PIN *</div>
+          <input class="form-input" id="su-pin" placeholder="A000000000A" maxlength="11" style="font-family:var(--fm)">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <div class="form-label">Email Address *</div>
+          <input class="form-input" id="su-email" type="email" placeholder="you@company.co.ke" autocomplete="email">
+        </div>
+        <div class="form-group">
+          <div class="form-label">Phone Number</div>
+          <input class="form-input" id="su-phone" type="tel" placeholder="+254 700 000 000" autocomplete="tel">
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="form-label">Industry Sector</div>
+        <select class="form-select" id="su-sector">
+          <option value="RETAIL">Retail &amp; Trade</option>
+          <option value="SERVICES">Professional Services</option>
+          <option value="FMCG">FMCG / Manufacturing</option>
+          <option value="AGRI">Agriculture</option>
+          <option value="TECH">Technology</option>
+          <option value="HOSPITALITY">Hospitality &amp; Food</option>
+          <option value="HEALTH">Healthcare</option>
+          <option value="CONSTRUCTION">Construction &amp; Real Estate</option>
+          <option value="EDUCATION">Education</option>
+          <option value="NGO">NGO / Non-Profit</option>
+          <option value="OTHER">Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <div class="form-label">Choose Your Plan (free trial for all)</div>
+        <div class="tier-selector" id="tier-selector">
+          <div class="tier-option" onclick="selectTier('payg')" data-tier="payg">
+            <div class="tier-option-name">Pay-As-You-Go</div>
+            <div class="tier-option-price">KES 0 + 1.25%</div>
+          </div>
+          <div class="tier-option" onclick="selectTier('starter')" data-tier="starter">
+            <div class="tier-option-name">Starter</div>
+            <div class="tier-option-price">KES 2,000 + 0.5%</div>
+          </div>
+          <div class="tier-option selected" onclick="selectTier('professional')" data-tier="professional">
+            <div class="tier-option-popular">⭐ Popular</div>
+            <div class="tier-option-name">Professional</div>
+            <div class="tier-option-price">KES 6,500 + 0.75%</div>
+          </div>
+          <div class="tier-option" onclick="selectTier('enterprise')" data-tier="enterprise">
+            <div class="tier-option-name">Enterprise</div>
+            <div class="tier-option-price">KES 18,000 + 1.0%</div>
+          </div>
+        </div>
+      </div>
+      <button class="btn-start-trial" onclick="startTrial()">Start Free 72-Hour Trial →</button>
+      <p class="signup-fine"><b>No credit card required.</b> After 72 hours, choose a plan to continue. Your data is never deleted — we just limit new processing until you upgrade.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════ APP ════════════════════════════ -->
+<div id="s-app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-text">Q‑<span>Predict</span></div>
+      <div class="sb-company" id="sb-company-name">Loading…</div>
+    </div>
+    <div class="sb-trial-bar" id="sb-trial-bar">
+      <div class="sb-trial-label">⏱ Trial Active</div>
+      <div class="sb-trial-time" id="sb-trial-time">72:00:00</div>
+      <div class="sb-trial-sub">Click to upgrade anytime</div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-section">Analytics</div>
+      <div class="sb-item active" onclick="showView('overview')" id="sb-overview">
+        <span class="sb-item-icon">📊</span> Overview
+      </div>
+      <div class="sb-item" onclick="showView('forecast')" id="sb-forecast">
+        <span class="sb-item-icon">📈</span> Tax Forecast
+      </div>
+      <div class="sb-item" onclick="showView('analytics')" id="sb-analytics">
+        <span class="sb-item-icon">🧾</span> Receipt Analytics
+      </div>
+      <div class="sb-section">Compliance</div>
+      <div class="sb-item" onclick="showView('compliance')" id="sb-compliance">
+        <span class="sb-item-icon">📅</span> KRA Deadlines
+        <span class="sb-item-badge" id="sb-deadline-badge">3</span>
+      </div>
+      <div class="sb-section">Management</div>
+      <div class="sb-item" onclick="showView('clients')" id="sb-clients">
+        <span class="sb-item-icon">👥</span> Clients
+      </div>
+      <div class="sb-item" onclick="showView('commands')" id="sb-commands">
+        <span class="sb-item-icon">⌨️</span> TaxBot Commands
+      </div>
+      <div class="sb-item" onclick="showView('billing')" id="sb-billing">
+        <span class="sb-item-icon">💳</span> Billing
+      </div>
+    </nav>
+    <div class="sb-footer">
+      <div class="sb-footer-user" id="sb-user-email">user@company.co.ke</div>
+      <div class="sb-footer-logout" onclick="logout()">Sign out</div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="app-main">
+    <!-- TOP BAR -->
+    <div class="app-topbar">
+      <div class="topbar-title" id="topbar-title">Overview</div>
+      <div class="topbar-time" id="topbar-time"></div>
+      <div class="topbar-online">Live</div>
+      <button class="topbar-upgrade" onclick="showView('billing')">Upgrade Plan</button>
+    </div>
+
+    <!-- TRIAL BANNER -->
+    <div class="trial-banner" id="trial-banner">
+      <div class="tb-text">🎯 <b>72-hour trial</b> — full access. No limits until trial ends.</div>
+      <div class="tb-clock" id="tb-clock">72:00:00 remaining</div>
+      <button class="tb-upgrade" onclick="showView('billing')">Upgrade Now</button>
+    </div>
+
+    <!-- VIEWS -->
+    <div class="view active" id="v-overview">
+      <div class="view-title">Financial Overview</div>
+      <div class="view-sub" id="ov-sub">FY 2025 · Loading…</div>
+      <div class="kpi-grid" id="ov-kpis"></div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><div><div class="card-title">Monthly Expenses</div><div class="card-sub">12-month trend</div></div><div class="card-action" onclick="showView('analytics')">Full Analytics →</div></div>
+          <div class="chart-wrap" id="ov-bar-chart" style="height:140px;display:flex;align-items:flex-end;gap:3px;overflow:hidden"></div>
+          <div style="display:flex;justify-content:space-between;margin-top:8px;font-family:var(--fm);font-size:9px;color:var(--muted)"><span id="ov-chart-min"></span><span id="ov-chart-max"></span></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div><div class="card-title">Tax Liability</div><div class="card-sub">Rolling 6 months</div></div></div>
+          <div class="chart-wrap" id="ov-line-chart" style="height:140px"></div>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><div><div class="card-title">Expense Categories</div><div class="card-sub">YTD breakdown</div></div></div>
+          <div style="display:flex;align-items:center;gap:20px">
+            <div id="ov-donut" style="flex-shrink:0"></div>
+            <div class="chart-legend" id="ov-donut-legend" style="flex-direction:column;gap:8px;margin:0"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div><div class="card-title">Upcoming Deadlines</div><div class="card-sub">Next 45 days</div></div><div class="card-action" onclick="showView('compliance')">All Deadlines →</div></div>
+          <div id="ov-deadlines"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="view" id="v-forecast">
+      <div class="view-title">Tax Forecast</div>
+      <div class="view-sub">Quarterly projections · Finance Act 2024 rates · VAT, PAYE, Corp Tax, WHT</div>
+      <div class="kpi-grid" id="fc-kpis"></div>
+
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header"><div><div class="card-title">Annual Tax Liability Projection</div><div class="card-sub">Based on current run-rate</div></div></div>
+        <div style="height:180px;margin-bottom:8px" id="fc-annual-chart"></div>
+        <div class="chart-legend" id="fc-legend"></div>
+      </div>
+
+      <div id="fc-quarters"></div>
+
+      <div class="card" style="margin-top:16px">
+        <div class="card-header"><div><div class="card-title">PAYE Calculator</div><div class="card-sub">Finance Act 2024 · Individual monthly tax</div></div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+          <div>
+            <div style="font-family:var(--fm);font-size:11px;color:var(--muted);margin-bottom:8px">GROSS MONTHLY SALARY (KES)</div>
+            <input type="range" id="paye-slider" min="20000" max="500000" step="5000" value="80000" oninput="updatePAYE()">
+            <div style="display:flex;justify-content:space-between;font-family:var(--fm);font-size:10px;color:var(--muted);margin-top:4px"><span>KES 20K</span><span>KES 500K</span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px" id="paye-result"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="view" id="v-analytics">
+      <div class="view-title">Receipt Analytics</div>
+      <div class="view-sub">Spend patterns, vendor analysis, category trends — from your TaxBot expense database</div>
+      <div class="kpi-grid" id="an-kpis"></div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><div><div class="card-title">Spend by Category</div><div class="card-sub">YTD total allocation</div></div></div>
+          <div style="display:flex;gap:20px;align-items:center">
+            <div id="an-donut" style="flex-shrink:0"></div>
+            <div class="chart-legend" id="an-legend" style="flex-direction:column;gap:9px;margin:0"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div><div class="card-title">Monthly Trend</div><div class="card-sub">Expenses vs VAT</div></div></div>
+          <div style="height:200px" id="an-trend-chart"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div><div class="card-title">Top Vendors</div><div class="card-sub">By YTD spend</div></div><div class="card-action" id="an-vendor-toggle" onclick="toggleVendorView()">Show All</div></div>
+        <div class="tbl-wrap"><table class="tbl" id="an-vendor-table"></table></div>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <div class="card-header"><div><div class="card-title">Receipt Log</div><div class="card-sub">Last 20 transactions</div></div></div>
+        <div class="tbl-wrap"><table class="tbl" id="an-receipt-log"></table></div>
+      </div>
+    </div>
+
+    <div class="view" id="v-compliance">
+      <div class="view-title">KRA Compliance</div>
+      <div class="view-sub">All deadlines · Finance Act 2024 · Never pay a penalty again</div>
+      <div class="kpi-grid" id="co-kpis"></div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><div><div class="card-title">Upcoming Deadlines</div><div class="card-sub">Next 90 days · KRA iTax</div></div></div>
+          <div id="co-deadlines-full"></div>
+        </div>
+        <div>
+          <div class="card" style="margin-bottom:16px">
+            <div class="card-header"><div><div class="card-title">Compliance Score</div><div class="card-sub">Based on filing history</div></div></div>
+            <div style="text-align:center;padding:12px 0">
+              <div id="co-gauge" style="position:relative;display:inline-block"></div>
+              <div style="font-family:var(--fm);font-size:36px;font-weight:600;color:var(--sage);margin-top:8px" id="co-score-val">94%</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:4px">KRA Compliance Score</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px" id="co-score-breakdown"></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div><div class="card-title">KRA eTIMS Status</div><div class="card-sub">Current month</div></div></div>
+            <div id="co-etims-status"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:0">
+        <div class="card-header"><div><div class="card-title">Annual Compliance Calendar</div><div class="card-sub">All KRA filing dates for your accounting year</div></div></div>
+        <div class="tbl-wrap"><table class="tbl" id="co-calendar"></table></div>
+      </div>
+    </div>
+
+    <div class="view" id="v-clients">
+      <div class="view-title">Client Management</div>
+      <div class="view-sub" id="cl-sub">Loading…</div>
+      <div class="kpi-grid" id="cl-kpis"></div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><div><div class="card-title">Your Clients</div><div class="card-sub">Active on TaxBot Kenya</div></div><button class="btn btn-primary btn-sm" onclick="toast('Open TaxBot: python taxbot.py add-client', 'success')">+ Add via TaxBot</button></div>
+          <div id="cl-list"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div><div class="card-title">Billing Summary</div><div class="card-sub">This month across all clients</div></div></div>
+          <div id="cl-billing-summary"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="view" id="v-commands">
+      <div class="view-title">TaxBot Commands</div>
+      <div class="view-sub">All 25 available commands · Copy and run in your terminal</div>
+      <div class="kpi-grid" id="cmd-kpis"></div>
+      <div id="cmd-grid" style="display:flex;flex-direction:column;gap:12px"></div>
+    </div>
+
+    <div class="view" id="v-billing">
+      <div class="view-title">Billing &amp; Subscription</div>
+      <div class="view-sub">Manage your plan · Usage-based pricing · Cancel anytime</div>
+
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header"><div><div class="card-title">Current Plan</div><div class="card-sub" id="billing-plan-sub">Loading…</div></div><span class="badge badge-green" id="billing-plan-badge">Active</span></div>
+        <div class="billing-calc" id="billing-calc"></div>
+      </div>
+
+      <div style="margin-bottom:20px">
+        <div style="font-family:var(--fd);font-size:17px;font-weight:700;color:#fff;margin-bottom:16px">Compare Plans</div>
+        <div class="tier-compare" id="tier-compare-grid"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div><div class="card-title">Billing Calculator</div><div class="card-sub">Estimate your monthly fee</div></div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div>
+              <div style="font-family:var(--fm);font-size:10px;color:var(--muted);margin-bottom:6px">RECEIPTS PROCESSED</div>
+              <input type="range" id="bill-receipts" min="10" max="1000" step="10" value="150" oninput="updateBillingCalc()">
+              <div style="display:flex;justify-content:space-between;font-family:var(--fm);font-size:10px;color:var(--muted);margin-top:3px"><span>10</span><span id="bill-receipts-val">150</span><span>1000</span></div>
+            </div>
+            <div>
+              <div style="font-family:var(--fm);font-size:10px;color:var(--muted);margin-bottom:6px">EMPLOYEES (PAYE)</div>
+              <input type="range" id="bill-employees" min="1" max="50" step="1" value="8" oninput="updateBillingCalc()">
+              <div style="display:flex;justify-content:space-between;font-family:var(--fm);font-size:10px;color:var(--muted);margin-top:3px"><span>1</span><span id="bill-emp-val">8</span><span>50</span></div>
+            </div>
+            <div>
+              <div style="font-family:var(--fm);font-size:10px;color:var(--muted);margin-bottom:6px">TAX MANAGED (KES/MO)</div>
+              <input type="range" id="bill-tax" min="50000" max="2000000" step="50000" value="400000" oninput="updateBillingCalc()">
+              <div style="display:flex;justify-content:space-between;font-family:var(--fm);font-size:10px;color:var(--muted);margin-top:3px"><span>50K</span><span id="bill-tax-val">400K</span><span>2M</span></div>
+            </div>
+          </div>
+          <div id="billing-calc-result"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MOBILE NAV -->
+    <div class="mobile-nav" id="mob-nav">
+      <button class="mob-nav-btn active" onclick="showView('overview')" id="mb-overview"><div class="mob-nav-icon">📊</div><div class="mob-nav-lbl">Overview</div></button>
+      <button class="mob-nav-btn" onclick="showView('forecast')" id="mb-forecast"><div class="mob-nav-icon">📈</div><div class="mob-nav-lbl">Forecast</div></button>
+      <button class="mob-nav-btn" onclick="showView('compliance')" id="mb-compliance"><div class="mob-nav-icon">📅</div><div class="mob-nav-lbl">KRA</div></button>
+      <button class="mob-nav-btn" onclick="showView('billing')" id="mb-billing"><div class="mob-nav-icon">💳</div><div class="mob-nav-lbl">Billing</div></button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════ EXPIRED ════════════════════════ -->
+<div id="s-expired" class="screen">
+  <div class="expired-icon">⏰</div>
+  <h2 class="expired-title">Trial Ended</h2>
+  <p class="expired-sub">Your 72-hour trial has ended. Choose a plan to continue with full access. Your data is safely stored — nothing is deleted.</p>
+  <div class="expired-plans" id="expired-plans"></div>
+  <button class="btn btn-secondary" onclick="showLanding()" style="margin-top:8px">← Back to Home</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ════════════════════════════ SCRIPTS ════════════════════════ -->
+<script>
+'use strict';
+
+// ══════════════════════════════════════════ CONSTANTS ════════════
+var TIERS = {
+  payg:         {name:'Pay-As-You-Go', base:0,      per_receipt:100, per_emp:450, vat_fee:1800, wht_fee:900,  pct:0.0125, max_clients:3,   max_receipts:50},
+  starter:      {name:'Starter',       base:2000,   per_receipt:50,  per_emp:200, vat_fee:500,  wht_fee:300,  pct:0.005,  max_clients:5,   max_receipts:200},
+  professional: {name:'Professional',  base:6500,   per_receipt:35,  per_emp:350, vat_fee:1200, wht_fee:600,  pct:0.0075, max_clients:20,  max_receipts:1000},
+  enterprise:   {name:'Enterprise',    base:18000,  per_receipt:20,  per_emp:500, vat_fee:2500, wht_fee:1200, pct:0.01,   max_clients:999, max_receipts:99999}
+};
+
+var CATEGORIES = ['Office Supplies','Travel & Transport','Meals & Ent.','Software & Tech',
+  'Utilities','Professional Services','Marketing & Ads','Fuel','Healthcare',
+  'Rent & Occupancy','Bank Charges','Equipment','Other'];
+
+var CAT_COLORS = ['#C8952A','#52B788','#52A8D5','#9B7EC8',
+  '#E05555','#F0B429','#89C4E1','#95D5B2','#8B9D77',
+  '#D4A574','#6B9CA7','#B89BC8','#7A8E7A'];
+
+var VENDORS = ['Safaricom PLC','Kenya Power','Nairobi Water','Uber Kenya','Java House',
+  'Westgate Mall','Carrefour Sarit','Total Energies','Britam Insurance',
+  'Stanbic Bank Charges','DHL Kenya','Microsoft 365','Google Workspace',
+  'Printfast Ltd','Office Warehouse','Equity Bank Charges'];
+
+var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+// ══════════════════════════════════════════ STATE ════════════════
+var STATE = {
+  screen: 'landing',
+  view: 'overview',
+  trial: null,
+  data: null,
+  selectedTier: 'professional',
+};
+
+function saveState() {
+  try { localStorage.setItem('qpredict-state', JSON.stringify({trial:STATE.trial})); } catch(e) {}
+}
+
+function loadState() {
+  try {
+    var s = JSON.parse(localStorage.getItem('qpredict-state') || '{}');
+    if (s.trial) STATE.trial = s.trial;
+  } catch(e) {}
+}
+
+// ══════════════════════════════════════════ TAX ENGINE ═══════════
+var TAX = {
+  // PAYE Finance Act 2024 — monthly
+  paye: function(gross) {
+    var tax = 0;
+    if (gross <= 24000)       { tax = gross * 0.10; }
+    else if (gross <= 32333)  { tax = 2400 + (gross - 24000) * 0.25; }
+    else if (gross <= 500000) { tax = 4483.25 + (gross - 32333) * 0.30; }
+    else if (gross <= 800000) { tax = 144473.25 + (gross - 500000) * 0.325; }
+    else                      { tax = 241973.25 + (gross - 800000) * 0.35; }
+    var relief = 2400; // personal relief
+    return Math.max(0, tax - relief);
+  },
+  vat:      function(amount)  { return amount * 0.16; },
+  vatInput: function(amount)  { return amount * 0.16; },
+  corpTax:  function(profit)  { return profit * 0.30; },
+  nssf:     function(gross)   {
+    var t1 = Math.min(gross, 7000) * 0.06;
+    var t2 = Math.max(0, Math.min(gross, 36000) - 7000) * 0.06;
+    return t1 + t2;
+  },
+  shif:     function(gross)   { return gross * 0.0275; },  // SHIF 2.75%
+  ahl:      function(gross)   { return gross * 0.015; },   // Affordable Housing Levy
+  effectivePAYERate: function(gross) {
+    return gross > 0 ? (this.paye(gross) / gross * 100).toFixed(1) : 0;
+  }
+};
+
+// ══════════════════════════════════════════ DEMO DATA ════════════
+function generateDemoData(company, tier, sector) {
+  var now = new Date();
+  var yr  = now.getFullYear();
+  var em  = 8; // employees
+
+  // Monthly expense totals with realistic seasonality
+  var bases = [310000,285000,420000,380000,350000,395000,330000,310000,450000,390000,370000,580000];
+  var months = bases.map(function(b,i) {
+    var v = b + (Math.random()-0.5) * b * 0.15;
+    v = Math.round(v);
+    var vatable = Math.round(v * 0.65);
+    // breakdown by category
+    var cats = {};
+    var remaining = v;
+    CATEGORIES.slice(0,12).forEach(function(c,j) {
+      if (j === 11) { cats[c] = remaining; return; }
+      var share = [0.12,0.10,0.08,0.09,0.07,0.11,0.06,0.06,0.04,0.08,0.05,0.08,0.06][j] || 0.05;
+      var amt = Math.round(v * share * (0.85 + Math.random()*0.3));
+      cats[c] = amt; remaining -= amt;
+    });
+    // employees PAYE
+    var avgSalary = 65000;
+    var totalGross = avgSalary * em + (Math.random()-0.5) * 10000;
+    var paye = Math.round(em * TAX.paye(avgSalary));
+    return {
+      month: MONTHS[i], m: i+1, year: yr,
+      total: v, vatable: vatable, vatInput: Math.round(vatable * 0.16),
+      vatOutput: Math.round(v * 0.55 * 1.1 * 0.16),  // approx sales VAT
+      paye: paye, gross: Math.round(totalGross), employees: em,
+      categories: cats,
+      receipts: Math.floor(30 + Math.random()*80),
+      profit: Math.round(v * 0.28 * (0.9 + Math.random()*0.2)),
+    };
+  });
+
+  // Generate realistic transactions
+  var transactions = [];
+  months.forEach(function(mo, mi) {
+    var count = mo.receipts;
+    for (var i=0; i<count; i++) {
+      var cat = CATEGORIES[Math.floor(Math.random()*12)];
+      var vendor = VENDORS[Math.floor(Math.random()*VENDORS.length)];
+      var day = Math.floor(1 + Math.random()*28);
+      var date = yr + '-' + String(mo.m).padStart(2,'0') + '-' + String(day).padStart(2,'0');
+      var amount = Math.round(500 + Math.random()*50000);
+      var hasVAT = Math.random() > 0.35;
+      var payments = ['M-Pesa','M-Pesa','M-Pesa','Cash','Card','EFT'];
+      transactions.push({
+        id: 'TXN-' + String(transactions.length+1).padStart(4,'0'),
+        date: date, vendor: vendor, category: cat,
+        amount: amount, vat: hasVAT ? Math.round(amount*0.16/1.16) : 0,
+        payment: payments[Math.floor(Math.random()*payments.length)],
+        month: mi
+      });
+    }
+  });
+  transactions.sort(function(a,b){ return b.date.localeCompare(a.date); });
+
+  // Demo clients
+  var demoClients = [
+    {id:'savanna_001',name:'Savanna Supplies Ltd',pin:'A001234567B',tier:'professional',receipts:187,sector:'RETAIL',employees:8,monthlyRevenue:2400000,vatRegistered:true},
+    {id:'limuru_002',name:'Limuru Highlands Trust',pin:'P002345678C',tier:'starter',receipts:43,sector:'AGRI',employees:12,monthlyRevenue:890000,vatRegistered:false},
+    {id:'nairobi_003',name:'NairobiTech Solutions',pin:'A003456789D',tier:'professional',receipts:95,sector:'TECH',employees:15,monthlyRevenue:1750000,vatRegistered:true},
+    {id:'swift_004',name:'Swift Logistics Kenya',pin:'A004567890E',tier:'starter',receipts:62,sector:'SERVICES',employees:22,monthlyRevenue:3200000,vatRegistered:true},
+    {id:'green_005',name:'GreenGrow Agri SACCO',pin:'V005678901F',tier:'payg',receipts:28,sector:'AGRI',employees:5,monthlyRevenue:450000,vatRegistered:false},
+  ];
+
+  return { months: months, transactions: transactions, clients: demoClients,
+           company: company, sector: sector, year: yr, employees: em,
+           tier: tier };
+}
+
+// ══════════════════════════════════════════ CHARTS ═══════════════
+// SVG Bar Chart (monthly)
+function svgBarChart(data, opts) {
+  opts = opts || {};
+  var w = opts.w || 400, h = opts.h || 140;
+  var color = opts.color || '#C8952A', color2 = opts.color2;
+  var max = Math.max.apply(null, data.map(function(d){return d.v||0}));
+  if (!max) max = 1;
+  var bw = Math.floor((w - (data.length-1)*3) / data.length);
+  var rects = data.map(function(d,i) {
+    var bh = Math.round((d.v/max) * (h-24)); if(bh<2&&d.v>0)bh=2;
+    var x = i*(bw+3), y = h-24-bh;
+    var c = (color2 && d.highlight) ? color2 : (d.highlight?color2||color:color);
+    var lbl = opts.noLabel ? '' : '<text x="'+(x+bw/2)+'" y="'+(h-5)+'" text-anchor="middle" fill="#4E6A4E" font-size="8" font-family="IBM Plex Mono,monospace">'+d.l+'</text>';
+    return '<rect x="'+x+'" y="'+y+'" width="'+bw+'" height="'+bh+'" rx="2" fill="'+c+'" opacity="'+(d.highlight?'1':'0.7')+'"><title>'+d.l+': KES '+(d.v||0).toLocaleString()+'</title></rect>'+lbl;
+  }).join('');
+  return '<svg viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none" style="width:100%;height:'+h+'px">'+rects+'</svg>';
+}
+
+// SVG Multi-Line Chart
+function svgLineChart(series, opts) {
+  opts = opts || {};
+  var w = opts.w || 400, h = opts.h || 140, pad = 8;
+  var allVals = [];
+  series.forEach(function(s){s.data.forEach(function(v){allVals.push(v);});});
+  var max = Math.max.apply(null,allVals)||1, min = Math.min.apply(null,allVals)||0;
+  var range = max-min||1;
+  var paths = series.map(function(s) {
+    var pts = s.data.map(function(v,i) {
+      var x = (i/(s.data.length-1))*(w-pad*2)+pad;
+      var y = h - pad - ((v-min)/range)*(h-pad*2-16);
+      return [x,y];
+    });
+    var d = pts.map(function(p,i){return (i?'L':'M')+p[0].toFixed(1)+','+p[1].toFixed(1);}).join(' ');
+    var fillPts = pts.map(function(p){return p[0].toFixed(1)+','+p[1].toFixed(1);}).join(' ');
+    var fill = s.fill ? '<path d="'+d+' L'+pts[pts.length-1][0]+','+h+' L'+pts[0][0]+','+h+' Z" fill="'+s.color+'" opacity="0.07"/>' : '';
+    var dots = pts.map(function(p){return '<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="3" fill="'+s.color+'" opacity="0.9"/>';}).join('');
+    return fill+'<path d="'+d+'" fill="none" stroke="'+s.color+'" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>'+dots;
+  }).join('');
+  // Y-axis labels
+  var yLabels = [0,.5,1].map(function(t) {
+    var v = min + range*t;
+    var y = h - pad - t*(h-pad*2-16);
+    return '<text x="2" y="'+y+'" fill="#4E6A4E" font-size="8" font-family="IBM Plex Mono,monospace">'+fmtK(v)+'</text>';
+  }).join('');
+  // X-axis labels
+  var n = series[0].data.length;
+  var xLabels = (opts.labels||[]).map(function(l,i) {
+    if(n<=1)return '';
+    var x = (i/(n-1))*(w-pad*2)+pad;
+    return '<text x="'+x+'" y="'+(h-1)+'" text-anchor="middle" fill="#4E6A4E" font-size="8" font-family="IBM Plex Mono,monospace">'+l+'</text>';
+  }).join('');
+  return '<svg viewBox="0 0 '+w+' '+h+'" style="width:100%;height:'+h+'px">'+yLabels+paths+xLabels+'</svg>';
+}
+
+// SVG Donut Chart
+function svgDonut(segments, opts) {
+  opts = opts || {};
+  var sz = opts.size || 160, r = opts.r || 64, ir = opts.ir || 42, cx = sz/2, cy = sz/2;
+  var total = segments.reduce(function(s,d){return s+(d.v||0);},0)||1;
+  var angle = -Math.PI/2;
+  var arcs = segments.map(function(d) {
+    var sweep = (d.v/total) * 2 * Math.PI;
+    if(sweep===0)return '';
+    var x1=cx+r*Math.cos(angle),y1=cy+r*Math.sin(angle);
+    var x2=cx+r*Math.cos(angle+sweep),y2=cy+r*Math.sin(angle+sweep);
+    var xi1=cx+ir*Math.cos(angle),yi1=cy+ir*Math.sin(angle);
+    var xi2=cx+ir*Math.cos(angle+sweep),yi2=cy+ir*Math.sin(angle+sweep);
+    var large = sweep>Math.PI?1:0;
+    var path = 'M'+x1.toFixed(2)+','+y1.toFixed(2)+' A'+r+','+r+',0,'+large+',1,'+x2.toFixed(2)+','+y2.toFixed(2)+' L'+xi2.toFixed(2)+','+yi2.toFixed(2)+' A'+ir+','+ir+',0,'+large+',0,'+xi1.toFixed(2)+','+yi1.toFixed(2)+' Z';
+    angle += sweep;
+    return '<path d="'+path+'" fill="'+d.c+'" opacity="0.88"><title>'+d.l+': KES '+fmtK(d.v)+'</title></path>';
+  }).join('');
+  return '<svg viewBox="0 0 '+sz+' '+sz+'" style="width:'+sz+'px;height:'+sz+'px">'+arcs+'</svg>';
+}
+
+// ══════════════════════════════════════════ HELPERS ══════════════
+function fmtK(v) {
+  v = Math.round(v||0);
+  if(v>=1000000) return (v/1000000).toFixed(1)+'M';
+  if(v>=1000)    return (v/1000).toFixed(0)+'K';
+  return v.toString();
+}
+function fmtKES(v) { return 'KES ' + Math.round(v||0).toLocaleString(); }
+function fmtPct(v) { return (v||0).toFixed(1)+'%'; }
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function getNextDeadline(day, monthOffset) {
+  var now = new Date();
+  var d = new Date(now.getFullYear(), now.getMonth() + (monthOffset||0), day);
+  if (d <= now) d = new Date(now.getFullYear(), now.getMonth() + 1 + (monthOffset||0), day);
+  return d;
+}
+function daysUntil(date) {
+  return Math.ceil((date - new Date()) / 86400000);
+}
+function fmtDate(d) {
+  return d.toLocaleDateString('en-KE',{day:'numeric',month:'short',year:'numeric'});
+}
+
+// ══════════════════════════════════════════ NAVIGATION ═══════════
+function showLanding() {
+  STATE.screen = 'landing';
+  document.querySelectorAll('.screen, #s-app').forEach(function(el){
+    el.classList.remove('active');
+  });
+  document.getElementById('s-landing').classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function showSignup(tier) {
+  if (tier) selectTier(tier);
+  document.querySelectorAll('.screen, #s-app').forEach(function(el){ el.classList.remove('active'); });
+  document.getElementById('s-signup').classList.add('active');
+  STATE.screen = 'signup';
+  window.scrollTo(0,0);
+}
+
+function showApp() {
+  document.querySelectorAll('.screen, #s-app').forEach(function(el){ el.classList.remove('active'); });
+  document.getElementById('s-app').classList.add('active');
+  STATE.screen = 'app';
+  initApp();
+}
+
+function showExpired() {
+  document.querySelectorAll('.screen, #s-app').forEach(function(el){ el.classList.remove('active'); });
+  document.getElementById('s-expired').classList.add('active');
+  STATE.screen = 'expired';
+  renderExpiredPlans();
+}
+
+function showView(name) {
+  STATE.view = name;
+  // Update sidebar
+  document.querySelectorAll('.sb-item').forEach(function(el){ el.classList.remove('active'); });
+  var sbi = document.getElementById('sb-'+name);
+  if(sbi) sbi.classList.add('active');
+  // Update mobile nav
+  document.querySelectorAll('.mob-nav-btn').forEach(function(el){ el.classList.remove('active'); });
+  var mbi = document.getElementById('mb-'+name);
+  if(mbi) mbi.classList.add('active');
+  // Show view
+  document.querySelectorAll('.view').forEach(function(el){ el.classList.remove('active'); });
+  var v = document.getElementById('v-'+name);
+  if(v) v.classList.add('active');
+  // Update topbar title
+  var titles = {overview:'Overview',forecast:'Tax Forecast',analytics:'Receipt Analytics',
+    compliance:'KRA Compliance',clients:'Client Management',commands:'TaxBot Commands',billing:'Billing & Subscription'};
+  document.getElementById('topbar-title').textContent = titles[name] || name;
+  // Render view
+  var renders = {
+    overview:   renderOverview,
+    forecast:   renderForecast,
+    analytics:  renderAnalytics,
+    compliance: renderCompliance,
+    clients:    renderClients,
+    commands:   renderCommands,
+    billing:    renderBilling
+  };
+  if(renders[name]) renders[name]();
+}
+
+function scrollTo(sel) {
+  var el = document.querySelector(sel);
+  if(el) el.scrollIntoView({behavior:'smooth'});
+}
+
+// ══════════════════════════════════════════ TIER SELECTION ════════
+function selectTier(tier) {
+  STATE.selectedTier = tier;
+  document.querySelectorAll('.tier-option').forEach(function(el){
+    el.classList.toggle('selected', el.dataset.tier === tier);
+  });
+}
+
+// ══════════════════════════════════════════ TRIAL ════════════════
+function startTrial() {
+  var company = document.getElementById('su-company').value.trim();
+  var pin     = document.getElementById('su-pin').value.trim().toUpperCase();
+  var email   = document.getElementById('su-email').value.trim();
+  var phone   = document.getElementById('su-phone').value.trim();
+  var sector  = document.getElementById('su-sector').value;
+
+  if(!company){ toast('Enter your company name', 'error'); return; }
+  if(!pin || pin.length < 11){ toast('Enter a valid 11-character KRA PIN', 'error'); return; }
+  if(!email || !email.includes('@')){ toast('Enter a valid email address', 'error'); return; }
+
+  STATE.trial = {
+    company: company, pin: pin, email: email, phone: phone,
+    sector: sector, tier: STATE.selectedTier,
+    startedAt: Date.now(),
+    expiresAt: Date.now() + 72*60*60*1000  // 72 hours
+  };
+  STATE.data = generateDemoData(company, STATE.selectedTier, sector);
+  saveState();
+  toast('Welcome to Q-Predict, ' + company + '! ✓', 'success');
+  showApp();
+}
+
+function isTrialActive() {
+  return STATE.trial && Date.now() < STATE.trial.expiresAt;
+}
+
+function getTrialRemaining() {
+  if(!STATE.trial) return 0;
+  return Math.max(0, STATE.trial.expiresAt - Date.now());
+}
+
+function fmtDuration(ms) {
+  var s = Math.floor(ms/1000);
+  var h = Math.floor(s/3600);
+  var m = Math.floor((s%3600)/60);
+  var sec = s%60;
+  return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0');
+}
+
+// ══════════════════════════════════════════ APP INIT ═════════════
+function initApp() {
+  if(!STATE.trial || !STATE.data) return;
+  var t = STATE.trial;
+
+  // Company info
+  document.getElementById('sb-company-name').textContent = t.company;
+  document.getElementById('sb-user-email').textContent   = t.email;
+
+  // Show/hide trial bar
+  var banner = document.getElementById('trial-banner');
+  var sbbar  = document.getElementById('sb-trial-bar');
+  if(isTrialActive()) {
+    banner.style.display = '';
+    sbbar.style.display = '';
+  } else {
+    banner.style.display = 'none';
+    sbbar.style.display = 'none';
+  }
+
+  // Deadline badge
+  var upcomingCount = computeDeadlines().filter(function(d){return daysUntil(d.date)<=14;}).length;
+  var badge = document.getElementById('sb-deadline-badge');
+  if(badge) badge.textContent = upcomingCount;
+
+  showView('overview');
+  startClocks();
+}
+
+var clockInterval = null;
+function startClocks() {
+  if(clockInterval) clearInterval(clockInterval);
+  clockInterval = setInterval(function(){
+    var rem = getTrialRemaining();
+    if(rem <= 0) { clearInterval(clockInterval); showExpired(); return; }
+    var fmt = fmtDuration(rem);
+    var tc = document.getElementById('tb-clock');
+    var st = document.getElementById('sb-trial-time');
+    if(tc) tc.textContent = fmt + ' remaining';
+    if(st) st.textContent = fmt;
+    // topbar clock
+    var tp = document.getElementById('topbar-time');
+    if(tp) tp.textContent = new Date().toLocaleTimeString('en-KE',{hour:'2-digit',minute:'2-digit'});
+  }, 1000);
+}
+
+// ══════════════════════════════════════════ DEADLINES ════════════
+function computeDeadlines() {
+  var now = new Date();
+  var yr = now.getFullYear();
+  var mo = now.getMonth(); // 0-indexed
+  var deadlines = [];
+
+  // VAT — 20th of following month
+  var vatDate = new Date(yr, mo+1, 20);
+  if(vatDate <= now) vatDate = new Date(yr, mo+2, 20);
+  deadlines.push({type:'VAT Return',date:vatDate,amount:fmtKES(187000),code:'VAT201',urgency:daysUntil(vatDate)<=7?'red':daysUntil(vatDate)<=14?'amber':'green',icon:'🧾'});
+
+  // PAYE — 9th of following month
+  var payeDate = new Date(yr, mo+1, 9);
+  if(payeDate <= now) payeDate = new Date(yr, mo+2, 9);
+  deadlines.push({type:'PAYE Remittance',date:payeDate,amount:fmtKES(92000),code:'PAYE001',urgency:daysUntil(payeDate)<=7?'red':daysUntil(payeDate)<=14?'amber':'green',icon:'👥'});
+
+  // WHT — 20th of following month
+  var whtDate = new Date(yr, mo+1, 20);
+  if(whtDate <= now) whtDate = new Date(yr, mo+2, 20);
+  deadlines.push({type:'Withholding Tax',date:whtDate,amount:fmtKES(34500),code:'WHT002',urgency:daysUntil(whtDate)<=7?'red':daysUntil(whtDate)<=14?'amber':'green',icon:'💸'});
+
+  // Installment Tax — quarterly (20th of 3,6,9,12)
+  [3,6,9,12].forEach(function(m) {
+    var d = new Date(yr, m-1, 20);
+    if(d > now) deadlines.push({type:'Installment Tax',date:d,amount:fmtKES(75000),code:'INST'+m,urgency:daysUntil(d)<=14?'amber':'green',icon:'🏦'});
+  });
+
+  // Annual returns — June 30 next year
+  var annualDate = new Date(yr, 5, 30);
+  if(annualDate <= now) annualDate = new Date(yr+1, 5, 30);
+  deadlines.push({type:'Annual Tax Return',date:annualDate,amount:'—',code:'IT1',urgency:'green',icon:'📋'});
+
+  // NSSF — 15th of following month
+  var nssfDate = new Date(yr, mo+1, 15);
+  if(nssfDate <= now) nssfDate = new Date(yr, mo+2, 15);
+  deadlines.push({type:'NSSF Remittance',date:nssfDate,amount:fmtKES(18432),code:'NSSF',urgency:daysUntil(nssfDate)<=7?'amber':'green',icon:'🔒'});
+
+  // SHIF — 9th of following month
+  var shifDate = new Date(yr, mo+1, 9);
+  if(shifDate <= now) shifDate = new Date(yr, mo+2, 9);
+  deadlines.push({type:'SHIF Remittance',date:shifDate,amount:fmtKES(14300),code:'SHIF',urgency:daysUntil(shifDate)<=7?'amber':'green',icon:'🏥'});
+
+  // AHL — 9th of following month
+  var ahlDate = new Date(yr, mo+1, 9);
+  if(ahlDate <= now) ahlDate = new Date(yr, mo+2, 9);
+  deadlines.push({type:'Housing Levy (AHL)',date:ahlDate,amount:fmtKES(7800),code:'AHL',urgency:daysUntil(ahlDate)<=7?'amber':'green',icon:'🏠'});
+
+  deadlines.sort(function(a,b){ return a.date-b.date; });
+  return deadlines;
+}
+
+// ══════════════════════════════════════════ RENDER: OVERVIEW ═════
+function renderOverview() {
+  if(!STATE.data) return;
+  var d = STATE.data;
+  var nowM = new Date().getMonth();
+  var curMonth = d.months[nowM] || d.months[11];
+  var prevMonth = d.months[nowM>0?nowM-1:11];
+  var ytd = d.months.slice(0,nowM+1).reduce(function(s,m){return s+m.total;},0);
+  var ytdVAT = d.months.slice(0,nowM+1).reduce(function(s,m){return s+(m.vatOutput-m.vatInput);},0);
+  var ytdPAYE = d.months.slice(0,nowM+1).reduce(function(s,m){return s+m.paye;},0);
+  var ytdRec = d.months.slice(0,nowM+1).reduce(function(s,m){return s+m.receipts;},0);
+  var trendPct = function(cur,prev){ return prev>0?((cur-prev)/prev*100).toFixed(1):0; };
+
+  document.getElementById('ov-sub').textContent = 'FY '+d.year+' · '+d.company+' · '+TIERS[d.tier].name+' Plan';
+
+  // KPIs
+  var kpis = [
+    {label:'Total Expenses YTD', value:fmtKES(ytd), trend:trendPct(curMonth.total,prevMonth.total)+'% vs prev month', tdir:'neutral', icon:'💰', cls:'gold'},
+    {label:'VAT Liability YTD',  value:fmtKES(Math.max(0,ytdVAT)), trend:'Input: '+fmtKES(d.months.slice(0,nowM+1).reduce(function(s,m){return s+m.vatInput;},0)), tdir:'neutral', icon:'🧾', cls:'blue'},
+    {label:'PAYE Remitted YTD',  value:fmtKES(ytdPAYE), trend:d.employees+' employees · '+fmtKES(curMonth.paye)+' this month', tdir:'neutral', icon:'👥', cls:'sage'},
+    {label:'Receipts Processed', value:ytdRec.toLocaleString(), trend:'Avg '+Math.round(ytdRec/(nowM+1))+'/month', tdir:'up', icon:'🧾', cls:'purple'},
+  ];
+  document.getElementById('ov-kpis').innerHTML = kpis.map(function(k) {
+    return '<div class="kpi-card '+k.cls+'"><div class="kpi-icon">'+k.icon+'</div><div class="kpi-label">'+k.label+'</div><div class="kpi-value">'+k.value+'</div><div class="kpi-trend '+k.tdir+'">'+k.trend+'</div></div>';
+  }).join('');
+
+  // Bar chart - monthly expenses
+  var barData = d.months.map(function(m,i){ return {v:m.total,l:m.month,highlight:(i===nowM)}; });
+  document.getElementById('ov-bar-chart').innerHTML = svgBarChart(barData, {w:500,h:130,color:'#C8952A',color2:'#F0B429'});
+  var vals = d.months.map(function(m){return m.total;});
+  document.getElementById('ov-chart-min').textContent = 'Min: '+fmtKES(Math.min.apply(null,vals));
+  document.getElementById('ov-chart-max').textContent = 'Max: '+fmtKES(Math.max.apply(null,vals));
+
+  // Line chart - tax liability (last 6 months)
+  var last6 = d.months.slice(Math.max(0,nowM-5),nowM+1);
+  var taxSeries = [{
+    data: last6.map(function(m){return Math.max(0,m.vatOutput-m.vatInput)+m.paye;}),
+    color:'#F0B429', fill:true
+  }];
+  document.getElementById('ov-line-chart').innerHTML = svgLineChart(taxSeries,{w:380,h:130,labels:last6.map(function(m){return m.month;})});
+
+  // Donut chart
+  var catTotals = {};
+  d.months.forEach(function(m){ Object.keys(m.categories||{}).forEach(function(c){ catTotals[c]=(catTotals[c]||0)+m.categories[c]; }); });
+  var catArr = Object.keys(catTotals).map(function(c,i){ return {l:c,v:catTotals[c],c:CAT_COLORS[i%CAT_COLORS.length]}; });
+  catArr.sort(function(a,b){return b.v-a.v;});
+  var top5 = catArr.slice(0,5);
+  document.getElementById('ov-donut').innerHTML = svgDonut(top5, {size:140,r:58,ir:36});
+  document.getElementById('ov-donut-legend').innerHTML = top5.map(function(s){
+    return '<div class="chart-legend-item"><div class="chart-legend-dot" style="background:'+s.c+'"></div><span>'+esc(s.l)+'</span><span style="margin-left:auto;font-family:var(--fm);font-size:10px;color:var(--amber)">'+fmtKES(s.v)+'</span></div>';
+  }).join('');
+
+  // Upcoming deadlines
+  var dl = computeDeadlines().slice(0,4);
+  document.getElementById('ov-deadlines').innerHTML = dl.map(function(d){
+    var days = daysUntil(d.date);
+    return '<div class="compliance-item"><div class="ci-icon '+d.urgency+'">'+d.icon+'</div><div class="ci-body"><div class="ci-title">'+esc(d.type)+'</div><div class="ci-sub">'+fmtDate(d.date)+'</div></div><div class="ci-right"><div class="ci-amount">'+d.amount+'</div><div class="ci-status"><span class="badge badge-'+(d.urgency==='red'?'red':d.urgency==='amber'?'amber':'green')+'">'+days+' days</span></div></div></div>';
+  }).join('');
+}
+
+// ══════════════════════════════════════════ RENDER: FORECAST ═════
+function renderForecast() {
+  if(!STATE.data) return;
+  var d = STATE.data;
+  var nowM = new Date().getMonth();
+  var annualExpenses = d.months.reduce(function(s,m){return s+m.total;},0);
+  var annualProfit   = d.months.reduce(function(s,m){return s+m.profit;},0);
+  var annualVAT      = Math.max(0, d.months.reduce(function(s,m){return s+(m.vatOutput-m.vatInput);},0));
+  var annualPAYE     = d.months.reduce(function(s,m){return s+m.paye;},0);
+  var annualCorp     = TAX.corpTax(annualProfit);
+  var annualTotal    = annualVAT + annualPAYE + annualCorp;
+
+  document.getElementById('fc-kpis').innerHTML = [
+    {label:'Annual Tax Estimate',   value:fmtKES(annualTotal), icon:'📊', cls:'gold'},
+    {label:'VAT (Net Annual)',       value:fmtKES(annualVAT),  icon:'🧾', cls:'blue'},
+    {label:'PAYE Annual',            value:fmtKES(annualPAYE), icon:'👥', cls:'sage'},
+    {label:'Corp Tax Estimate',      value:fmtKES(annualCorp), icon:'🏦', cls:'purple'},
+  ].map(function(k){
+    return '<div class="kpi-card '+k.cls+'"><div class="kpi-icon">'+k.icon+'</div><div class="kpi-label">'+k.label+'</div><div class="kpi-value">'+k.value+'</div></div>';
+  }).join('');
+
+  // Annual multi-series bar chart
+  var ann_chart = svgLineChart([
+    {data:d.months.map(function(m){return m.vatOutput-m.vatInput;}), color:'#52A8D5', fill:false},
+    {data:d.months.map(function(m){return m.paye;}), color:'#52B788', fill:false},
+    {data:d.months.map(function(m){return TAX.corpTax(m.profit)/4;}), color:'#C8952A', fill:false},
+  ], {w:700,h:170,labels:MONTHS});
+  document.getElementById('fc-annual-chart').innerHTML = ann_chart;
+  document.getElementById('fc-legend').innerHTML = [
+    {c:'#52A8D5',l:'VAT Liability'},{c:'#52B788',l:'PAYE'},{c:'#C8952A',l:'Corp Tax (est.)'}
+  ].map(function(s){
+    return '<div class="chart-legend-item"><div class="chart-legend-dot" style="background:'+s.c+'"></div><span>'+s.l+'</span></div>';
+  }).join('');
+
+  // Quarters
+  var quarters = [
+    {label:'Q1',months:[0,1,2]},{label:'Q2',months:[3,4,5]},
+    {label:'Q3',months:[6,7,8]},{label:'Q4',months:[9,10,11]}
+  ];
+  document.getElementById('fc-quarters').innerHTML = quarters.map(function(q) {
+    var qm = q.months.map(function(i){return d.months[i];});
+    var qExp  = qm.reduce(function(s,m){return s+m.total;},0);
+    var qVAT  = Math.max(0, qm.reduce(function(s,m){return s+(m.vatOutput-m.vatInput);},0));
+    var qPAYE = qm.reduce(function(s,m){return s+m.paye;},0);
+    var qProf = qm.reduce(function(s,m){return s+m.profit;},0);
+    var qCorp = TAX.corpTax(qProf)/4;
+    var qPeriod = qm[0].month+' – '+qm[2].month+' '+d.year;
+    var cells = [
+      {l:'Total Expenses',v:fmtKES(qExp),n:''},
+      {l:'VAT Liability',v:fmtKES(qVAT),n:'Installment due 20th'},
+      {l:'PAYE Total',v:fmtKES(qPAYE),n:d.employees+' employees'},
+      {l:'Corp Tax (Est.)',v:fmtKES(qCorp),n:'25% of annual estimate'},
+      {l:'NSSF',v:fmtKES(qm.reduce(function(s,m){return s+TAX.nssf(65000)*d.employees;},0)),n:'Tier 1+2'},
+      {l:'SHIF',v:fmtKES(qm.reduce(function(s,m){return s+TAX.shif(65000)*d.employees;},0)),n:'2.75% of gross'},
+    ];
+    return '<div class="forecast-quarter"><div class="fq-header"><div class="fq-label">'+q.label+'</div><div class="fq-period">'+qPeriod+'</div></div><div class="fq-grid">'+cells.map(function(c){return '<div class="fq-cell"><div class="fq-cell-label">'+c.l+'</div><div class="fq-cell-value">'+c.v+'</div><div class="fq-cell-note">'+c.n+'</div></div>';}).join('')+'</div></div>';
+  }).join('');
+
+  // PAYE calculator
+  updatePAYE();
+}
+
+function updatePAYE() {
+  var slider = document.getElementById('paye-slider');
+  if(!slider) return;
+  var gross = parseInt(slider.value);
+  var paye  = TAX.paye(gross);
+  var nssf  = TAX.nssf(gross);
+  var shif  = TAX.shif(gross);
+  var ahl   = TAX.ahl(gross);
+  var total = paye+nssf+shif+ahl;
+  var net   = gross-total;
+  var cells = [
+    {l:'Gross Salary',v:fmtKES(gross)},
+    {l:'PAYE',v:fmtKES(paye)},
+    {l:'NSSF',v:fmtKES(nssf)},
+    {l:'SHIF',v:fmtKES(shif)},
+    {l:'AHL',v:fmtKES(ahl)},
+    {l:'Net Pay',v:fmtKES(net)},
+    {l:'Effective Rate',v:fmtPct(total/gross*100)},
+    {l:'Employer AHL',v:fmtKES(ahl)},
+  ];
+  var el = document.getElementById('paye-result');
+  if(el) el.innerHTML = cells.map(function(c){
+    return '<div style="background:var(--raised);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px"><div style="font-family:var(--fm);font-size:9px;text-transform:uppercase;color:var(--muted);margin-bottom:3px">'+c.l+'</div><div style="font-family:var(--fm);font-size:14px;color:'+(c.l==='Net Pay'?'var(--sage)':'var(--amber)')+'">'+c.v+'</div></div>';
+  }).join('');
+}
+
+// ══════════════════════════════════════════ RENDER: ANALYTICS ════
+function renderAnalytics() {
+  if(!STATE.data) return;
+  var d = STATE.data;
+  var nowM = new Date().getMonth();
+  var ytd = d.months.slice(0,nowM+1);
+  var ytdExp  = ytd.reduce(function(s,m){return s+m.total;},0);
+  var ytdRec  = ytd.reduce(function(s,m){return s+m.receipts;},0);
+  var ytdVAT  = ytd.reduce(function(s,m){return s+m.vatInput;},0);
+  var avgMo   = ytdExp/(nowM+1);
+
+  document.getElementById('an-kpis').innerHTML = [
+    {label:'YTD Expenses',      value:fmtKES(ytdExp), icon:'💰', cls:'gold'},
+    {label:'Monthly Average',   value:fmtKES(avgMo),  icon:'📊', cls:'blue'},
+    {label:'Input VAT Claimable',value:fmtKES(ytdVAT),icon:'🧾', cls:'sage'},
+    {label:'Total Receipts',    value:ytdRec.toLocaleString(), icon:'🗃', cls:'purple'},
+  ].map(function(k){
+    return '<div class="kpi-card '+k.cls+'"><div class="kpi-icon">'+k.icon+'</div><div class="kpi-label">'+k.label+'</div><div class="kpi-value">'+k.value+'</div></div>';
+  }).join('');
+
+  // Donut
+  var catTotals = {};
+  ytd.forEach(function(m){ Object.keys(m.categories||{}).forEach(function(c){ catTotals[c]=(catTotals[c]||0)+m.categories[c]; }); });
+  var catArr = Object.keys(catTotals).map(function(c,i){ return {l:c,v:catTotals[c],c:CAT_COLORS[i%CAT_COLORS.length]}; });
+  catArr.sort(function(a,b){return b.v-a.v;});
+  var top7 = catArr.slice(0,7);
+  document.getElementById('an-donut').innerHTML = svgDonut(top7, {size:160,r:70,ir:44});
+  document.getElementById('an-legend').innerHTML = top7.map(function(s){
+    return '<div class="chart-legend-item" style="font-size:11px"><div class="chart-legend-dot" style="background:'+s.c+'"></div><span style="flex:1">'+esc(s.l)+'</span><span style="font-family:var(--fm);font-size:10px;color:var(--amber)">'+fmtK(s.v)+'</span></div>';
+  }).join('');
+
+  // Trend line: expenses vs vat
+  document.getElementById('an-trend-chart').innerHTML = svgLineChart([
+    {data:d.months.map(function(m){return m.total;}), color:'#C8952A', fill:true},
+    {data:d.months.map(function(m){return m.vatInput;}), color:'#52A8D5', fill:false},
+  ], {w:450,h:190,labels:MONTHS});
+
+  // Vendor table
+  var vendorTotals = {};
+  d.transactions.forEach(function(t){ vendorTotals[t.vendor]=(vendorTotals[t.vendor]||0)+t.amount; });
+  var vendors = Object.keys(vendorTotals).map(function(v){ return {v:v,t:vendorTotals[v]}; });
+  vendors.sort(function(a,b){return b.t-a.t;});
+  var top10 = vendors.slice(0,10);
+  var maxV = top10[0]?top10[0].t:1;
+  STATE._allVendors = vendors;
+  STATE._showAllVendors = false;
+  renderVendorTable(top10, maxV);
+
+  // Receipt log
+  renderReceiptLog(d.transactions.slice(0,20));
+}
+
+function renderVendorTable(vendors, maxV) {
+  document.getElementById('an-vendor-table').innerHTML =
+    '<thead><tr><th>#</th><th>Vendor</th><th>YTD Spend</th><th>% of Total</th><th>Share</th></tr></thead><tbody>' +
+    vendors.map(function(v,i){
+      var pct = (v.t/maxV*100).toFixed(0);
+      return '<tr><td class="mono muted">'+(i+1)+'</td><td>'+esc(v.v)+'</td><td class="mono amber">'+fmtKES(v.t)+'</td><td class="mono muted">'+fmtPct(v.t/STATE.data.months.reduce(function(s,m){return s+m.total;},0)*100)+'</td><td><div class="progress-track" style="width:80px"><div class="progress-fill" style="width:'+pct+'%;background:var(--gold)"></div></div></td></tr>';
+    }).join('')+'</tbody>';
+}
+
+function toggleVendorView() {
+  STATE._showAllVendors = !STATE._showAllVendors;
+  var vd = document.getElementById('an-vendor-toggle');
+  if(vd) vd.textContent = STATE._showAllVendors ? 'Show Less' : 'Show All';
+  var all = STATE._allVendors || [];
+  var show = STATE._showAllVendors ? all : all.slice(0,10);
+  renderVendorTable(show, all[0]?all[0].t:1);
+}
+
+function renderReceiptLog(txns) {
+  document.getElementById('an-receipt-log').innerHTML =
+    '<thead><tr><th>ID</th><th>Date</th><th>Vendor</th><th>Category</th><th>Amount</th><th>VAT</th><th>Payment</th></tr></thead><tbody>' +
+    txns.map(function(t){
+      return '<tr><td class="mono muted" style="font-size:10px">'+t.id+'</td><td class="mono">'+t.date+'</td><td>'+esc(t.vendor)+'</td><td><span class="badge badge-dim">'+esc(t.category)+'</span></td><td class="mono amber">'+fmtKES(t.amount)+'</td><td class="mono '+(t.vat>0?'green':'muted')+'">'+fmtKES(t.vat)+'</td><td class="mono muted">'+t.payment+'</td></tr>';
+    }).join('')+'</tbody>';
+}
+
+// ══════════════════════════════════════════ RENDER: COMPLIANCE ═══
+function renderCompliance() {
+  if(!STATE.data) return;
+  var d = STATE.data;
+
+  // KPIs
+  var dl = computeDeadlines();
+  var urgent = dl.filter(function(x){return x.urgency==='red';}).length;
+  var warn   = dl.filter(function(x){return x.urgency==='amber';}).length;
+  document.getElementById('co-kpis').innerHTML = [
+    {label:'Compliance Score', value:'94%',         icon:'🏆', cls:'sage'},
+    {label:'Overdue Filings',  value:'0',            icon:'✅', cls:'gold'},
+    {label:'Due This Week',    value:urgent.toString(),icon:'⚠️', cls:(urgent>0?'red':'sage')},
+    {label:'Due This Month',   value:(urgent+warn).toString(),icon:'📅',cls:(warn>0?'gold':'sage')},
+  ].map(function(k){
+    return '<div class="kpi-card '+k.cls+'"><div class="kpi-icon">'+k.icon+'</div><div class="kpi-label">'+k.label+'</div><div class="kpi-value">'+k.value+'</div></div>';
+  }).join('');
+
+  // Full deadline list
+  document.getElementById('co-deadlines-full').innerHTML = dl.map(function(item){
+    var days = daysUntil(item.date);
+    return '<div class="compliance-item"><div class="ci-icon '+item.urgency+'">'+item.icon+'</div><div class="ci-body"><div class="ci-title">'+esc(item.type)+'</div><div class="ci-sub">Due: '+fmtDate(item.date)+'<span class="mono muted" style="margin-left:8px;font-size:10px">'+item.code+'</span></div></div><div class="ci-right"><div class="ci-amount">'+item.amount+'</div><div class="ci-status"><span class="badge badge-'+(item.urgency==='red'?'red':item.urgency==='amber'?'amber':'green')+'">'+days+'d</span></div></div></div>';
+  }).join('');
+
+  // Compliance score breakdown
+  var scoreItems = [
+    {l:'VAT Returns Filed On Time',pct:100,c:'var(--sage)'},
+    {l:'PAYE Remittances',         pct:100,c:'var(--sage)'},
+    {l:'Annual Return',            pct:100,c:'var(--sage)'},
+    {l:'eTIMS Invoices',           pct:87, c:'var(--amber)'},
+    {l:'WHT Remittances',          pct:100,c:'var(--sage)'},
+  ];
+  document.getElementById('co-score-breakdown').innerHTML = scoreItems.map(function(s){
+    return '<div><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px"><span>'+s.l+'</span><span style="font-family:var(--fm);color:var(--text)">'+s.pct+'%</span></div><div class="progress-track"><div class="progress-fill" style="width:'+s.pct+'%;background:'+s.c+'"></div></div></div>';
+  }).join('');
+
+  // eTIMS status
+  var etims = [
+    {step:'Generate Input Template', cmd:'kra-input', done:true},
+    {step:'Fill Yellow Cells (Excel)', cmd:'manual', done:true},
+    {step:'Run eTIMS Processor', cmd:'kra-run', done:false},
+    {step:'Review 8-Sheet Workbook', cmd:'manual', done:false},
+    {step:'Submit via KRA iTax', cmd:'manual', done:false},
+  ];
+  document.getElementById('co-etims-status').innerHTML = etims.map(function(s){
+    return '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">'+(s.done?'<span style="color:var(--sage)">✓</span>':'<span style="color:var(--dim)">○</span>')+'<span style="font-size:12px;'+(s.done?'color:var(--muted)':'color:var(--text)')+'">'+s.step+'</span>'+(s.cmd!=='manual'?'<code style="margin-left:auto;font-family:var(--fm);font-size:10px;color:var(--sage);background:var(--raised);padding:2px 7px;border-radius:4px">'+s.cmd+'</code>':'')+'</div>';
+  }).join('');
+
+  // Annual calendar table
+  var yr = new Date().getFullYear();
+  var calDeadlines = [];
+  MONTHS.forEach(function(m,i) {
+    var date20 = new Date(yr,i,20), date9 = new Date(yr,i,9), date15 = new Date(yr,i,15);
+    calDeadlines.push({date:fmtDate(date9),type:'PAYE',desc:'For '+MONTHS[i===0?11:i-1]+' payroll',code:'PAYE'});
+    calDeadlines.push({date:fmtDate(date15),type:'NSSF/SHIF',desc:'For '+MONTHS[i===0?11:i-1]+' period',code:'NSSF'});
+    calDeadlines.push({date:fmtDate(date20),type:'VAT',desc:'For '+MONTHS[i===0?11:i-1]+' transactions',code:'VAT201'});
+    calDeadlines.push({date:fmtDate(date20),type:'WHT',desc:'For '+MONTHS[i===0?11:i-1]+' payments',code:'WHT002'});
+  });
+  [3,6,9,12].forEach(function(m){
+    calDeadlines.push({date:fmtDate(new Date(yr,m-1,20)),type:'Installment Tax',desc:'25% of annual estimate',code:'INST'});
+  });
+  calDeadlines.push({date:fmtDate(new Date(yr,5,30)),type:'Annual Returns',desc:'Corporation Tax Return',code:'IT1'});
+  calDeadlines.sort(function(a,b){ return new Date(a.date)-new Date(b.date); });
+  document.getElementById('co-calendar').innerHTML =
+    '<thead><tr><th>Date</th><th>Filing Type</th><th>Description</th><th>KRA Code</th></tr></thead><tbody>' +
+    calDeadlines.slice(0,32).map(function(c){
+      return '<tr><td class="mono">'+c.date+'</td><td><span class="badge badge-dim">'+c.type+'</span></td><td class="muted">'+c.desc+'</td><td class="mono muted">'+c.code+'</td></tr>';
+    }).join('')+'</tbody>';
+}
+
+// ══════════════════════════════════════════ RENDER: CLIENTS ══════
+function renderClients() {
+  if(!STATE.data) return;
+  var d = STATE.data;
+  var t = TIERS[d.tier];
+
+  document.getElementById('cl-sub').textContent = 'Up to '+t.max_clients+' clients on '+t.name+' plan · '+d.clients.length+' registered';
+
+  document.getElementById('cl-kpis').innerHTML = [
+    {label:'Active Clients',   value:d.clients.length,                            icon:'👥', cls:'sage'},
+    {label:'Plan Limit',       value:t.max_clients,                               icon:'📋', cls:'blue'},
+    {label:'Total Receipts',   value:d.clients.reduce(function(s,c){return s+c.receipts;},0), icon:'🧾', cls:'gold'},
+    {label:'Total Employees',  value:d.clients.reduce(function(s,c){return s+c.employees;},0),icon:'👤', cls:'purple'},
+  ].map(function(k){
+    return '<div class="kpi-card '+k.cls+'"><div class="kpi-icon">'+k.icon+'</div><div class="kpi-label">'+k.label+'</div><div class="kpi-value">'+k.value+'</div></div>';
+  }).join('');
+
+  document.getElementById('cl-list').innerHTML = d.clients.map(function(c){
+    var initials = c.name.split(' ').slice(0,2).map(function(w){return w[0];}).join('');
+    var colors = ['#1B4332','#2D3F50','#3D2B50','#50362B','#1D4030'];
+    var color = colors[c.name.length % colors.length];
+    return '<div class="client-row"><div class="client-avatar" style="background:'+color+'">'+initials+'</div><div style="flex:1"><div class="client-name">'+esc(c.name)+'</div><div class="client-meta">'+c.pin+' · '+c.sector+(c.vatRegistered?' · VAT Registered':'')+'</div></div><div class="client-receipts"><b>'+c.receipts+'</b>receipts/mo</div><div style="margin-left:12px"><span class="badge badge-'+(c.tier==='professional'?'green':c.tier==='enterprise'?'amber':'dim')+'">'+c.tier+'</span></div></div>';
+  }).join('');
+
+  // Billing summary
+  var billingRows = d.clients.map(function(c){
+    var ct = TIERS[c.tier];
+    var base = ct.base;
+    var rfee = c.receipts * ct.per_receipt;
+    var efee = c.employees * ct.per_emp;
+    var taxManaged = c.monthlyRevenue * 0.18;
+    var pctFee = taxManaged * ct.pct;
+    var total = Math.max(base+rfee+efee, pctFee);
+    return {name:c.name, tier:c.tier, total:total};
+  });
+  var grandTotal = billingRows.reduce(function(s,r){return s+r.total;},0);
+  document.getElementById('cl-billing-summary').innerHTML =
+    '<table class="tbl"><thead><tr><th>Client</th><th>Tier</th><th>Monthly Fee</th></tr></thead><tbody>' +
+    billingRows.map(function(r){
+      return '<tr><td>'+esc(r.name)+'</td><td><span class="badge badge-dim">'+r.tier+'</span></td><td class="mono amber">'+fmtKES(r.total)+'</td></tr>';
+    }).join('')+'</tbody><tfoot><tr><td colspan="2" style="font-family:var(--fd);font-weight:700;color:#fff;padding:12px">Total Monthly Revenue</td><td class="mono" style="font-size:16px;color:var(--amber);padding:12px">'+fmtKES(grandTotal)+'</td></tr></tfoot></table>';
+}
+
+// ══════════════════════════════════════════ RENDER: COMMANDS ═════
+function renderCommands() {
+  var CMD_DATA = [
+    {group:'Setup & Admin', color:'#52B788', cmds:[
+      {cmd:'setup',         desc:'First-time setup wizard (Gmail OAuth, folder structure)',    args:''},
+      {cmd:'add-client',    desc:'Register a new client interactively (prompts for all fields)',args:''},
+      {cmd:'add-individual',desc:'Register an individual taxpayer client',                      args:''},
+      {cmd:'status',        desc:'Show system status — Gmail link, client count, last run',     args:'[client_id]'},
+      {cmd:'demo',          desc:'Run demo mode with sample data',                              args:''},
+    ]},
+    {group:'Receipt Processing', color:'#C8952A', cmds:[
+      {cmd:'watch',       desc:'Start live watcher — processes receipts dropped in inbox/ folders in real-time',args:''},
+      {cmd:'scan-gmail',  desc:'One-shot Gmail scan — pulls all unread receipt attachments from registered client emails',args:''},
+      {cmd:'process',     desc:'Process all receipts in inbox/ — runs OCR + AI extraction + posting to database',args:'<client_id>'},
+      {cmd:'import-excel',desc:'Import from Excel/M-Pesa statement with 3-layer duplicate prevention',args:'<client_id> [--file path] [--dry-run]'},
+    ]},
+    {group:'Accounting & Reports', color:'#52A8D5', cmds:[
+      {cmd:'monthly',   desc:'Full month-end close: receipts → ledger → P&L → BS → TB → handover report',args:'<client_id> [YYYY-MM]'},
+      {cmd:'months',    desc:'Run monthly close for all registered clients at once',                       args:'[YYYY-MM]'},
+      {cmd:'pl',        desc:'Generate Profit & Loss statement',                                          args:'<client_id> [YYYY-MM]'},
+      {cmd:'bs',        desc:'Generate Balance Sheet',                                                    args:'<client_id>'},
+      {cmd:'tb',        desc:'Generate Trial Balance',                                                    args:'<client_id> [YYYY-MM]'},
+      {cmd:'coa',       desc:'Print Chart of Accounts',                                                   args:'<client_id>'},
+      {cmd:'budget',    desc:'Budget vs actuals variance report',                                          args:'<client_id>'},
+      {cmd:'recon',     desc:'Bank reconciliation report',                                                 args:'<client_id>'},
+      {cmd:'handover',  desc:'Generate accountant handover pack (.docx + .txt)',                           args:'<client_id> [YYYY-MM]'},
+      {cmd:'audit',     desc:'Audit trail — all entries with source documents',                            args:'<client_id>'},
+      {cmd:'fx',        desc:'Foreign exchange gain/loss report',                                          args:'<client_id>'},
+    ]},
+    {group:'KRA eTIMS & Billing', color:'#9B7EC8', cmds:[
+      {cmd:'kra-input', desc:'Generate KRA eTIMS input template (8-sheet Excel workbook) for client to fill',args:'<client_id>'},
+      {cmd:'kra-run',   desc:'Process filled KRA input template → complete 8-sheet eTIMS submission workbook',args:'<client_id>'},
+      {cmd:'tax',       desc:'Compute tax summary: VAT, PAYE, WHT, installment for the month',             args:'<client_id> [YYYY-MM]'},
+      {cmd:'billing',   desc:'Generate billing invoice based on tier, receipts, employees, tax managed',   args:'[client_id]'},
+      {cmd:'dashboard', desc:'Launch Streamlit web dashboard at localhost:8501',                           args:''},
+    ]},
+  ];
+
+  var kpis = document.getElementById('cmd-kpis');
+  if(kpis) kpis.innerHTML = [
+    {label:'Total Commands',    value:'25', icon:'⌨️', cls:'gold'},
+    {label:'Automated',         value:'23', icon:'🤖', cls:'sage'},
+    {label:'Requires Excel',    value:'2',  icon:'📊', cls:'blue'},
+    {label:'KRA eTIMS Sheets',  value:'8',  icon:'📋', cls:'purple'},
+  ].map(function(k){
+    return '<div class="kpi-card '+k.cls+'"><div class="kpi-icon">'+k.icon+'</div><div class="kpi-label">'+k.label+'</div><div class="kpi-value">'+k.value+'</div></div>';
+  }).join('');
+
+  document.getElementById('cmd-grid').innerHTML = CMD_DATA.map(function(g){
+    return '<div class="card"><div class="card-header" style="margin-bottom:12px"><div class="card-title" style="display:flex;align-items:center;gap:10px"><span style="width:8px;height:8px;border-radius:50%;background:'+g.color+';flex-shrink:0"></span>'+g.group+'</div></div>'+
+    g.cmds.map(function(c){
+      var fullCmd = 'python taxbot.py '+c.cmd+(c.args?' '+c.args:'');
+      return '<div style="display:flex;align-items:flex-start;gap:14px;padding:10px 0;border-bottom:1px solid var(--border)">'+
+        '<div style="flex:1">'+
+          '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">'+
+            '<code style="font-family:var(--fm);font-size:12px;color:'+g.color+';background:var(--raised);padding:3px 8px;border-radius:5px">'+c.cmd+'</code>'+
+            (c.args?'<span style="font-family:var(--fm);font-size:10px;color:var(--muted)">'+esc(c.args)+'</span>':'')+'</div>'+
+          '<div style="font-size:12px;color:var(--muted);line-height:1.55">'+esc(c.desc)+'</div>'+
+        '</div>'+
+        '<button style="font-family:var(--fm);font-size:10px;background:var(--raised);border:1px solid var(--border2);color:var(--text);border-radius:6px;padding:5px 10px;cursor:pointer;flex-shrink:0;white-space:nowrap" onclick="copyCmd(\''+fullCmd.replace(/'/g,"\\'")+'\')" title="Copy command">📋 Copy</button>'+
+      '</div>';
+    }).join('')+'</div>';
+  }).join('');
+}
+
+function copyCmd(cmd) {
+  if(navigator.clipboard) {
+    navigator.clipboard.writeText(cmd).then(function(){ toast('Copied! ✓', 'success'); });
+  } else {
+    var ta = document.createElement('textarea');
+    ta.value = cmd; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    toast('Copied! ✓', 'success');
+  }
+}
+
+// ══════════════════════════════════════════ RENDER: BILLING ══════
+function renderBilling() {
+  if(!STATE.data) return;
+  var d = STATE.data;
+  var t = STATE.trial;
+  var tier = TIERS[d.tier];
+  var receipts = d.months.reduce(function(s,m){return s+m.receipts;},0) / 12;
+  var employees = d.employees;
+  var taxManaged = d.months.reduce(function(s,m){return s+m.total*0.18;},0) / 12;
+
+  document.getElementById('billing-plan-sub').textContent = tier.name+' Plan · '+t.company;
+
+  var rfee = receipts * tier.per_receipt;
+  var efee = employees * tier.per_emp;
+  var vfee = tier.vat_fee;
+  var wfee = tier.wht_fee;
+  var pctFee = taxManaged * tier.pct;
+  var base = tier.base;
+  var subtotal = Math.max(base+rfee+efee+vfee+wfee, pctFee);
+
+  document.getElementById('billing-calc').innerHTML = [
+    {l:'Base fee',            v:fmtKES(base)},
+    {l:'Receipts ('+Math.round(receipts)+' × '+tier.per_receipt+')', v:fmtKES(rfee)},
+    {l:'Employees ('+employees+' × '+tier.per_emp+')', v:fmtKES(efee)},
+    {l:'VAT filing fee',      v:fmtKES(vfee)},
+    {l:'WHT filing fee',      v:fmtKES(wfee)},
+    {l:'% of tax managed ('+fmtPct(tier.pct*100)+')', v:fmtKES(pctFee)},
+    {l:'Monthly Total',       v:fmtKES(subtotal), total:true},
+  ].map(function(r){
+    return '<div class="bc-row'+(r.total?' total':'')+'"><span class="bc-label">'+r.l+'</span><span class="bc-value'+(r.total?' gold':'')+'">'+r.v+'</span></div>';
+  }).join('');
+
+  // Tier compare
+  document.getElementById('tier-compare-grid').innerHTML = Object.keys(TIERS).map(function(key){
+    var ti = TIERS[key];
+    var active = key === d.tier;
+    var feats = ['Up to '+(ti.max_clients===999?'Unlimited':ti.max_clients)+' clients', (ti.max_receipts===99999?'Unlimited':ti.max_receipts)+' receipts/mo', 'VAT fee: '+fmtKES(ti.vat_fee), 'WHT fee: '+fmtKES(ti.wht_fee)];
+    return '<div class="tc-card'+(active?' active':'')+'">'+
+      '<div class="tc-name">'+ti.name+'</div>'+
+      '<div class="tc-price">KES '+fmtK(ti.base)+'<span style="font-size:12px;color:var(--muted)">/mo</span></div>'+
+      '<div class="tc-pct">+ '+fmtPct(ti.pct*100)+' of tax managed</div>'+
+      '<div class="tc-features">'+feats.map(function(f){return '<div class="tc-feat">'+f+'</div>';}).join('')+'</div>'+
+      '<button class="tc-btn'+(active?' gold':'')+'" onclick="upgradeTier(\''+key+'\')">'+(active?'Current Plan':'Select Plan')+'</button>'+
+    '</div>';
+  }).join('');
+
+  updateBillingCalc();
+}
+
+function upgradeTier(tier) {
+  if(!STATE.data) return;
+  STATE.data.tier = tier;
+  STATE.trial.tier = tier;
+  saveState();
+  toast('Plan updated to '+TIERS[tier].name+' ✓', 'success');
+  renderBilling();
+}
+
+function updateBillingCalc() {
+  var receipts  = parseInt(document.getElementById('bill-receipts')?.value||150);
+  var employees = parseInt(document.getElementById('bill-employees')?.value||8);
+  var taxManaged= parseInt(document.getElementById('bill-tax')?.value||400000);
+
+  var rv = document.getElementById('bill-receipts-val');
+  var ev = document.getElementById('bill-emp-val');
+  var tv = document.getElementById('bill-tax-val');
+  if(rv) rv.textContent = receipts;
+  if(ev) ev.textContent = employees;
+  if(tv) tv.textContent = fmtK(taxManaged);
+
+  var results = Object.keys(TIERS).map(function(key){
+    var t = TIERS[key];
+    var base = t.base;
+    var rfee = receipts * t.per_receipt;
+    var efee = employees * t.per_emp;
+    var vfee = t.vat_fee;
+    var wfee = t.wht_fee;
+    var pct  = taxManaged * t.pct;
+    var total = Math.max(base+rfee+efee+vfee+wfee, pct);
+    return {tier:key,name:t.name,total:total};
+  });
+
+  var el = document.getElementById('billing-calc-result');
+  if(!el) return;
+  el.innerHTML = '<div style="display:flex;flex-direction:column;gap:8px">'+
+    results.map(function(r){
+      var active = STATE.data && r.tier === STATE.data.tier;
+      return '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--raised);border:1px solid '+(active?'var(--gold)':'var(--border)')+';border-radius:var(--r)">'+
+        '<span style="font-family:var(--fd);font-size:12px;font-weight:700;color:'+(active?'var(--amber)':'var(--muted)')+'">'+r.name+'</span>'+
+        '<span style="margin-left:auto;font-family:var(--fm);font-size:15px;color:var(--text)">'+fmtKES(r.total)+'/mo</span>'+
+        (active?'<span style="font-family:var(--fm);font-size:9px;color:var(--gold);background:rgba(200,149,42,.1);border:1px solid rgba(200,149,42,.2);border-radius:10px;padding:2px 7px">Current</span>':'')+
+      '</div>';
+    }).join('')+
+  '</div>';
+}
+
+// ══════════════════════════════════════════ EXPIRED PLANS ════════
+function renderExpiredPlans() {
+  document.getElementById('expired-plans').innerHTML = Object.keys(TIERS).map(function(key){
+    var t = TIERS[key];
+    return '<div style="background:var(--panel);border:1px solid '+(key==='professional'?'var(--gold)':'var(--border)')+';border-radius:var(--r2);padding:20px;text-align:center">'+
+      '<div style="font-family:var(--fd);font-size:14px;font-weight:700;color:#fff;margin-bottom:6px">'+t.name+'</div>'+
+      '<div style="font-family:var(--fm);font-size:20px;color:var(--amber)">KES '+fmtK(t.base)+'</div>'+
+      '<div style="font-family:var(--fm);font-size:11px;color:var(--gold);margin-bottom:16px">+'+fmtPct(t.pct*100)+'/mo</div>'+
+      '<button style="width:100%;padding:10px;background:'+(key==='professional'?'var(--gold)':'transparent')+';color:'+(key==='professional'?'var(--bg)':'var(--text)')+';border:1px solid '+(key==='professional'?'var(--gold)':'var(--border2)')+';border-radius:8px;font-family:var(--fd);font-size:12px;font-weight:700;cursor:pointer" onclick="selectAndProceed(\''+key+'\')">Choose '+t.name+'</button>'+
+    '</div>';
+  }).join('');
+}
+
+function selectAndProceed(tier) {
+  // Extend trial by upgrading
+  if(STATE.trial) {
+    STATE.trial.tier = tier;
+    STATE.trial.expiresAt = Date.now() + 24*60*60*1000; // +24hr grace
+    STATE.data.tier = tier;
+    saveState();
+    toast('Plan selected! Trial extended 24 hours. ✓', 'success');
+    showApp();
+  } else {
+    showSignup(tier);
+  }
+}
+
+// ══════════════════════════════════════════ LANDING SPARKLINE ════
+function renderLandingSparkline() {
+  var data = [310,285,420,380,350,395,330,310,450,390,370,580].map(function(v,i){return {v:v*1000,l:MONTHS[i]};});
+  var el = document.getElementById('preview-sparkline');
+  if(el) el.innerHTML = svgBarChart(data, {w:860,h:60,color:'#C8952A',noLabel:true});
+}
+
+// ══════════════════════════════════════════ TOAST ════════════════
+var _toastTimer;
+function toast(msg, type) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show'+(type?' '+type:'');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(function(){ el.classList.remove('show'); }, 2800);
+}
+
+// ══════════════════════════════════════════ LOGOUT ═══════════════
+function logout() {
+  if(!confirm('Sign out and clear session?')) return;
+  localStorage.removeItem('qpredict-state');
+  STATE.trial = null; STATE.data = null;
+  showLanding();
+}
+
+// ══════════════════════════════════════════ INIT ═════════════════
+document.addEventListener('DOMContentLoaded', function() {
+  loadState();
+  renderLandingSparkline();
+
+  if(STATE.trial) {
+    if(isTrialActive()) {
+      STATE.data = STATE.data || generateDemoData(STATE.trial.company, STATE.trial.tier, STATE.trial.sector||'RETAIL');
+      showApp();
+    } else {
+      showExpired();
+    }
+  } else {
+    showLanding();
+  }
+});
+</script>
+</body>
+</html>
