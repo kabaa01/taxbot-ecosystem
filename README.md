@@ -1,12 +1,14 @@
 # Taxbot-Ecosystem
 
-Tax Intelligence Platform
+Tax Intelligence Platform - 
+
 
 
 Stay ahead of your taxes with the Tax Intelligence Platform. Effortlessly track receipts and statements while our automated system handles regulatory compliance for you.
 
 
-About Us 
+
+About Us:
 
 
 
