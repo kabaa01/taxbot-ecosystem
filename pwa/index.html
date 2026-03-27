@@ -1514,7 +1514,37 @@ function updateOnline() {
     badge.classList.remove('live');
   }
 }
-window.addEventListener('online',  updateOnline);
+
+// Auto-send: when connectivity is restored, notify user of pending receipts
+function flushQueue() {
+  if (!settings.autosend) return;
+  if (!db) return;
+  dbGetAll().then(function(recs) {
+    var pending = recs.filter(function(r) { return r.status === 'pending'; });
+    if (pending.length === 0) return;
+    var msg = pending.length === 1
+      ? '📶 Back online — 1 receipt queued. Tap to send.'
+      : '📶 Back online — ' + pending.length + ' receipts queued. Tap to send.';
+    // Show persistent toast that navigates to queue
+    var t = document.getElementById('toast');
+    if (t) {
+      t.textContent = msg;
+      t.classList.add('show');
+      t.style.cursor = 'pointer';
+      t.onclick = function() {
+        t.classList.remove('show');
+        t.onclick = null;
+        t.style.cursor = '';
+        showView('queue');
+      };
+      setTimeout(function() { t.classList.remove('show'); t.onclick = null; t.style.cursor = ''; }, 6000);
+    }
+    // Update home badge immediately
+    refreshHomeQueue();
+  });
+}
+
+window.addEventListener('online',  function() { updateOnline(); flushQueue(); });
 window.addEventListener('offline', updateOnline);
 
 // ── PWA Install ───────────────────────────────────────────────────────────────
