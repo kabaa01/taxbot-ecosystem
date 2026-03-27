@@ -1090,11 +1090,12 @@ var TAX = {
   // PAYE Finance Act 2024 — monthly
   paye: function(gross) {
     var tax = 0;
-    if (gross <= 24000)       { tax = gross * 0.10; }
-    else if (gross <= 32333)  { tax = 2400 + (gross - 24000) * 0.25; }
-    else if (gross <= 500000) { tax = 4483.25 + (gross - 32333) * 0.30; }
-    else if (gross <= 800000) { tax = 144473.25 + (gross - 500000) * 0.325; }
-    else                      { tax = 241973.25 + (gross - 800000) * 0.35; }
+    // Finance Act 2024 monthly bands (annual ÷ 12): 288K→24K, 388K→32,333, 5.7M→475K, 9M→750K
+    if (gross <= 24000)        { tax = gross * 0.10; }
+    else if (gross <= 32333)   { tax = 2400 + (gross - 24000) * 0.25; }
+    else if (gross <= 475000)  { tax = 4483.25 + (gross - 32333) * 0.30; }
+    else if (gross <= 750000)  { tax = 137283.35 + (gross - 475000) * 0.325; }
+    else                       { tax = 226658.35 + (gross - 750000) * 0.35; }
     var relief = 2400; // personal relief
     return Math.max(0, tax - relief);
   },
@@ -1102,8 +1103,8 @@ var TAX = {
   vatInput: function(amount)  { return amount * 0.16; },
   corpTax:  function(profit)  { return profit * 0.30; },
   nssf:     function(gross)   {
-    var t1 = Math.min(gross, 7000) * 0.06;
-    var t2 = Math.max(0, Math.min(gross, 36000) - 7000) * 0.06;
+    var t1 = Math.min(gross, 6000) * 0.06;            // Tier I: 6% of first KES 6,000
+    var t2 = Math.max(0, Math.min(gross, 18000) - 6000) * 0.06;  // Tier II: 6% of KES 6,001–18,000
     return t1 + t2;
   },
   shif:     function(gross)   { return gross * 0.0275; },  // SHIF 2.75%
@@ -1828,7 +1829,7 @@ function renderClients() {
     var efee = c.employees * ct.per_emp;
     var taxManaged = c.monthlyRevenue * 0.18;
     var pctFee = taxManaged * ct.pct;
-    var total = Math.max(base+rfee+efee, pctFee);
+    var total = Math.max(base+rfee+efee+ct.vat_fee+ct.wht_fee, pctFee);
     return {name:c.name, tier:c.tier, total:total};
   });
   var grandTotal = billingRows.reduce(function(s,r){return s+r.total;},0);
@@ -2069,15 +2070,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
   if(STATE.trial) {
     if(isTrialActive()) {
-      STATE.data = STATE.data || generateDemoData(STATE.trial.company, STATE.trial.tier, STATE.trial.sector||'RETAIL');
-      showApp();
-    } else {
-      showExpired();
-    }
-  } else {
-    showLanding();
-  }
-});
-</script>
-</body>
-</html>
+      STATE.
