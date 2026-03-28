@@ -818,7 +818,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
       </div>
     </nav>
     <div class="sb-footer">
-      <div class="sb-footer-user" id="sb-user-email">user@company.co.ke</div>
+      <div class="sb-footer-user" id="sb-user-email"></div>
       <div class="sb-footer-logout" onclick="logout()">Sign out</div>
     </div>
   </aside>
@@ -1066,6 +1066,17 @@ var VENDORS = ['Safaricom PLC','Kenya Power','Nairobi Water','Uber Kenya','Java 
 var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
 // ══════════════════════════════════════════ STATE ════════════════
+// ═══════════════════════════════════════════════════════════
+// ACCOUNTANT CONFIG — edit before deploying
+// ═══════════════════════════════════════════════════════════
+var FIRM = {
+  name: 'Your Accounting Firm',
+  email: 'accounts@yourfirm.co.ke',
+  phone: '+254700000000',
+  pwa_url: 'https://yourusername.github.io/taxbot-ecosystem/pwa/'
+};
+// ═══════════════════════════════════════════════════════════
+
 var STATE = {
   screen: 'landing',
   view: 'overview',
@@ -1090,7 +1101,6 @@ var TAX = {
   // PAYE Finance Act 2024 — monthly
   paye: function(gross) {
     var tax = 0;
-    // Finance Act 2024 monthly bands (annual ÷ 12): 288K→24K, 388K→32,333, 5.7M→475K, 9M→750K
     if (gross <= 24000)        { tax = gross * 0.10; }
     else if (gross <= 32333)   { tax = 2400 + (gross - 24000) * 0.25; }
     else if (gross <= 475000)  { tax = 4483.25 + (gross - 32333) * 0.30; }
@@ -1405,12 +1415,17 @@ function fmtDuration(ms) {
 
 // ══════════════════════════════════════════ APP INIT ═════════════
 function initApp() {
+  // Set sidebar email from FIRM config if no trial active
+  var emailEl = document.getElementById('sb-user-email');
+  if (emailEl && !emailEl.textContent) {
+    emailEl.textContent = (STATE.trial && STATE.trial.email) ? STATE.trial.email : FIRM.email;
+  }
   if(!STATE.trial || !STATE.data) return;
   var t = STATE.trial;
 
   // Company info
   document.getElementById('sb-company-name').textContent = t.company;
-  document.getElementById('sb-user-email').textContent   = t.email;
+  document.getElementById('sb-user-email').textContent = t.email || FIRM.email;
 
   // Show/hide trial bar
   var banner = document.getElementById('trial-banner');
@@ -2070,4 +2085,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
   if(STATE.trial) {
     if(isTrialActive()) {
-      STATE.
+      STATE.screen = 'app';
+      initApp();
+    } else {
+      showExpired();
+      renderExpiredPlans();
+    }
+  } else {
+    showLanding();
+  }
+});
+</script>
+</body>
+</html>
