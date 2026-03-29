@@ -731,7 +731,7 @@ body {
 
       <div class="amount-hero">
         <div style="flex:1">
-          <div class="ah-label">Amount Paid</div>
+          <div class="ah-label" id="amount-hero-label">Amount Paid</div>
           <div style="display:flex;align-items:baseline;gap:4px">
             <input class="ah-input" id="f-amount" type="number" inputmode="decimal" placeholder="0.00" step="0.01">
             <span class="ah-currency">KES</span>
@@ -739,10 +739,47 @@ body {
         </div>
       </div>
 
+      <!-- ── FIX 2: CASH FLOW DIRECTION TOGGLE ──────────────────────────── -->
+      <div id="direction-toggle-wrap" style="margin:0 0 16px">
+        <div style="font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--muted);margin-bottom:8px;text-transform:uppercase">Money Direction</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <button id="dir-out" onclick="setDirection('out')"
+            style="padding:14px 8px;border-radius:12px;border:2px solid var(--red,#EF4444);background:rgba(239,68,68,.12);color:#EF4444;font-weight:800;font-size:15px;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:4px">
+            <span style="font-size:22px">💸</span>
+            <span>Money OUT</span>
+            <span style="font-size:10px;font-weight:500;opacity:.75">I paid this</span>
+          </button>
+          <button id="dir-in" onclick="setDirection('in')"
+            style="padding:14px 8px;border-radius:12px;border:2px solid var(--border);background:var(--surface);color:var(--muted);font-weight:800;font-size:15px;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:4px">
+            <span style="font-size:22px">💰</span>
+            <span>Money IN</span>
+            <span style="font-size:10px;font-weight:500;opacity:.75">I received this</span>
+          </button>
+        </div>
+        <div id="direction-hint" style="font-size:11px;color:var(--muted);margin-top:6px;text-align:center">
+          Tap Money IN for factory payments, cooperative payouts, sales receipts
+        </div>
+      </div>
+
+      <!-- ── FIX 1: DOCUMENT TYPE CLASSIFIER ────────────────────────────── -->
+      <div id="doctype-wrap" style="margin:0 0 16px">
+        <div style="font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--muted);margin-bottom:8px;text-transform:uppercase">Document Type</div>
+        <select id="f-doctype" style="width:100%;padding:11px 14px;border-radius:10px;border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit" onchange="onDocTypeChange()">
+          <option value="RECEIPT_EXPENSE">🧾 Payment Receipt — I paid someone</option>
+          <option value="SALES_INVOICE">📄 Sales Invoice — I invoiced a customer</option>
+          <option value="SETTLEMENT_STATEMENT">🏭 Settlement / Factory Statement — cooperative or factory paid me</option>
+          <option value="BANK_STATEMENT">🏦 Bank / M-Pesa Statement — account activity</option>
+          <option value="PAYSLIP">💼 Payslip — salary from employer</option>
+          <option value="OTHER">📋 Other Document</option>
+        </select>
+        <div id="doctype-hint" style="font-size:11px;color:var(--sage);margin-top:5px;padding:6px 10px;background:rgba(110,231,183,.08);border-radius:7px;display:none"></div>
+      </div>
+
       <div class="field-group">
         <div class="field">
-          <div class="field-label">Vendor / Payee</div>
-          <input class="field-input" id="f-vendor" type="text" placeholder="e.g. Safaricom, Java House…" autocomplete="off">
+          <div class="field-label" id="vendor-label">Vendor / Payee</div>
+          <input class="field-input" id="f-vendor" type="text" placeholder="e.g. Safaricom, Java House…" autocomplete="off" oninput="checkKnownSources()">
+          <div id="known-source-badge" style="display:none;margin-top:5px;padding:5px 10px;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);border-radius:7px;font-size:11px;color:#10B981;font-weight:600"></div>
         </div>
         <div class="field-row">
           <div class="field">
@@ -750,33 +787,48 @@ body {
             <input class="field-input" id="f-date" type="date">
           </div>
           <div class="field">
-            <div class="field-label">Payment</div>
-            <select class="field-select" id="f-payment">
-              <option value="M-Pesa">M-Pesa</option>
-              <option value="Cash">Cash</option>
-              <option value="Card">Card</option>
-              <option value="EFT">EFT</option>
-              <option value="Cheque">Cheque</option>
-            </select>
+            <div id="payment-label-wrap" class="field">
+              <div class="field-label" id="payment-label">Payment Method</div>
+              <select class="field-select" id="f-payment">
+                <option value="M-Pesa">M-Pesa</option>
+                <option value="Cash">Cash</option>
+                <option value="Card">Card</option>
+                <option value="EFT">EFT / Bank Transfer</option>
+                <option value="Cheque">Cheque</option>
+              </select>
+            </div>
           </div>
         </div>
-        <div class="field">
-          <div class="field-label">Category</div>
-          <select class="field-select" id="f-category">
+        <div class="field" id="category-field-wrap">
+          <div class="field-label" id="category-label">Category</div>
+          <select class="field-select" id="f-category" onchange="onCategoryChange()">
             <option value="">— auto-detect —</option>
-            <option>Office Supplies</option><option>Meals &amp; Entertainment</option>
-            <option>Travel &amp; Transport</option><option>Software &amp; Tech</option>
-            <option>Utilities</option><option>Healthcare</option>
-            <option>Marketing &amp; Ads</option><option>Professional Services</option>
-            <option>Education &amp; Training</option><option>Fuel</option>
-            <option>Rent &amp; Occupancy</option><option>Equipment &amp; Machinery</option>
-            <option>Bank Charges</option><option>Clothing &amp; Uniforms</option>
-            <option>Salaries &amp; Wages</option><option>Other</option>
+            <optgroup label="── EXPENSES ──">
+              <option>Office Supplies</option><option>Meals &amp; Entertainment</option>
+              <option>Travel &amp; Transport</option><option>Software &amp; Tech</option>
+              <option>Utilities</option><option>Healthcare</option>
+              <option>Marketing &amp; Ads</option><option>Professional Services</option>
+              <option>Education &amp; Training</option><option>Fuel</option>
+              <option>Rent &amp; Occupancy</option><option>Equipment &amp; Machinery</option>
+              <option>Bank Charges</option><option>Clothing &amp; Uniforms</option>
+              <option>Salaries &amp; Wages</option><option>Other Expense</option>
+            </optgroup>
+            <optgroup label="── REVENUE / INCOME ──">
+              <option value="Tea Sales — Karirana">Tea Sales — Karirana</option>
+              <option value="Tea Sales — KTDA">Tea Sales — KTDA</option>
+              <option value="Tea Sales — Maramba">Tea Sales — Maramba</option>
+              <option value="Agricultural Sales">Agricultural Sales</option>
+              <option value="Sales Revenue">Sales Revenue</option>
+              <option value="Consulting Income">Consulting Income</option>
+              <option value="Rental Income">Rental Income</option>
+              <option value="Dividend / Cooperative Payout">Dividend / Cooperative Payout</option>
+              <option value="Other Income">Other Income</option>
+            </optgroup>
           </select>
         </div>
         <div class="field">
           <div class="field-label">Notes (optional)</div>
-          <input class="field-input" id="f-notes" type="text" placeholder="Invoice ref, project code…" autocomplete="off">
+          <input class="field-input" id="f-notes" type="text" placeholder="Invoice ref, delivery month, project code…" autocomplete="off">
         </div>
       </div>
     </div>
@@ -868,8 +920,21 @@ body {
         </div>
       </div>
 
+      <!-- ── FIX 3: KNOWN REVENUE SOURCES ─────────────────────────────── -->
       <div class="settings-section">
-        <div class="settings-section-title">Capture Options</div>
+        <div class="settings-section-title">📥 Known Income Sources</div>
+        <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;font-size:12.5px;color:var(--muted);line-height:1.7;margin-bottom:10px">
+          Any vendor name in this list is automatically flagged as <strong style="color:#10B981">Money IN (Revenue)</strong> when scanned — preventing misclassification as an expense.
+          Add factory names, cooperatives, SACCOs, or regular customers here.
+        </div>
+        <div id="revenue-source-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px"></div>
+        <div style="display:flex;gap:8px">
+          <input id="new-revenue-source" class="sr-input" style="flex:1" placeholder="e.g. Karirana Estates, KTDA" oninput="this.value=this.value" onkeydown="if(event.key==='Enter')addRevenueSource()">
+          <button onclick="addRevenueSource()" style="padding:8px 16px;background:rgba(16,185,129,.15);border:1.5px solid #10B981;color:#10B981;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap">+ Add</button>
+        </div>
+      </div>
+
+
         <div class="settings-card">
           <div class="settings-row">
             <div class="sr-icon">🗜</div>
@@ -942,6 +1007,16 @@ body {
 'use strict';
 
 // ── State ─────────────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════
+// ACCOUNTANT CONFIG — set once when deploying to clients
+// ══════════════════════════════════════════════════════════════
+var ACCT = {
+  name:  'Your Accounting Firm',
+  email: 'accounts@yourfirm.co.ke',
+  phone: '+254700000000'
+};
+// ══════════════════════════════════════════════════════════════
+
 var currentView  = 'home';
 var prevView     = 'home';
 var mediaStream  = null;
@@ -971,9 +1046,17 @@ function loadSettings() {
     Object.assign(settings, s);
   } catch(e) {}
   applySettingsToUI();
+  renderRevenueSources();           // Fix 3: render known sources on load
 }
 
 function applySettingsToUI() {
+  // Pre-fill from ACCT config if not yet customised
+  if (!settings.acctEmail && ACCT.email && ACCT.email !== 'accounts@yourfirm.co.ke') {
+    settings.acctEmail = ACCT.email;
+  }
+  if (!settings.acctWa && ACCT.phone && ACCT.phone !== '+254700000000') {
+    settings.acctWa = ACCT.phone;
+  }
   setVal('s-company',   settings.company);
   setVal('s-acct-email',settings.acctEmail);
   setVal('s-acct-wa',   settings.acctWa);
@@ -999,7 +1082,7 @@ function setVal(id, v) { var el = document.getElementById(id); if(el) el.value =
 function getChk(id) { var el = document.getElementById(id); return el ? el.checked : false; }
 function setChk(id, v) { var el = document.getElementById(id); if(el) el.checked = !!v; }
 
-// ── IndexedDB ─────────────────────────────────────────────────────────────────
+// ── local storage ─────────────────────────────────────────────────────────────────
 function initDB() {
   return new Promise(function(res, rej) {
     var req = indexedDB.open(DB_NAME, DB_VER);
@@ -1011,7 +1094,7 @@ function initDB() {
       }
     };
     req.onsuccess = function(e) { db = e.target.result; res(db); };
-    req.onerror   = function(e) { console.warn('IDB error', e); res(null); };
+    req.onerror   = function(e) { console.warn('Storage error', e); res(null); };
   });
 }
 
@@ -1237,61 +1320,260 @@ function openReview(imgDataUrl, fileName) {
   document.getElementById('f-category').value = '';
   document.getElementById('f-payment').value  = 'M-Pesa';
 
-  // Try basic amount detection from image EXIF/filename
+  // Reset document classifier to expense default (Fix 1 + 2)
+  var dtEl = document.getElementById('f-doctype');
+  if (dtEl) dtEl.value = 'RECEIPT_EXPENSE';
+  setDirection('out');
+  onDocTypeChange(true);
+  var badge = document.getElementById('known-source-badge');
+  if (badge) badge.style.display = 'none';
+
+  // Try basic vendor detection from filename
   if (fileName) { setVal('f-vendor', fileName.replace(/\.[^.]+$/, '').replace(/[_-]/g,' ')); }
 
   showView('review');
 }
 
 // ── Sending ────────────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+// FIX 1 + 2 + 3 — Document classifier, direction toggle, known revenue sources
+// ══════════════════════════════════════════════════════════════════════════════
+
+// Doc-type metadata
+var DOC_TYPE_META = {
+  RECEIPT_EXPENSE:      { direction:'out', label:'Expense',  ledger:'DR Expense / CR Bank', color:'#EF4444', hint:'Standard purchase — posted to expense accounts.' },
+  SALES_INVOICE:        { direction:'in',  label:'Revenue',  ledger:'DR Bank / CR Revenue', color:'#10B981', hint:'Money owed TO you — posted to revenue accounts.' },
+  SETTLEMENT_STATEMENT: { direction:'in',  label:'Revenue',  ledger:'DR Bank / CR Revenue', color:'#10B981', hint:'Factory / cooperative payment — posted to revenue accounts.' },
+  BANK_STATEMENT:       { direction:'in',  label:'Statement',ledger:'Reference only',        color:'#60A5FA', hint:'Bank/M-Pesa statement — used for reconciliation only.' },
+  PAYSLIP:              { direction:'in',  label:'Income',   ledger:'DR Bank / CR Salary Income', color:'#A78BFA', hint:'Salary received — posted to employment income.' },
+  OTHER:                { direction:'out', label:'Other',    ledger:'Manual review needed', color:'#94A3B8', hint:'Accountant will classify manually.' },
+};
+
+var currentDirection = 'out'; // default: expense
+
+function setDirection(dir) {
+  currentDirection = dir;
+  var outBtn = document.getElementById('dir-out');
+  var inBtn  = document.getElementById('dir-in');
+  var amtLbl = document.getElementById('amount-hero-label');
+  var hint   = document.getElementById('direction-hint');
+
+  if (dir === 'out') {
+    // Active: Money OUT
+    outBtn.style.borderColor = '#EF4444';
+    outBtn.style.background  = 'rgba(239,68,68,.18)';
+    outBtn.style.color       = '#EF4444';
+    inBtn.style.borderColor  = 'var(--border)';
+    inBtn.style.background   = 'var(--surface)';
+    inBtn.style.color        = 'var(--muted)';
+    if (amtLbl) amtLbl.textContent = 'Amount Paid';
+    if (hint) hint.textContent = 'Expense: DR Expense account / CR Bank — this reduces your bank balance.';
+    document.getElementById('vendor-label').textContent = 'Vendor / Payee (who you paid)';
+    // Switch doctype if currently set to income type
+    var dt = document.getElementById('f-doctype').value;
+    if (DOC_TYPE_META[dt] && DOC_TYPE_META[dt].direction === 'in') {
+      document.getElementById('f-doctype').value = 'RECEIPT_EXPENSE';
+      onDocTypeChange(true);
+    }
+  } else {
+    // Active: Money IN
+    inBtn.style.borderColor  = '#10B981';
+    inBtn.style.background   = 'rgba(16,185,129,.18)';
+    inBtn.style.color        = '#10B981';
+    outBtn.style.borderColor = 'var(--border)';
+    outBtn.style.background  = 'var(--surface)';
+    outBtn.style.color       = 'var(--muted)';
+    if (amtLbl) amtLbl.textContent = 'Amount Received';
+    if (hint) hint.textContent = 'Revenue: DR Bank / CR Revenue account — this increases your income.';
+    document.getElementById('vendor-label').textContent = 'Payer / Source (who paid you)';
+    // Switch doctype if currently set to expense type
+    var dt2 = document.getElementById('f-doctype').value;
+    if (!DOC_TYPE_META[dt2] || DOC_TYPE_META[dt2].direction !== 'in') {
+      document.getElementById('f-doctype').value = 'SETTLEMENT_STATEMENT';
+      onDocTypeChange(true);
+    }
+  }
+}
+
+function onDocTypeChange(fromDirection) {
+  var dt   = document.getElementById('f-doctype').value;
+  var meta = DOC_TYPE_META[dt] || DOC_TYPE_META.OTHER;
+  var hintEl = document.getElementById('doctype-hint');
+  if (hintEl) {
+    hintEl.textContent = meta.ledger + ' — ' + meta.hint;
+    hintEl.style.display = 'block';
+    hintEl.style.color = meta.color;
+    hintEl.style.background = meta.color.replace(')', ',.08)').replace('rgb','rgba');
+  }
+  // Sync direction toggle
+  if (!fromDirection && meta.direction !== currentDirection) {
+    setDirection(meta.direction);
+  } else if (!fromDirection) {
+    currentDirection = meta.direction;
+  }
+  // Update category options visibility / default
+  if (meta.direction === 'in') {
+    // Pre-select a revenue category
+    var catEl = document.getElementById('f-category');
+    if (catEl && (!catEl.value || catEl.querySelector('optgroup[label*="EXPENSES"] option:checked'))) {
+      if (dt === 'SETTLEMENT_STATEMENT') catEl.value = 'Agricultural Sales';
+      else if (dt === 'SALES_INVOICE')   catEl.value = 'Sales Revenue';
+      else if (dt === 'PAYSLIP')         catEl.value = 'Other Income';
+    }
+  }
+  // Update amount label
+  var amtLbl = document.getElementById('amount-hero-label');
+  if (amtLbl) amtLbl.textContent = meta.direction === 'in' ? 'Amount Received' : 'Amount Paid';
+}
+
+function onCategoryChange() {
+  var cat = document.getElementById('f-category').value;
+  var incomeCategories = ['Tea Sales — Karirana','Tea Sales — KTDA','Tea Sales — Maramba',
+    'Agricultural Sales','Sales Revenue','Consulting Income','Rental Income',
+    'Dividend / Cooperative Payout','Other Income'];
+  if (incomeCategories.indexOf(cat) !== -1 && currentDirection !== 'in') {
+    setDirection('in');
+  }
+}
+
+// ── FIX 3: Known Revenue Sources ─────────────────────────────────────────────
+var DEFAULT_REVENUE_SOURCES = [
+  'Karirana Estates','Karirana Estates Limited','KTDA','Kenya Tea Development Agency',
+  'Maramba','Limuru Tea','James Finlay','Eastern Produce','Ekaterra','Unilever Tea',
+];
+
+function loadRevenueSources() {
+  try {
+    var saved = localStorage.getItem('taxbot-revenue-sources');
+    if (saved) return JSON.parse(saved);
+  } catch(e) {}
+  return DEFAULT_REVENUE_SOURCES.slice();
+}
+
+function saveRevenueSources(list) {
+  try { localStorage.setItem('taxbot-revenue-sources', JSON.stringify(list)); } catch(e) {}
+}
+
+function renderRevenueSources() {
+  var list = loadRevenueSources();
+  var el = document.getElementById('revenue-source-list');
+  if (!el) return;
+  if (list.length === 0) {
+    el.innerHTML = '<div style="font-size:12px;color:var(--muted);font-style:italic">No sources added yet.</div>';
+    return;
+  }
+  el.innerHTML = list.map(function(src, i) {
+    return '<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.2);border-radius:8px">' +
+      '<span style="font-size:13px;color:#10B981;flex:1">💰 ' + src + '</span>' +
+      '<button onclick="removeRevenueSource(' + i + ')" style="background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:0 4px;line-height:1">×</button>' +
+    '</div>';
+  }).join('');
+}
+
+function addRevenueSource() {
+  var inp = document.getElementById('new-revenue-source');
+  var val = inp ? inp.value.trim() : '';
+  if (!val) return;
+  var list = loadRevenueSources();
+  if (list.indexOf(val) === -1) {
+    list.push(val);
+    saveRevenueSources(list);
+    renderRevenueSources();
+  }
+  if (inp) inp.value = '';
+}
+
+function removeRevenueSource(idx) {
+  var list = loadRevenueSources();
+  list.splice(idx, 1);
+  saveRevenueSources(list);
+  renderRevenueSources();
+}
+
+function checkKnownSources() {
+  var vendor = (getVal('f-vendor') || '').toLowerCase();
+  if (!vendor) {
+    document.getElementById('known-source-badge').style.display = 'none';
+    return;
+  }
+  var list = loadRevenueSources();
+  var match = list.find(function(s) { return vendor.includes(s.toLowerCase()) || s.toLowerCase().includes(vendor); });
+  var badge = document.getElementById('known-source-badge');
+  if (match) {
+    badge.textContent = '✅ Known Income Source — switching to Money IN (Revenue)';
+    badge.style.display = 'block';
+    if (currentDirection !== 'in') setDirection('in');
+    // Auto-set doctype to settlement if not already income type
+    var dt = document.getElementById('f-doctype').value;
+    if (!DOC_TYPE_META[dt] || DOC_TYPE_META[dt].direction !== 'in') {
+      document.getElementById('f-doctype').value = 'SETTLEMENT_STATEMENT';
+      onDocTypeChange(true);
+    }
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
 function buildReceiptRecord() {
+  var dt   = document.getElementById('f-doctype') ? document.getElementById('f-doctype').value : 'RECEIPT_EXPENSE';
+  var meta = DOC_TYPE_META[dt] || DOC_TYPE_META.OTHER;
   return {
-    vendor:   getVal('f-vendor') || 'Unknown',
-    amount:   parseFloat(getVal('f-amount')) || 0,
-    date:     getVal('f-date')   || new Date().toISOString().slice(0,10),
-    payment:  getVal('f-payment') || 'M-Pesa',
-    category: getVal('f-category') || '',
-    notes:    getVal('f-notes')  || '',
-    company:  settings.company || 'Client',
-    pin:      settings.pin || '',
-    dataUrl:  currentDataUrl,
-    fileName: 'receipt_' + new Date().toISOString().replace(/[:.]/g,'-').slice(0,19) + '.jpg',
-    status:   'pending',
-    capturedAt: new Date().toISOString(),
+    vendor:      getVal('f-vendor') || 'Unknown',
+    amount:      parseFloat(getVal('f-amount')) || 0,
+    date:        getVal('f-date')   || new Date().toISOString().slice(0,10),
+    payment:     getVal('f-payment') || 'M-Pesa',
+    category:    getVal('f-category') || '',
+    notes:       getVal('f-notes')  || '',
+    company:     settings.company || 'Client',
+    pin:         settings.pin || '',
+    dataUrl:     currentDataUrl,
+    fileName:    'receipt_' + new Date().toISOString().replace(/[:.]/g,'-').slice(0,19) + '.jpg',
+    status:      'pending',
+    capturedAt:  new Date().toISOString(),
+    // ── Three-fix fields ──────────────────────────────────────────────
+    docType:     dt,
+    direction:   meta.direction,        // 'in' | 'out'
+    ledgerHint:  meta.ledger,           // e.g. 'DR Bank / CR Revenue'
+    txLabel:     meta.label,            // 'Revenue' | 'Expense' | 'Statement'
   };
 }
 
 function sendViaEmail() {
   var email = settings.acctEmail;
   if (!email) {
-    toast('⚙️ Set accountant email in Setup first', 'error');
+    toast('⚙️ Tap Setup (bottom right) → enter accountant email first', 'error');
     setTimeout(function(){ showView('settings'); }, 1200);
     return;
   }
 
   var rec = buildReceiptRecord();
+  // Tag line changes based on direction — accountant sees this instantly in inbox
+  var tag = rec.direction === 'in' ? '[INCOME]' : '[EXPENSE]';
   var subject = encodeURIComponent(
-    '[RECEIPT] ' + rec.company + ' | KES ' + (rec.amount||'?') + ' | ' + rec.date
+    tag + ' ' + rec.company + ' | KES ' + (rec.amount||'?') + ' | ' + rec.date + ' | ' + rec.vendor
   );
   var body = encodeURIComponent(
     'TaxBot Receipt Submission\n' +
     '─────────────────────────\n' +
-    'Company:  ' + rec.company + '\n' +
-    'KRA PIN:  ' + (rec.pin || 'N/A') + '\n' +
-    'Vendor:   ' + rec.vendor + '\n' +
-    'Amount:   KES ' + (rec.amount || '0') + '\n' +
-    'Date:     ' + rec.date + '\n' +
-    'Payment:  ' + rec.payment + '\n' +
-    'Category: ' + (rec.category || 'auto-detect') + '\n' +
-    'Notes:    ' + (rec.notes || '—') + '\n\n' +
+    'Company:      ' + rec.company + '\n' +
+    'KRA PIN:      ' + (rec.pin || 'N/A') + '\n' +
+    'Vendor:       ' + rec.vendor + '\n' +
+    'Amount:       KES ' + (rec.amount || '0') + '\n' +
+    'Date:         ' + rec.date + '\n' +
+    'Payment:      ' + rec.payment + '\n' +
+    'Category:     ' + (rec.category || 'auto-detect') + '\n' +
+    '── Classification ──────────────────\n' +
+    'Direction:    ' + (rec.direction === 'in' ? 'MONEY IN (Revenue/Income)' : 'MONEY OUT (Expense)') + '\n' +
+    'Doc Type:     ' + rec.docType + '\n' +
+    'Ledger Entry: ' + rec.ledgerHint + '\n' +
+    '────────────────────────────────────\n' +
+    'Notes:        ' + (rec.notes || '—') + '\n\n' +
     'Sent via TaxBot Receipt Capture PWA\n' +
     'Receipt image is attached to this email.'
   );
 
-  // Save to queue first
   saveToQueue(rec, 'sent').then(function() { refreshHomeQueue(); });
 
-  // For image — download first, then open email client
   if (currentBlob) {
     var url = URL.createObjectURL(currentBlob);
     var a = document.createElement('a');
@@ -1301,14 +1583,13 @@ function sendViaEmail() {
       window.location.href = 'mailto:' + email + '?subject=' + subject + '&body=' + body;
     }, 800);
     showSuccess(
-      'Receipt Ready to Send!',
-      'The receipt image was saved to your device.\n' +
-      'Attach it to the email that just opened — then hit Send. ' +
-      'TaxBot will pick it up automatically.'
+      (rec.direction === 'in' ? '💰 Income' : '💸 Expense') + ' Receipt Ready!',
+      'Image saved to device. Attach it to the email that just opened.\n' +
+      'Classified as: ' + rec.txLabel + ' — ' + rec.ledgerHint
     );
   } else {
     window.location.href = 'mailto:' + email + '?subject=' + subject + '&body=' + body;
-    showSuccess('Email Draft Opened', 'Fill in the email and attach the receipt file manually.');
+    showSuccess('Email Draft Opened', 'Classified as: ' + rec.txLabel);
   }
 }
 
@@ -1321,17 +1602,20 @@ function sendViaWhatsApp() {
   }
 
   var rec = buildReceiptRecord();
+  var dirIcon = rec.direction === 'in' ? '💰' : '💸';
+  var dirLabel = rec.direction === 'in' ? 'INCOME received from' : 'EXPENSE paid to';
   var msg = encodeURIComponent(
-    '🧾 *Receipt from ' + rec.company + '*\n' +
-    'Vendor: ' + rec.vendor + '\n' +
+    dirIcon + ' *' + rec.txLabel + ' — ' + rec.company + '*\n' +
+    dirLabel + ': ' + rec.vendor + '\n' +
     'Amount: KES ' + (rec.amount || '?') + '\n' +
     'Date: '   + rec.date + '\n' +
     'Payment: ' + rec.payment + '\n' +
+    'Ledger: ' + rec.ledgerHint + '\n' +
+    (rec.category ? 'Category: ' + rec.category + '\n' : '') +
     (rec.notes ? 'Notes: ' + rec.notes + '\n' : '') +
     '\n_Sent via TaxBot Receipt PWA_'
   );
 
-  // Download image first
   if (currentBlob) {
     var url = URL.createObjectURL(currentBlob);
     var a = document.createElement('a');
@@ -1340,9 +1624,7 @@ function sendViaWhatsApp() {
   }
 
   saveToQueue(rec, 'sent').then(function(){ refreshHomeQueue(); });
-
-  var waUrl = 'https://wa.me/' + wa + '?text=' + msg;
-  window.open(waUrl, '_blank');
+  window.open('https://wa.me/' + wa + '?text=' + msg, '_blank');
   showSuccess('Sharing via WhatsApp', 'Attach the saved receipt image in the WhatsApp window.');
 }
 
@@ -1398,8 +1680,7 @@ function saveToQueue(rec, status) {
 }
 
 function sendAllPending() {
-  toast('✉️ Opening email client...', 'success');
-  sendViaEmail();
+  showView('queue');
 }
 
 // ── UI refresh ────────────────────────────────────────────────────────────────
@@ -1515,7 +1796,7 @@ function updateOnline() {
   }
 }
 
-// Auto-send: when connectivity is restored, notify user of pending receipts
+// Auto-notify when back online with pending receipts
 function flushQueue() {
   if (!settings.autosend) return;
   if (!db) return;
@@ -1525,21 +1806,14 @@ function flushQueue() {
     var msg = pending.length === 1
       ? '📶 Back online — 1 receipt queued. Tap to send.'
       : '📶 Back online — ' + pending.length + ' receipts queued. Tap to send.';
-    // Show persistent toast that navigates to queue
     var t = document.getElementById('toast');
     if (t) {
       t.textContent = msg;
       t.classList.add('show');
       t.style.cursor = 'pointer';
-      t.onclick = function() {
-        t.classList.remove('show');
-        t.onclick = null;
-        t.style.cursor = '';
-        showView('queue');
-      };
+      t.onclick = function() { t.classList.remove('show'); t.onclick = null; t.style.cursor = ''; showView('queue'); };
       setTimeout(function() { t.classList.remove('show'); t.onclick = null; t.style.cursor = ''; }, 6000);
     }
-    // Update home badge immediately
     refreshHomeQueue();
   });
 }
