@@ -1160,24 +1160,44 @@ function generateDemoData(company, tier, sector) {
     };
   });
 
-  // Generate realistic transactions
+  // Generate realistic transactions — with Fix 1/2/3 classification fields
+  var REVENUE_VENDORS_DEMO = ['Karirana Estates Limited','KTDA','Limuru Tea','James Finlay','Cooperative Bank'];
+  var EXPENSE_DOC_TYPES    = ['RECEIPT_EXPENSE','RECEIPT_EXPENSE','RECEIPT_EXPENSE','BANK_STATEMENT'];
+  var REVENUE_DOC_TYPES_D  = ['SETTLEMENT_STATEMENT','SALES_INVOICE','PAYSLIP'];
   var transactions = [];
   months.forEach(function(mo, mi) {
     var count = mo.receipts;
     for (var i=0; i<count; i++) {
-      var cat = CATEGORIES[Math.floor(Math.random()*12)];
-      var vendor = VENDORS[Math.floor(Math.random()*VENDORS.length)];
-      var day = Math.floor(1 + Math.random()*28);
+      // ~15% of transactions are income (realistic ratio)
+      var isIncome = Math.random() < 0.15;
+      var cat, vendor, docType, direction, ledgerHint;
+      if (isIncome) {
+        cat       = ['Tea Sales — Karirana','Agricultural Sales','Sales Revenue','Consulting Income','Other Income'][Math.floor(Math.random()*5)];
+        vendor    = REVENUE_VENDORS_DEMO[Math.floor(Math.random()*REVENUE_VENDORS_DEMO.length)];
+        docType   = REVENUE_DOC_TYPES_D[Math.floor(Math.random()*REVENUE_DOC_TYPES_D.length)];
+        direction = 'in';
+        ledgerHint= 'DR Bank / CR Revenue';
+      } else {
+        cat       = CATEGORIES[Math.floor(Math.random()*12)];
+        vendor    = VENDORS[Math.floor(Math.random()*VENDORS.length)];
+        docType   = EXPENSE_DOC_TYPES[Math.floor(Math.random()*EXPENSE_DOC_TYPES.length)];
+        direction = 'out';
+        ledgerHint= 'DR Expense / CR Bank';
+      }
+      var day  = Math.floor(1 + Math.random()*28);
       var date = yr + '-' + String(mo.m).padStart(2,'0') + '-' + String(day).padStart(2,'0');
-      var amount = Math.round(500 + Math.random()*50000);
-      var hasVAT = Math.random() > 0.35;
-      var payments = ['M-Pesa','M-Pesa','M-Pesa','Cash','Card','EFT'];
+      var amount  = Math.round(500 + Math.random()*50000);
+      var hasVAT  = !isIncome && Math.random() > 0.35;
+      var payments = ['M-Pesa','M-Pesa','M-Pesa','Cash','Card','EFT','Cheque'];
       transactions.push({
         id: 'TXN-' + String(transactions.length+1).padStart(4,'0'),
         date: date, vendor: vendor, category: cat,
         amount: amount, vat: hasVAT ? Math.round(amount*0.16/1.16) : 0,
         payment: payments[Math.floor(Math.random()*payments.length)],
-        month: mi
+        month: mi,
+        direction:   direction,
+        docType:     docType,
+        ledgerHint:  ledgerHint,
       });
     }
   });
@@ -1675,27 +1695,83 @@ function renderAnalytics() {
   var ytdVAT  = ytd.reduce(function(s,m){return s+m.vatInput;},0);
   var avgMo   = ytdExp/(nowM+1);
 
+  // ── Fix 1/2/3: Revenue vs Expense classification from transactions ──────────
+  var REVENUE_CATEGORIES = ['Tea Sales — Karirana','Tea Sales — KTDA','Tea Sales — Maramba',
+    'Agricultural Sales','Sales Revenue','Consulting Income','Rental Income',
+    'Dividend / Cooperative Payout','Other Income'];
+  var REVENUE_DOC_TYPES = ['SALES_INVOICE','SETTLEMENT_STATEMENT','PAYSLIP'];
+
+  var ytdRevenue = 0, ytdExpense = 0, incomeCount = 0, expenseCount = 0;
+  var misclassRisk = []; // transactions that look like income but have direction='out'
+
+  d.transactions.forEach(function(t) {
+    var isRevenue = (t.direction === 'in') ||
+                   (REVENUE_DOC_TYPES.indexOf(t.docType) !== -1) ||
+                   (REVENUE_CATEGORIES.indexOf(t.category) !== -1);
+    if (isRevenue) {
+      ytdRevenue += t.amount; incomeCount++;
+    } else {
+      ytdExpense += t.amount; expenseCount++;
+    }
+    // Flag risk: vendor is a known revenue source but direction is 'out' or docType is expense
+    if (t.docType === 'RECEIPT_EXPENSE' && REVENUE_CATEGORIES.indexOf(t.category) !== -1) {
+      misclassRisk.push(t);
+    }
+  });
+
+  var netPosition = ytdRevenue - ytdExpense;
+  var netCls = netPosition >= 0 ? 'sage' : 'red';
+
   document.getElementById('an-kpis').innerHTML = [
-    {label:'YTD Expenses',      value:fmtKES(ytdExp), icon:'💰', cls:'gold'},
-    {label:'Monthly Average',   value:fmtKES(avgMo),  icon:'📊', cls:'blue'},
-    {label:'Input VAT Claimable',value:fmtKES(ytdVAT),icon:'🧾', cls:'sage'},
-    {label:'Total Receipts',    value:ytdRec.toLocaleString(), icon:'🗃', cls:'purple'},
+    {label:'YTD Revenue (IN)',   value:fmtKES(ytdRevenue), icon:'💰', cls:'sage'},
+    {label:'YTD Expenses (OUT)', value:fmtKES(ytdExpense), icon:'💸', cls:'gold'},
+    {label:'Net Position',       value:fmtKES(netPosition),icon: netPosition>=0?'📈':'📉', cls: netCls},
+    {label:'Input VAT Claimable',value:fmtKES(ytdVAT),    icon:'🧾', cls:'blue'},
+    {label:'Income Transactions',value:incomeCount,         icon:'📥', cls:'purple'},
+    {label:'Expense Transactions',value:expenseCount,       icon:'📤', cls:'gold'},
   ].map(function(k){
     return '<div class="kpi-card '+k.cls+'"><div class="kpi-icon">'+k.icon+'</div><div class="kpi-label">'+k.label+'</div><div class="kpi-value">'+k.value+'</div></div>';
   }).join('');
 
-  // Donut
+  // Misclassification alert
+  var alertEl = document.getElementById('an-misclass-alert');
+  if (!alertEl) {
+    alertEl = document.createElement('div');
+    alertEl.id = 'an-misclass-alert';
+    document.getElementById('an-kpis').parentNode.insertBefore(alertEl, document.getElementById('an-kpis').nextSibling);
+  }
+  if (misclassRisk.length > 0) {
+    alertEl.innerHTML = '<div style="margin:14px 0;padding:12px 16px;background:rgba(239,68,68,.08);border:1.5px solid rgba(239,68,68,.3);border-radius:10px;font-size:12px;color:#EF4444">' +
+      '<strong>⚠️ Possible Misclassification — ' + misclassRisk.length + ' transaction(s)</strong><br>' +
+      'These are posted as EXPENSES but their category looks like income. Review and reclassify:<br>' +
+      '<ul style="margin:6px 0 0 16px;line-height:1.8">' +
+      misclassRisk.slice(0,5).map(function(t){
+        return '<li>'+esc(t.vendor)+' — '+fmtKES(t.amount)+' — '+t.date+' (category: '+t.category+')</li>';
+      }).join('') +
+      (misclassRisk.length > 5 ? '<li>… and '+(misclassRisk.length-5)+' more</li>' : '') +
+      '</ul>' +
+      '<div style="margin-top:6px;color:rgba(239,68,68,.7)">Fix: change Direction to Money IN in PWA, or run <code style="font-family:var(--fm);font-size:11px">python taxbot.py reclassify-income &lt;id&gt;</code></div>' +
+    '</div>';
+  } else {
+    alertEl.innerHTML = '<div style="margin:10px 0;padding:8px 14px;background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.2);border-radius:8px;font-size:11px;color:#10B981">✅ No misclassification risk detected — all income/expense directions look correct.</div>';
+  }
+
+  // Donut — split by Revenue vs Expense categories
   var catTotals = {};
   ytd.forEach(function(m){ Object.keys(m.categories||{}).forEach(function(c){ catTotals[c]=(catTotals[c]||0)+m.categories[c]; }); });
-  var catArr = Object.keys(catTotals).map(function(c,i){ return {l:c,v:catTotals[c],c:CAT_COLORS[i%CAT_COLORS.length]}; });
+  var catArr = Object.keys(catTotals).map(function(c,i){
+    var isRev = REVENUE_CATEGORIES.indexOf(c) !== -1;
+    return {l:c, v:catTotals[c], c: isRev ? '#10B981' : CAT_COLORS[i%CAT_COLORS.length], isRev: isRev};
+  });
   catArr.sort(function(a,b){return b.v-a.v;});
   var top7 = catArr.slice(0,7);
   document.getElementById('an-donut').innerHTML = svgDonut(top7, {size:160,r:70,ir:44});
   document.getElementById('an-legend').innerHTML = top7.map(function(s){
-    return '<div class="chart-legend-item" style="font-size:11px"><div class="chart-legend-dot" style="background:'+s.c+'"></div><span style="flex:1">'+esc(s.l)+'</span><span style="font-family:var(--fm);font-size:10px;color:var(--amber)">'+fmtK(s.v)+'</span></div>';
+    var tag = s.isRev ? '<span style="font-size:9px;background:rgba(16,185,129,.15);color:#10B981;border-radius:4px;padding:1px 5px;margin-left:4px">IN</span>' : '';
+    return '<div class="chart-legend-item" style="font-size:11px"><div class="chart-legend-dot" style="background:'+s.c+'"></div><span style="flex:1">'+esc(s.l)+tag+'</span><span style="font-family:var(--fm);font-size:10px;color:var(--amber)">'+fmtK(s.v)+'</span></div>';
   }).join('');
 
-  // Trend line: expenses vs vat
+  // Trend line: revenue IN vs expenses OUT
   document.getElementById('an-trend-chart').innerHTML = svgLineChart([
     {data:d.months.map(function(m){return m.total;}), color:'#C8952A', fill:true},
     {data:d.months.map(function(m){return m.vatInput;}), color:'#52A8D5', fill:false},
@@ -1736,9 +1812,23 @@ function toggleVendorView() {
 
 function renderReceiptLog(txns) {
   document.getElementById('an-receipt-log').innerHTML =
-    '<thead><tr><th>ID</th><th>Date</th><th>Vendor</th><th>Category</th><th>Amount</th><th>VAT</th><th>Payment</th></tr></thead><tbody>' +
+    '<thead><tr><th>Direction</th><th>Date</th><th>Vendor</th><th>Category</th><th>Amount</th><th>Doc Type</th><th>Payment</th></tr></thead><tbody>' +
     txns.map(function(t){
-      return '<tr><td class="mono muted" style="font-size:10px">'+t.id+'</td><td class="mono">'+t.date+'</td><td>'+esc(t.vendor)+'</td><td><span class="badge badge-dim">'+esc(t.category)+'</span></td><td class="mono amber">'+fmtKES(t.amount)+'</td><td class="mono '+(t.vat>0?'green':'muted')+'">'+fmtKES(t.vat)+'</td><td class="mono muted">'+t.payment+'</td></tr>';
+      var isIn   = t.direction === 'in';
+      var dirBadge = isIn
+        ? '<span style="background:rgba(16,185,129,.15);color:#10B981;border-radius:12px;padding:2px 8px;font-size:10px;font-weight:700;white-space:nowrap">💰 IN</span>'
+        : '<span style="background:rgba(239,68,68,.10);color:#EF4444;border-radius:12px;padding:2px 8px;font-size:10px;font-weight:700;white-space:nowrap">💸 OUT</span>';
+      var amtStyle = isIn ? 'mono sage' : 'mono amber';
+      var docLabel = (t.docType||'RECEIPT_EXPENSE').replace(/_/g,' ').toLowerCase().replace(/\b\w/g,function(c){return c.toUpperCase();});
+      return '<tr>' +
+        '<td>'+dirBadge+'</td>' +
+        '<td class="mono" style="font-size:11px">'+t.date+'</td>' +
+        '<td>'+esc(t.vendor)+'</td>' +
+        '<td><span class="badge badge-dim">'+esc(t.category)+'</span></td>' +
+        '<td class="'+amtStyle+'">'+fmtKES(t.amount)+'</td>' +
+        '<td class="mono muted" style="font-size:10px">'+docLabel+'</td>' +
+        '<td class="mono muted" style="font-size:11px">'+t.payment+'</td>' +
+      '</tr>';
     }).join('')+'</tbody>';
 }
 
