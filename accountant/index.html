@@ -807,7 +807,81 @@ python taxbot.py compliance-check > compliance_report.txt<br>
 <h2>📱 Receipt Capture PWA — Client Mobile App</h2>
 <p>A Progressive Web App clients install on their phones. No App Store, no Play Store. Clients snap receipts and email them directly to the accountant's TaxBot-monitored Gmail address.</p>
 
-<h3>📤 How receipts flow from client to TaxBot</h3>
+<div class="alert alert-g">
+  <span>✅</span>
+  <div><strong>Version 3.2 — Revenue vs Expense Classification built in.</strong>
+  The PWA now has three interlocking fixes that prevent income being misposted as expenses.
+  The client classifies the document before sending — the accountant sees the result immediately in the email subject line.</div>
+</div>
+
+<h3>📤 How receipts flow from client to TaxBot — Updated</h3>
+<table>
+<tr><th>Step</th><th>Action</th><th>Who</th><th>What's new</th></tr>
+<tr><td>1</td><td>Client opens PWA, taps camera, snaps receipt</td><td>Client</td><td>—</td></tr>
+<tr><td>2</td><td>Fills Amount. Selects <strong>Money OUT</strong> or <strong>Money IN</strong></td><td>Client (5 sec)</td><td>🆕 Direction toggle</td></tr>
+<tr><td>3</td><td>Selects <strong>Document Type</strong> (Receipt, Settlement, Invoice, etc.)</td><td>Client (5 sec)</td><td>🆕 Doc classifier</td></tr>
+<tr><td>4</td><td>Types vendor name — if a <em>known income source</em>, direction flips automatically</td><td>PWA automated</td><td>🆕 Known sources</td></tr>
+<tr><td>5</td><td>Fills Vendor, Date, Category (Revenue or Expense group), Notes</td><td>Client</td><td>Categories split into Revenue / Expense groups</td></tr>
+<tr><td>6</td><td>Taps Email — subject reads <code>[INCOME]</code> or <code>[EXPENSE]</code>, body includes ledger hint</td><td>PWA automated</td><td>🆕 Classification in email</td></tr>
+<tr><td>7</td><td>TaxBot scans Gmail — reads Direction + DocType fields, routes to correct ledger account</td><td>TaxBot: <code>scan-gmail</code></td><td>🆕 Correct DR/CR posting</td></tr>
+<tr><td>8</td><td>Accountant reviews — INCOME rows go to 4xxx Revenue, EXPENSE rows to 5xxx Expense</td><td>Accountant</td><td>—</td></tr>
+</table>
+
+<h3>⚙️ Fix 1 — Document Type Classifier</h3>
+<div class="card">
+  <p style="margin-bottom:12px">The client selects what kind of document they are scanning. Each type maps to a specific journal entry:</p>
+  <table>
+    <tr><th>Document Type</th><th>Direction</th><th>Ledger Entry</th><th>Example</th></tr>
+    <tr><td>🧾 Payment Receipt</td><td>💸 Money OUT</td><td>DR Expense / CR Bank</td><td>Fuel receipt, office supplies</td></tr>
+    <tr><td>📄 Sales Invoice</td><td>💰 Money IN</td><td>DR Bank / CR Revenue</td><td>Invoice issued to customer</td></tr>
+    <tr><td>🏭 Settlement Statement</td><td>💰 Money IN</td><td>DR Bank / CR Revenue</td><td>Karirana monthly tea payout, KTDA statement</td></tr>
+    <tr><td>🏦 Bank Statement</td><td>💰 Money IN</td><td>Reference only (reconciliation)</td><td>KCB, M-Pesa statement</td></tr>
+    <tr><td>💼 Payslip</td><td>💰 Money IN</td><td>DR Bank / CR Salary Income</td><td>P9A, employer payslip</td></tr>
+    <tr><td>📋 Other</td><td>—</td><td>Manual review needed</td><td>Any unrecognised document</td></tr>
+  </table>
+</div>
+
+<h3>⚙️ Fix 2 — Cash Flow Direction Toggle</h3>
+<div class="card">
+  <p>The client taps <strong>💸 Money OUT</strong> (red, default) or <strong>💰 Money IN</strong> (green) before filling any other field. The two controls are bidirectionally linked — changing the doc type syncs the toggle and vice versa. The email subject automatically changes:</p>
+  <ul class="checklist" style="margin-top:10px">
+    <li><div class="chk-g chk">💸</div><div>Expense: subject reads <code>[EXPENSE] Company | KES X | Date | Vendor</code></div></li>
+    <li><div class="chk-g chk">💰</div><div>Income: subject reads <code>[INCOME] Company | KES X | Date | Vendor</code></div></li>
+  </ul>
+  <p style="margin-top:10px;color:var(--muted)">The email body includes the full ledger hint: <em>"DR Bank / CR Revenue"</em> — the accountant never has to guess.</p>
+</div>
+
+<h3>⚙️ Fix 3 — Known Revenue Sources (Manage in PWA Setup Tab)</h3>
+<div class="card">
+  <p>The accountant pre-loads a list of vendor names that are always income. When a client types a matching vendor name, the PWA automatically flips to Money IN and selects Settlement Statement. Default list includes:</p>
+  <div style="display:flex;flex-wrap:wrap;gap:6px;margin:10px 0">
+    <span style="background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);color:#10B981;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600">Karirana Estates</span>
+    <span style="background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);color:#10B981;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600">KTDA</span>
+    <span style="background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);color:#10B981;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600">Maramba</span>
+    <span style="background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);color:#10B981;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600">Limuru Tea</span>
+    <span style="background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);color:#10B981;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600">James Finlay</span>
+    <span style="background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);color:#10B981;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600">Eastern Produce</span>
+  </div>
+  <p><strong>To add a client's income source:</strong> Open the PWA → Setup tab → scroll to "Known Income Sources" → type the vendor name → tap Add. The source is stored locally in the client's browser.</p>
+  <p style="margin-top:8px;color:var(--muted)"><strong>Accountant action:</strong> When onboarding a farming or cooperative client, always ask "Who pays you for your produce?" and add those names to their Known Income Sources immediately.</p>
+</div>
+
+<h3>📥 income_inbox Folder — Accountant-Side Safety Net</h3>
+<div class="card">
+  <div class="alert alert-b" style="margin-bottom:12px">
+    <span>ℹ️</span>
+    <div>For clients who cannot use the PWA classification (e.g. they just forward PDFs without classifying), use the <code>income_inbox</code> folder as a second line of defence.</div>
+  </div>
+  <ul class="checklist">
+    <li><div class="chk"></div><div>Create folder: <code>C:\MyERP\clients\&lt;id&gt;\income_inbox\</code></div></li>
+    <li><div class="chk"></div><div>Drop all factory statements, KTDA payments, cooperative payouts here — NOT in the regular <code>inbox\</code></div></li>
+    <li><div class="chk"></div><div>Run: <code>python taxbot.py process-income &lt;id&gt;</code> — posts as DR Bank / CR Revenue automatically</div></li>
+    <li><div class="chk"></div><div>Regular <code>inbox\</code> continues to be treated as expenses</div></li>
+    <li><div class="chk"></div><div>Add known revenue vendors to TaxBot registry: <code>python taxbot.py add-revenue-source &lt;id&gt; "Karirana Estates"</code></div></li>
+  </ul>
+</div>
+
+<h3>📤 How receipts flow from client to TaxBot — Legacy (without PWA)</h3>
 <table>
 <tr><th>Step</th><th>Action</th><th>Who</th></tr>
 <tr><td>1</td><td>Client opens PWA, taps camera, snaps receipt</td><td>Client on phone</td></tr>
@@ -876,12 +950,199 @@ python taxbot.py compliance-check > compliance_report.txt<br>
 </div><!-- wrap -->
 
 <script>
-function show(id) {
+// ── TAB NAVIGATION ─────────────────────────────────────────────────────────
+function show(id, el) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById('panel-' + id).classList.add('active');
-  event.target.classList.add('active');
+  (el || event.target).classList.add('active');
 }
+
+// ── INTERACTIVE CHECKLISTS ──────────────────────────────────────────────────
+function initChecklists() {
+  var saved = {};
+  try { saved = JSON.parse(localStorage.getItem('taxbot-guide-checks') || '{}'); } catch(e){}
+  document.querySelectorAll('.checklist li').forEach(function(li, i) {
+    var key = 'chk-' + i;
+    li.setAttribute('data-key', key);
+    if (saved[key]) li.classList.add('done');
+    var chkEl = li.querySelector('.chk,.chk-g');
+    if (chkEl && saved[key]) chkEl.textContent = '✓';
+    li.addEventListener('click', function() {
+      li.classList.toggle('done');
+      var chk = li.querySelector('.chk,.chk-g');
+      var isDone = li.classList.contains('done');
+      if (chk) { chk.textContent = isDone ? '✓' : ''; }
+      var s = {};
+      try { s = JSON.parse(localStorage.getItem('taxbot-guide-checks') || '{}'); } catch(e){}
+      s[key] = isDone;
+      localStorage.setItem('taxbot-guide-checks', JSON.stringify(s));
+    });
+  });
+}
+
+function resetChecks() {
+  if (!confirm('Reset all checklists to unticked?')) return;
+  localStorage.removeItem('taxbot-guide-checks');
+  document.querySelectorAll('.checklist li').forEach(function(li) {
+    li.classList.remove('done');
+    var chk = li.querySelector('.chk,.chk-g');
+    if (chk) chk.textContent = '';
+  });
+}
+
+// ── COPY INLINE COMMANDS ───────────────────────────────────────────────────
+function wrapCodes() {
+  document.querySelectorAll('li code, td code, .card code').forEach(function(code) {
+    if (code.parentElement.classList.contains('code-wrap')) return;
+    if (!code.textContent.includes('python') && !code.textContent.includes('taxbot')) return;
+    var wrap = document.createElement('div');
+    wrap.className = 'code-wrap';
+    code.parentNode.insertBefore(wrap, code);
+    wrap.appendChild(code);
+    var btn = document.createElement('button');
+    btn.className = 'copy-inline';
+    btn.textContent = 'copy';
+    btn.onclick = function(e) {
+      e.stopPropagation();
+      navigator.clipboard.writeText(code.textContent).then(function() {
+        btn.textContent = '✓ copied'; btn.classList.add('copied');
+        setTimeout(function() { btn.textContent = 'copy'; btn.classList.remove('copied'); }, 1800);
+      }).catch(function() {
+        var ta = document.createElement('textarea');
+        ta.value = code.textContent; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+        btn.textContent = '✓'; setTimeout(function() { btn.textContent = 'copy'; }, 1400);
+      });
+    };
+    wrap.appendChild(btn);
+  });
+}
+
+// ── KRA DEADLINE WIDGET ────────────────────────────────────────────────────
+function renderDeadlines() {
+  var now = new Date();
+  var yr = now.getFullYear(), mo = now.getMonth(), day = now.getDate();
+
+  function nextOccurrence(dayOfMonth) {
+    var d = new Date(yr, mo, dayOfMonth);
+    if (d <= now) d = new Date(yr, mo + 1, dayOfMonth);
+    return d;
+  }
+  function daysUntil(d) { return Math.ceil((d - now) / 86400000); }
+  function fmtDate(d) { return d.toLocaleDateString('en-KE',{day:'numeric',month:'short'}); }
+  function urgency(days) { return days <= 3 ? 'urgent' : days <= 7 ? 'warn' : 'ok'; }
+
+  // Instalment tax months: Apr=3, Jun=5, Sep=8, Dec=11
+  var instMonths = [3,5,8,11];
+  var instDeadlines = instMonths.map(function(m) {
+    var d = new Date(yr, m, 20);
+    if (d <= now) d = new Date(yr+1, m, 20);
+    return d;
+  }).sort(function(a,b){return a-b});
+
+  var deadlines = [
+    { label:'PAYE / SHIF / AHL', date: nextOccurrence(9),  code:'PAYE-9th' },
+    { label:'NSSF Remittance',   date: nextOccurrence(15), code:'NSSF-15th' },
+    { label:'VAT-3 Return',      date: nextOccurrence(20), code:'VAT-20th' },
+    { label:'Instalment Tax',    date: instDeadlines[0],   code:'InstTax' },
+  ];
+
+  // Last day of month
+  var eom = new Date(yr, mo+1, 0);
+  deadlines.push({ label:'Month-End Close', date: eom, code:'monthly' });
+
+  // Annual returns (30 Jun)
+  var annReturn = new Date(yr, 5, 30);
+  if (annReturn <= now) annReturn = new Date(yr+1, 5, 30);
+  deadlines.push({ label:'Annual Return (IT1)', date: annReturn, code:'AnnReturn' });
+
+  deadlines.sort(function(a,b){return a.date-b.date});
+
+  var html = deadlines.map(function(dl) {
+    var days = daysUntil(dl.date);
+    var u = urgency(days);
+    return '<div class="dl-card '+u+'">' +
+      '<div class="dl-days '+u+'">' + (days === 0 ? 'TODAY' : days + 'd') + '</div>' +
+      '<div class="dl-label">' + dl.label + '</div>' +
+      '<div class="dl-date">' + fmtDate(dl.date) + '</div>' +
+    '</div>';
+  }).join('');
+
+  document.getElementById('deadline-cards').innerHTML = html;
+
+  // Month-end banner: show in last 5 days of month
+  var eomDays = daysUntil(new Date(yr, mo+1, 0));
+  var banner = document.getElementById('month-end-banner');
+  if (eomDays <= 5) {
+    banner.classList.add('show');
+    document.getElementById('meb-title').textContent = 
+      eomDays === 0 ? '⚠️ Last day of month — run monthly close NOW' :
+      eomDays <= 2 ? '⚠️ ' + eomDays + ' days to month-end' :
+      '🗓️ ' + eomDays + ' days to month-end — prepare monthly close';
+  }
+}
+
+// ── TODAY PRIORITY WIDGET ──────────────────────────────────────────────────
+var DAY_PLANS = [
+  // [dayName, icon, focusTitle, subtasks[]]
+  ['Sunday',   '☕', 'Rest Day', ['Review this week's completed tasks', 'Plan next week — any deadlines approaching?', 'Optional: catch up on client emails']],
+  ['Monday',   '📥', 'Data & Onboarding', ['New client submissions from weekend → add-client', 'scan-gmail + process all pending receipts', 'WhatsApp status update to new clients', 'Open Q-Predict KRA Compliance tab — check upcoming deadlines']],
+  ['Tuesday',  '📊', 'Reporting', ['run: python taxbot.py monthly <id> — for each business client', 'Check Trial Balances for discrepancies', 'Flag any REVIEW rows for client follow-up', 'Generate advisory reports for clients due quarterly']],
+  ['Wednesday','🏦', 'Tax Compliance', ['PAYE + SHIF + AHL due 9th — verify remitted', 'NSSF due 15th — verify remitted', 'Generate KRA eTIMS: kra-input → fill → kra-run', 'VAT-3 due 20th — upload to KRA iTax', 'NITA (0.5% payroll) due 20th']],
+  ['Thursday', '📧', 'Client Communication', ['Handover packages → python taxbot.py handover <id>', 'Weekly brief → python taxbot.py weekly-brief', 'Follow up on unresolved REVIEW transactions', 'Log all interactions in Audit Log', 'Send advisory reports to completed clients']],
+  ['Friday',   '✅', 'QA & Maintenance', ['python qa_full.py --report — must be 100%', 'Check error log: logs\\taxbot.log', 'Backup all Excel workbooks to external drive', 'Generate billing invoices: python taxbot.py billing', 'Send billing emails to clients']],
+  ['Saturday', '📋', 'Catch-Up & Planning', ['Process any weekend receipts', 'Review any outstanding client queries', 'Prep Monday client additions if needed']],
+];
+
+function renderTodayWidget() {
+  var now = new Date();
+  var dayIdx = now.getDay(); // 0=Sun … 6=Sat
+  var plan = DAY_PLANS[dayIdx];
+  var dateStr = now.toLocaleDateString('en-KE',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+  document.getElementById('today-day').textContent = plan[0] + ' — ' + plan[2];
+  document.getElementById('today-date').textContent = dateStr;
+  document.getElementById('today-icon').textContent = plan[1];
+  document.getElementById('today-task').textContent = '🎯 Focus: ' + plan[2];
+  document.getElementById('today-subtasks').innerHTML = plan[3].map(function(t) {
+    return '<div class="today-sub">→ ' + t + '</div>';
+  }).join('');
+
+  // Show deadline-specific alert based on day of month
+  var dom = now.getDate();
+  if (dom >= 7 && dom <= 9) {
+    var extra = document.createElement('div');
+    extra.style.cssText = 'margin-top:8px;background:#FEE2E2;border-left:4px solid #EF4444;padding:8px 12px;border-radius:0 8px 8px 0;font-size:12px;color:#991B1B;font-weight:600';
+    extra.textContent = '🚨 PAYE/SHIF/AHL due by 9th — verify all payrolls are remitted today!';
+    document.getElementById('today-subtasks').appendChild(extra);
+  } else if (dom >= 13 && dom <= 15) {
+    var extra2 = document.createElement('div');
+    extra2.style.cssText = 'margin-top:8px;background:#FEF3C7;border-left:4px solid #F59E0B;padding:8px 12px;border-radius:0 8px 8px 0;font-size:12px;color:#78350F;font-weight:600';
+    extra2.textContent = '⚠️ NSSF due by 15th — confirm all contributions submitted';
+    document.getElementById('today-subtasks').appendChild(extra2);
+  } else if (dom >= 18 && dom <= 20) {
+    var extra3 = document.createElement('div');
+    extra3.style.cssText = 'margin-top:8px;background:#FEF3C7;border-left:4px solid #F59E0B;padding:8px 12px;border-radius:0 8px 8px 0;font-size:12px;color:#78350F;font-weight:600';
+    extra3.textContent = '⚠️ VAT-3 + Instalment Tax + NITA due 20th — generate eTIMS workbooks now';
+    document.getElementById('today-subtasks').appendChild(extra3);
+  }
+}
+
+// ── INIT ───────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', function() {
+  renderDeadlines();
+  renderTodayWidget();
+  initChecklists();
+  wrapCodes();
+  // Add reset link
+  var h2 = document.querySelector('#panel-weekly h2');
+  if (h2) {
+    var btn = document.createElement('span');
+    btn.className = 'cl-reset'; btn.textContent = 'Reset checklist';
+    btn.onclick = resetChecks;
+    h2.appendChild(btn);
+  }
+});
 </script>
 </body>
 </html>
