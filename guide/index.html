@@ -615,7 +615,7 @@ C:\Users\John Kamau\AppData\...\python.exe -m pip install ...
 <span class="cmut"># Follow prompts to step 8
 # Press ENTER → browser opens → sign in → grant read access
 # Token saved to gmail_token.json (auto-refreshes)</span></code></pre>
-      <div class="al ok"><span class="ai">✅</span><div>Success: <strong>"Gmail connected: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="fa9b9999958f948e9b948eba83958f889e95979b9394d4999597">[email&#160;protected]</a>"</strong> and <strong>"Read-only confirmed"</strong>.</div></div>
+      <div class="al ok"><span class="ai">✅</span><div>Success: <strong>"Gmail connected: accounts@yourfirm.co.ke"</strong> and <strong>"Read-only confirmed"</strong>.</div></div>
     </div></div>
   </div>
 </div>
@@ -905,41 +905,86 @@ ollama pull qwen2.5:3b  <span class="cmut"># Re-pull model if missing</span></co
     <span style="font-size:28px">📱</span>
     <div>
       <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:var(--ink)">17. Receipt Capture PWA</div>
-      <div style="font-size:13px;color:var(--mu)">Mobile app · 100% online · zero installation · works offline</div>
+      <div style="font-size:13px;color:var(--mu)">Mobile app · 100% online · zero installation · works offline · revenue/expense classification built in</div>
     </div>
   </div>
 
   <div style="background:var(--glt);border:1px solid #A3D9B3;border-radius:var(--r);padding:18px 22px;margin-bottom:24px">
-    <strong style="color:var(--g2)">What it is:</strong> A Progressive Web App (PWA) that clients install on their phone. They snap a receipt photo, fill in Vendor/Amount/Category, and tap <em>Email to Accountant</em>. TaxBot's <code>scan-gmail</code> picks it up automatically — no manual file transfers.
+    <strong style="color:var(--g2)">What it is:</strong> A Progressive Web App (PWA) that clients install on their phone. They snap a receipt photo, classify it as income or expense, fill in Vendor/Amount/Category, and tap <em>Email to Accountant</em>. TaxBot's <code>scan-gmail</code> picks it up automatically — with the correct journal entry pre-determined.
   </div>
 
-  <h3 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:14px">How the PWA integrates with TaxBot</h3>
+  <!-- ── Revenue vs Expense Three-Fix Architecture ── -->
+  <h3 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:14px">⚠️ The Core Problem — Why Classification Matters</h3>
+  <div style="background:#FEF9EC;border:1.5px solid #F59E0B;border-radius:var(--r);padding:16px 20px;margin-bottom:20px;font-size:13px;line-height:1.8">
+    Without classification, the receipt scanner assumes <strong>every document is an expense</strong>. A factory settlement statement (income) and a fuel receipt (expense) look structurally identical to the OCR — both are PDFs with a vendor name and an amount. The scanner posts both as <code>DR Expense / CR Bank</code>. The fix requires the client to tell the system which direction the money flows <em>before</em> the document reaches TaxBot.
+  </div>
+
+  <h3 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:14px">✅ Three-Fix Classification Architecture</h3>
   <table>
-    <tr><th>Step</th><th>Who</th><th>Action</th><th>TaxBot Command</th></tr>
-    <tr><td>1</td><td>Client</td><td>Opens PWA on phone, snaps receipt, fills form</td><td>—</td></tr>
-    <tr><td>2</td><td>PWA</td><td>Compresses image, opens email client with structured subject + body</td><td>—</td></tr>
-    <tr><td>3</td><td>Client</td><td>Attaches image, sends to accountant's registered Gmail</td><td>—</td></tr>
-    <tr><td>4</td><td>TaxBot</td><td>Scans Gmail, extracts attachment, runs OCR + AI, posts to Expenses sheet</td><td><code>scan-gmail</code> or <code>watch</code></td></tr>
-    <tr><td>5</td><td>Accountant</td><td>Reviews REVIEW-flagged rows, runs monthly close</td><td><code>monthly &lt;id&gt;</code></td></tr>
+    <tr><th>Fix</th><th>Mechanism</th><th>Where</th><th>What it does</th></tr>
+    <tr><td><strong>Fix 1</strong><br>Doc Classifier</td><td>Dropdown: 6 document types</td><td>PWA Review screen</td><td>Maps each type to a ledger template. Settlement Statement → DR Bank / CR Revenue. Receipt → DR Expense / CR Bank.</td></tr>
+    <tr><td><strong>Fix 2</strong><br>Direction Toggle</td><td>💸 Money OUT / 💰 Money IN button</td><td>PWA Review screen</td><td>Client taps once. Email subject changes to [INCOME] or [EXPENSE]. Bidirectionally linked to Fix 1.</td></tr>
+    <tr><td><strong>Fix 3</strong><br>Known Sources</td><td>Managed vendor name list</td><td>PWA Setup tab</td><td>Auto-flips to Money IN when vendor matches a known income source (e.g. Karirana Estates). No client action needed.</td></tr>
   </table>
 
-  <h3 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin:24px 0 14px">PWA screens</h3>
+  <h3 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin:24px 0 14px">Document Type → Ledger Entry Mapping</h3>
+  <table>
+    <tr><th>Document Type</th><th>Direction</th><th>Journal Entry</th><th>Typical Example</th></tr>
+    <tr><td>🧾 Payment Receipt</td><td>💸 OUT</td><td>DR Expense / CR Bank</td><td>Fuel, office supplies, wages</td></tr>
+    <tr><td>📄 Sales Invoice</td><td>💰 IN</td><td>DR Bank / CR Revenue</td><td>Invoice issued to customer</td></tr>
+    <tr><td>🏭 Settlement Statement</td><td>💰 IN</td><td>DR Bank / CR Revenue</td><td>Karirana, KTDA, cooperative payout</td></tr>
+    <tr><td>🏦 Bank / M-Pesa Statement</td><td>💰 IN</td><td>Reference only (reconciliation)</td><td>Monthly bank statement</td></tr>
+    <tr><td>💼 Payslip</td><td>💰 IN</td><td>DR Bank / CR Salary Income</td><td>P9A, employer payslip</td></tr>
+    <tr><td>📋 Other</td><td>—</td><td>Manual review</td><td>Any unrecognised document</td></tr>
+  </table>
+
+  <h3 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin:24px 0 14px">income_inbox — Accountant-Side Safety Net</h3>
+  <div style="background:#F0FDF4;border:1px solid #86EFAC;border-radius:var(--r);padding:16px 20px;font-size:13px;line-height:1.9">
+    For clients who forward PDFs without classifying (e.g. forward from email), maintain a separate folder:<br>
+    <code style="background:#1E293B;color:#A3E635;padding:3px 8px;border-radius:4px">C:\MyERP\clients\&lt;id&gt;\income_inbox\</code><br>
+    Drop all factory statements, KTDA payments, cooperative payouts here. Then run:<br>
+    <code style="background:#1E293B;color:#A3E635;padding:3px 8px;border-radius:4px">python taxbot.py process-income &lt;id&gt;</code><br>
+    This posts as DR Bank / CR Revenue automatically. The regular <code>inbox\</code> remains expenses-only.
+  </div>
+
+  <h3 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin:24px 0 14px">Known Revenue Sources — Management</h3>
+  <div style="background:#F8F9FC;border:1px solid var(--bd);border-radius:var(--r);padding:16px 20px;font-size:13px;line-height:1.9">
+    Register a vendor permanently as a revenue source so no client action is ever needed:<br>
+    <code style="background:#1E293B;color:#A3E635;padding:3px 8px;border-radius:4px">python taxbot.py add-revenue-source &lt;id&gt; "Karirana Estates"</code><br>
+    <code style="background:#1E293B;color:#A3E635;padding:3px 8px;border-radius:4px">python taxbot.py list-revenue-sources &lt;id&gt;</code><br>
+    The client-side PWA also stores its own list in Setup → Known Income Sources (localStorage, per device).
+  </div>
+
+  <h3 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin:24px 0 14px">How the PWA integrates with TaxBot — Full Flow</h3>
+  <table>
+    <tr><th>Step</th><th>Who</th><th>Action</th><th>Fix</th></tr>
+    <tr><td>1</td><td>Client</td><td>Opens PWA, snaps or uploads document</td><td>—</td></tr>
+    <tr><td>2</td><td>Client</td><td>Taps 💸 Money OUT or 💰 Money IN</td><td>Fix 2</td></tr>
+    <tr><td>3</td><td>PWA</td><td>If vendor matches known list → auto-flips to Money IN</td><td>Fix 3</td></tr>
+    <tr><td>4</td><td>Client</td><td>Selects Document Type (Receipt, Settlement, Invoice…)</td><td>Fix 1</td></tr>
+    <tr><td>5</td><td>Client</td><td>Fills Amount, Vendor, Date, Category (Revenue / Expense group)</td><td>—</td></tr>
+    <tr><td>6</td><td>PWA</td><td>Email subject: [INCOME] or [EXPENSE] + ledger hint in body</td><td>Fixes 1+2</td></tr>
+    <tr><td>7</td><td>TaxBot</td><td>scan-gmail reads direction + docType → posts to correct accounts</td><td>All three</td></tr>
+    <tr><td>8</td><td>Accountant</td><td>Reviews Q-Predict Analytics → checks misclassification alert</td><td>Q-Predict</td></tr>
+  </table>
+
+  <h3 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin:24px 0 14px">PWA Screens — Updated</h3>
   <table>
     <tr><th>Screen</th><th>Description</th></tr>
     <tr><td><strong>Home</strong></td><td>Big camera button, gallery upload, PDF/CSV upload, recent receipts queue</td></tr>
     <tr><td><strong>Camera</strong></td><td>Live viewfinder, corner guides, flash toggle, front/back switch, shutter</td></tr>
-    <tr><td><strong>Review</strong></td><td>Image preview, Amount (KES), Vendor, Date, Payment method, Category, Notes</td></tr>
+    <tr><td><strong>Review</strong></td><td>Direction toggle (Money OUT/IN) → Doc Type dropdown → Amount → Vendor → Date → Payment → Category (Revenue/Expense groups) → Notes</td></tr>
     <tr><td><strong>Queue</strong></td><td>Pending/Sent/Failed stats; offline queue backed by IndexedDB</td></tr>
-    <tr><td><strong>Setup</strong></td><td>Company name, KRA PIN, accountant email + WhatsApp — persists across sessions</td></tr>
+    <tr><td><strong>Setup</strong></td><td>Company name, KRA PIN, accountant email + WhatsApp, <strong>Known Income Sources list</strong></td></tr>
   </table>
 
   <h3 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin:24px 0 14px">Send methods (in priority order)</h3>
   <table>
     <tr><th>Method</th><th>How it works</th><th>Best for</th></tr>
     <tr><td><strong>Native Share</strong></td><td>OS share sheet — image sent directly as file attachment via Gmail/WhatsApp/any app</td><td>Android &amp; iOS with apps installed</td></tr>
-    <tr><td><strong>Email</strong></td><td>Downloads compressed image, opens mail client pre-filled with structured subject + body</td><td>All devices; integrates with TaxBot Gmail scan</td></tr>
-    <tr><td><strong>WhatsApp</strong></td><td>Opens wa.me with pre-written message; image saved to device to attach</td><td>Clients who prefer WhatsApp</td></tr>
-    <tr><td><strong>Save to device</strong></td><td>Downloads .jpg for manual drop into <code>clients\&lt;id&gt;\inbox\</code></td><td>Direct local processing</td></tr>
+    <tr><td><strong>Email</strong></td><td>Downloads compressed image, opens mail client pre-filled. Subject: [INCOME] or [EXPENSE] + full ledger hint in body</td><td>All devices; integrates with TaxBot Gmail scan</td></tr>
+    <tr><td><strong>WhatsApp</strong></td><td>Opens wa.me with pre-written message including direction and ledger hint; image saved to attach</td><td>Clients who prefer WhatsApp</td></tr>
+    <tr><td><strong>Save to device</strong></td><td>Downloads .jpg for manual drop into <code>clients\&lt;id&gt;\inbox\</code> (expense) or <code>income_inbox\</code> (revenue)</td><td>Direct local processing</td></tr>
   </table>
 
   <h3 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin:24px 0 14px">Deploying the PWA (free — 2 minutes)</h3>
@@ -961,7 +1006,7 @@ ollama pull qwen2.5:3b  <span class="cmut"># Re-pull model if missing</span></co
   </div>
 
   <div style="margin-top:18px;padding:14px 18px;background:var(--amlt);border:1px solid #F59E0B;border-radius:var(--r)">
-    <strong style="color:var(--am)">Client setup (60 seconds):</strong> Open the URL → tap the 3-dot menu → "Add to Home Screen" → enter company name, KRA PIN, and accountant email in Setup tab. Done.
+    <strong style="color:var(--am)">Client setup (60 seconds):</strong> Open the URL → tap the 3-dot menu → "Add to Home Screen" → enter company name, KRA PIN, and accountant email in Setup tab → add known income sources (e.g. Karirana Estates). Done.
   </div>
 </div>
 
@@ -1044,5 +1089,64 @@ ollama pull qwen2.5:3b  <span class="cmut"># Re-pull model if missing</span></co
   TaxBot Kenya v3.1 &nbsp;·&nbsp; Finance Act 2024 &nbsp;·&nbsp; PWA + Q-Predict + Free Deploy &nbsp;·&nbsp; March 2026
 </footer>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-const secs = document.querySelectorA
+<script>
+// Section / accordion navigation
+var secs = document.querySelectorAll('.section');
+var links = document.querySelectorAll('.nav-link, .toc-link');
+
+function showSection(id) {
+  secs.forEach(function(s) { s.classList.remove('active'); });
+  links.forEach(function(l) { l.classList.remove('active'); });
+  var target = document.getElementById(id);
+  if (target) target.classList.add('active');
+  var activeLink = document.querySelector('[data-sec="' + id + '"]');
+  if (activeLink) activeLink.classList.add('active');
+}
+
+// Copy-command buttons
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.copy-cmd, .cmd-copy').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var code = btn.closest('.cmd-row, .cmd-block');
+      var text = code ? (code.querySelector('code') || code).textContent.trim() : (btn.dataset.cmd || '');
+      navigator.clipboard.writeText(text).then(function() {
+        var orig = btn.textContent;
+        btn.textContent = '✓ copied';
+        setTimeout(function() { btn.textContent = orig; }, 1600);
+      }).catch(function() {
+        var ta = document.createElement('textarea');
+        ta.value = text; document.body.appendChild(ta); ta.select();
+        document.execCommand('copy'); document.body.removeChild(ta);
+      });
+    });
+  });
+
+  // Tab switching
+  document.querySelectorAll('.tab-btn[data-tab]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var group = btn.closest('.tab-group');
+      if (!group) return;
+      group.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+      group.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+      btn.classList.add('active');
+      var panel = group.querySelector('#' + btn.dataset.tab);
+      if (panel) panel.classList.add('active');
+    });
+  });
+
+  // Smooth anchor scroll
+  document.querySelectorAll('a[href^="#"]').forEach(function(a) {
+    a.addEventListener('click', function(e) {
+      var target = document.querySelector(a.getAttribute('href'));
+      if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  
+    });
+  });
+
+  // Activate first section
+  var firstSec = document.querySelector('.section');
+  if (firstSec && !document.querySelector('.section.active')) firstSec.classList.add('active');
+});
+</script>
+</body>
+</html>
