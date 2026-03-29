@@ -321,7 +321,7 @@ body{font-family:'Source Serif 4',Georgia,serif;background:var(--cream);color:va
       <div class="fg c3">
         <div class="fgrp"><label>NSSF Contributions (KES)</label><div class="kes-w"><span class="pfx">KES</span><input type="number" id="ded-nssf" placeholder="0" min="0" oninput="autosave()"></div><span class="hint">Both sides combined</span></div>
         <div class="fgrp"><label>SHIF Contributions (KES)</label><div class="kes-w"><span class="pfx">KES</span><input type="number" id="ded-shif" placeholder="0" min="0" oninput="autosave()"></div><span class="hint">2.75% of gross (replaced NHIF)</span></div>
-        <div class="fgrp"><label>AHL Deductions (KES)</label><div class="kes-w"><span class="pfx">KES</span><input type="number" id="ded-ahl" placeholder="0" min="0" oninput="autosave()"></div><span class="hint">1.5% — Finance Act 2023</span></div>
+        <div class="fgrp"><label>AHL Deductions (KES)</label><div class="kes-w"><span class="pfx">KES</span><input type="number" id="ded-ahl" placeholder="0" min="0" oninput="autosave()"></div><span class="hint">1.5% of gross salary — Finance Act 2024</span></div>
         <div class="fgrp"><label>Life Insurance Premiums (KES)</label><div class="kes-w"><span class="pfx">KES</span><input type="number" id="ded-ins" placeholder="0" min="0" oninput="autosave()"></div></div>
         <div class="fgrp"><label>Pension / Retirement Fund (KES)</label><div class="kes-w"><span class="pfx">KES</span><input type="number" id="ded-pen" placeholder="0" min="0" oninput="autosave()"></div><span class="hint">Max KES 30,000/month deductible</span></div>
         <div class="fgrp"><label>Mortgage / Housing Interest (KES)</label><div class="kes-w"><span class="pfx">KES</span><input type="number" id="ded-mort" placeholder="0" min="0" oninput="autosave()"></div><span class="hint">Max KES 300,000/year</span></div>
@@ -536,7 +536,7 @@ body{font-family:'Source Serif 4',Georgia,serif;background:var(--cream);color:va
       <p>We are <strong>actively working on your file</strong> and applying professional expertise to identify every lawful deduction, relief, and tax benefit available to you under the <em>Income Tax Act (Cap 470)</em> and <em>Finance Act 2024</em>.</p>
       <p>Our team is currently <strong>thinking through how best to reduce your tax liability</strong> within the law. We review your profile against ACCA advisory standards, ICPAK professional ethics, and IFAC best practices — to ensure nothing is missed.</p>
       <p>Expect an update within <strong>5 working days</strong> of submitting your documents. For urgent matters, call or WhatsApp us directly.</p>
-      <p class="sig">Warm regards,<br>Your Tax & Advisory Team<br>📞 +254 7XX XXX XXX · ICPAK Registered · IFAC Compliant</p>
+      <p class="sig">Warm regards,<br>Your Tax & Advisory Team<br><span id="sig-phone">📞 +254 700 000 000</span> · ICPAK Registered · IFAC Compliant</p>
     </div>
     <div class="status-steps">
       <div style="font-size:11px;font-weight:700;color:var(--navy);margin-bottom:9px;letter-spacing:.04em;text-transform:uppercase">Your file progress:</div>
@@ -563,9 +563,21 @@ body{font-family:'Source Serif 4',Georgia,serif;background:var(--cream);color:va
       <button class="btn-dl btn-dl-n" onclick="showLanding()">+ Start New</button>
     </div>
     <div style="margin-top:22px;font-size:12px;color:var(--mid);line-height:1.9">
-      📧 Email your downloaded file to: <strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="026361616d776c76636c76427b6d7770666d6f636b6c2c616d6f">[email&#160;protected]</a></strong><br>
-      📱 Or WhatsApp: <strong>+254 7XX XXX XXX</strong><br>
-      We'll confirm receipt within 24 hours.
+      <div id="delivery-section" style="display:flex;flex-direction:column;gap:10px;margin-top:4px">
+  <a id="wa-send-btn" href="#" target="_blank"
+     style="display:flex;align-items:center;justify-content:center;gap:10px;background:#25D366;color:#fff;font-weight:700;font-size:14px;padding:13px 20px;border-radius:10px;text-decoration:none;transition:opacity .2s"
+     onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">
+    💬 Send via WhatsApp
+  </a>
+  <a id="email-send-btn" href="#"
+     style="display:flex;align-items:center;justify-content:center;gap:10px;background:#1E3A5F;color:#fff;font-weight:700;font-size:14px;padding:13px 20px;border-radius:10px;text-decoration:none;transition:opacity .2s"
+     onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+    📧 Send via Email
+  </a>
+  <p style="font-size:11px;color:#9CA3AF;text-align:center;margin-top:2px">
+    Both buttons auto-fill your details and reference number. We'll confirm within 24 hours.
+  </p>
+</div>
     </div>
 
     <!-- PWA Next Steps -->
@@ -575,7 +587,7 @@ body{font-family:'Source Serif 4',Georgia,serif;background:var(--cream);color:va
       <div style="display:flex;flex-direction:column;gap:10px;font-size:13px;color:#15803D">
         <div style="display:flex;align-items:flex-start;gap:10px">
           <span style="background:#16A34A;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px">1</span>
-          <span>Open <strong style="font-family:monospace">taxbot-receipts.yoursite.com</strong> on your phone <em style="color:#6B7280">(link from your accountant)</em></span>
+          <span>Open <strong style="font-family:monospace"><span id="pwa-link-text" style="font-family:monospace;color:#166534"></span></strong> on your phone <em style="color:#6B7280">(link from your accountant)</em></span>
         </div>
         <div style="display:flex;align-items:flex-start;gap:10px">
           <span style="background:#16A34A;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px">2</span>
@@ -623,7 +635,20 @@ body{font-family:'Source Serif 4',Georgia,serif;background:var(--cream);color:va
 </div>
 <div class="toast" id="toast"><span id="toast-icon">✅</span><span id="toast-msg">Saved</span></div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
+
+// ════════════════════════════════════════════════════════════════
+// ACCOUNTANT CONFIGURATION — edit these once before deploying
+// ════════════════════════════════════════════════════════════════
+var ACCT_CONFIG = {
+  name:    'Your Accounting Firm',
+  email:   'accounts@yourfirm.co.ke',
+  phone:   '+254700000000',   // WhatsApp number — digits only after +
+  pwa_url: 'https://yourusername.github.io/taxbot-ecosystem/pwa/'
+};
+// ════════════════════════════════════════════════════════════════
+
+
 var appState={mode:null,ref:null,submittedAt:null,data:{}};
 var empCount=0;
 var IND=5,BIZ=5,indStep=1,bizStep=1;
@@ -722,14 +747,14 @@ function submitInd(){
   if(!appState.data.consent){toast('⚠️','Please tick the consent checkbox to proceed');return}
   appState.ref=genRef();appState.submittedAt=new Date().toISOString();
   appState.data.ref=appState.ref;appState.data.submitted_at=appState.submittedAt;
-  buildSuccessCard();showView('success');
+  buildSuccessCard();buildDeliveryLinks();showView('success');
 }
 function submitBiz(){
   collectData();
   if(!appState.data.consent){toast('⚠️','Please tick the consent checkbox to proceed');return}
   appState.ref=genRef();appState.submittedAt=new Date().toISOString();
   appState.data.ref=appState.ref;appState.data.submitted_at=appState.submittedAt;
-  buildSuccessCard();showView('success');
+  buildSuccessCard();buildDeliveryLinks();showView('success');
 }
 function buildSuccessCard(){
   var d=appState.data;
@@ -737,6 +762,42 @@ function buildSuccessCard(){
   var ty=d.client_type==='individual'?'👤 Individual (Annual)':'🏢 Business (Monthly)';
   document.getElementById('success-card').innerHTML='<h4>📋 Onboarding Summary</h4><div class="sum-row"><span class="lbl">Reference</span><span class="val" style="color:var(--gold);font-family:JetBrains Mono,monospace">'+appState.ref+'</span></div><div class="sum-row"><span class="lbl">Client Name</span><span class="val">'+nm+'</span></div><div class="sum-row"><span class="lbl">KRA PIN</span><span class="val" style="font-family:JetBrains Mono,monospace">'+(d.kra_pin||'—')+'</span></div><div class="sum-row"><span class="lbl">Client Type</span><span class="val">'+ty+'</span></div><div class="sum-row"><span class="lbl">eTIMS Mode</span><span class="val">'+(d.etims_mode==='personal_pin'?'Personal PIN (not business registered)':'Business PIN')+'</span></div><div class="sum-row"><span class="lbl">Advisory Report</span><span class="val">'+(d.advisory_report_requested?'✅ Yes — KES 5,000':'—')+'</span></div><div class="sum-row"><span class="lbl">Submitted</span><span class="val">'+new Date().toLocaleDateString('en-KE',{day:'numeric',month:'long',year:'numeric'})+'</span></div>';
 }
+
+function buildDeliveryLinks() {
+  var d = appState.data;
+  var nm = d.name || d.biz_name || 'Client';
+  var ref = appState.ref || '—';
+  var waMsg = encodeURIComponent(
+    '📋 *Tax Onboarding — ' + nm + '*\n' +
+    'Reference: ' + ref + '\n' +
+    'KRA PIN: ' + (d.kra_pin || '—') + '\n' +
+    'Type: ' + (d.client_type === 'individual' ? 'Individual' : 'Business') + '\n\n' +
+    'Please find my onboarding data file attached.\n' +
+    '_Sent via TaxBot Client Onboarding Portal_'
+  );
+  var waNum = ACCT_CONFIG.phone.replace(/\D/g,'');
+  var waEl = document.getElementById('wa-send-btn');
+  if (waEl) waEl.href = 'https://wa.me/' + waNum + '?text=' + waMsg;
+
+  var emailSubject = encodeURIComponent('[ONBOARDING] ' + nm + ' — Ref: ' + ref);
+  var emailBody = encodeURIComponent(
+    'Dear ' + ACCT_CONFIG.name + ',\n\n' +
+    'Please find my tax onboarding details below.\n\n' +
+    'Name: ' + nm + '\n' +
+    'KRA PIN: ' + (d.kra_pin || '—') + '\n' +
+    'Reference: ' + ref + '\n' +
+    'Type: ' + (d.client_type === 'individual' ? 'Individual (Annual)' : 'Business (Monthly)') + '\n\n' +
+    'I have attached the onboarding data file (.json) to this email.\n\n' +
+    'Regards,\n' + nm
+  );
+  var emailEl = document.getElementById('email-send-btn');
+  if (emailEl) emailEl.href = 'mailto:' + ACCT_CONFIG.email + '?subject=' + emailSubject + '&body=' + emailBody;
+
+  // Also update PWA link if present
+  var pwaLink = document.getElementById('pwa-link-href');
+  if (pwaLink) pwaLink.href = ACCT_CONFIG.pwa_url;
+}
+
 function downloadJSON(){
   collectData();
   var payload={schema_version:'1.0',source:'Tax & Advisory Services — Client Onboarding Portal',ref:appState.ref,submitted_at:appState.submittedAt||new Date().toISOString(),taxbot_import:true,data:appState.data};
@@ -761,8 +822,35 @@ var dz=document.getElementById('drop-zone');
 dz.addEventListener('dragover',function(e){e.preventDefault();dz.classList.add('drag')});
 dz.addEventListener('dragleave',function(){dz.classList.remove('drag')});
 dz.addEventListener('drop',function(e){e.preventDefault();dz.classList.remove('drag');var files=e.dataTransfer.files;if(files[0]){var fi=document.getElementById('file-inp');fi.files=files;loadFile(fi)}});
+
 var toastTimer;
-function toast(icon,msg){var t=document.getElementById('toast');document.getEleme
-  dz.addEventListener('drop',function(e){e.preventDefault();dz.classList.remove('drag');var files=e.dataTransfer.files;if(files[0]){var fi=document.getElementById('file-inp');loadFile({files:files})}});
-  clearTimeout(toastTimer);
-  function toast(icon,msg){var t=document.getElementById('toast');var ti=document.getElementById('toast-icon')
+function toast(icon, msg) {
+  var t = document.getElementById('toast');
+  var ti = document.getElementById('toast-icon');
+  var tm = document.getElementById('toast-msg');
+  if (t && ti && tm) {
+    ti.textContent = icon;
+    tm.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function() { t.classList.remove('show'); }, 3200);
+  }
+}
+
+window.addEventListener('DOMContentLoaded', function() {
+  var sigPhone = document.getElementById('sig-phone');
+  if (sigPhone && ACCT_CONFIG.phone !== '+254700000000') {
+    sigPhone.textContent = '📞 ' + ACCT_CONFIG.phone;
+  }
+  var el = document.getElementById('pwa-link-text');
+  if (el) el.textContent = ACCT_CONFIG.pwa_url.replace('https://','');
+  var pwaLink = document.getElementById('pwa-link-href');
+  if (pwaLink) pwaLink.href = ACCT_CONFIG.pwa_url;
+  try {
+    var saved = localStorage.getItem('taxbot-onboard');
+    if (saved) { var parsed = JSON.parse(saved); if (parsed && parsed.data) appState.data = parsed.data; }
+  } catch(e) {}
+});
+</script>
+</body>
+</html>
