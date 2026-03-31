@@ -134,6 +134,7 @@ body {
   color: var(--muted);
 }
 .topbar-badge.live { color: var(--sage); border-color: var(--mint); }
+.topbar-badge.offline-warn { color: #F59E0B; border-color: rgba(245,158,11,.4); background: rgba(245,158,11,.08); }
 .back-btn {
   width: 36px; height: 36px;
   background: var(--raised); border: 1px solid var(--border2);
@@ -269,7 +270,7 @@ body {
   border-top: 1px solid var(--border);
   flex-shrink: 0; gap: 4px;
 }
-.bn-btn {
+.bn-btn { position: relative;
   flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
   padding: 8px 4px; border-radius: 10px; cursor: pointer; transition: all .18s;
   background: none; border: none;
@@ -657,6 +658,13 @@ body {
       <div class="topbar-badge live" id="count-badge" style="display:none">0 pending</div>
     </div>
     <div class="home-body">
+      <!-- First-run nudge: shown until accountant email is configured -->
+      <div id="setup-nudge" style="display:none;margin:10px 12px 0;padding:12px 14px;background:rgba(200,149,42,.1);border:1.5px solid rgba(200,149,42,.35);border-radius:12px">
+        <div style="font-size:13px;font-weight:700;color:var(--amber);margin-bottom:4px">⚙️ One-time setup needed — 60 seconds</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.6">Tap <strong style="color:var(--text)">SETUP</strong> below and enter your accountant's email address so your receipts reach them automatically.</div>
+        <button onclick="showView('settings')" style="margin-top:8px;width:100%;padding:8px;background:var(--amber);border:none;border-radius:8px;color:#1a1a1a;font-weight:700;font-size:12px;cursor:pointer;font-family:inherit">Go to Setup →</button>
+      </div>
+
       <div class="capture-hero fade-in" onclick="openCapture()">
         <div class="ch-icon">📷</div>
         <div class="ch-text">
@@ -688,7 +696,8 @@ body {
         <div class="bn-icon">🏠</div><div class="bn-lbl">HOME</div>
       </button>
       <button class="bn-btn" id="bn-queue" onclick="showView('queue')">
-        <div class="bn-icon">📋</div><div class="bn-lbl">QUEUE</div>
+        <div class="bn-icon">📋<span id="bn-queue-badge" style="display:none;position:absolute;top:-4px;right:-4px;background:#EF4444;color:#fff;border-radius:10px;font-size:9px;font-weight:800;padding:1px 5px;min-width:16px;text-align:center;line-height:1.4"></span></div>
+        <div class="bn-lbl">QUEUE</div>
       </button>
       <button class="bn-btn" id="bn-settings" onclick="showView('settings')">
         <div class="bn-icon">⚙️</div><div class="bn-lbl">SETUP</div>
@@ -759,11 +768,12 @@ body {
         <div id="direction-hint" style="font-size:11px;color:var(--muted);margin-top:6px;text-align:center">
           Tap Money IN for factory payments, cooperative payouts, sales receipts
         </div>
+        <div id="direction-auto-hint" style="display:none;font-size:11px;color:#10B981;margin-top:4px;text-align:center;font-weight:600"></div>
       </div>
 
       <!-- ── FIX 1: DOCUMENT TYPE CLASSIFIER ────────────────────────────── -->
       <div id="doctype-wrap" style="margin:0 0 16px">
-        <div style="font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--muted);margin-bottom:8px;text-transform:uppercase">Document Type</div>
+        <div style="font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--muted);margin-bottom:8px;text-transform:uppercase">What kind of document?</div>
         <select id="f-doctype" style="width:100%;padding:11px 14px;border-radius:10px;border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit" onchange="onDocTypeChange()">
           <option value="RECEIPT_EXPENSE">🧾 Payment Receipt — I paid someone</option>
           <option value="SALES_INVOICE">📄 Sales Invoice — I invoiced a customer</option>
@@ -922,7 +932,8 @@ body {
 
       <!-- ── FIX 3: KNOWN REVENUE SOURCES ─────────────────────────────── -->
       <div class="settings-section">
-        <div class="settings-section-title">📥 Known Income Sources</div>
+        <div class="settings-section-title" onclick="toggleKnownSources()" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between">📥 Known Income Sources <span id="known-sources-chevron" style="font-size:12px;color:var(--muted);transition:transform .2s">▼</span></div>
+        <div id="known-sources-body" style="display:none">
         <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;font-size:12.5px;color:var(--muted);line-height:1.7;margin-bottom:10px">
           Any vendor name in this list is automatically flagged as <strong style="color:#10B981">Money IN (Revenue)</strong> when scanned — preventing misclassification as an expense.
           Add factory names, cooperatives, SACCOs, or regular customers here.
@@ -932,6 +943,7 @@ body {
           <input id="new-revenue-source" class="sr-input" style="flex:1" placeholder="e.g. Karirana Estates, KTDA" oninput="this.value=this.value" onkeydown="if(event.key==='Enter')addRevenueSource()">
           <button onclick="addRevenueSource()" style="padding:8px 16px;background:rgba(16,185,129,.15);border:1.5px solid #10B981;color:#10B981;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap">+ Add</button>
         </div>
+        </div><!-- /known-sources-body -->
       </div>
 
 
@@ -1057,6 +1069,9 @@ function applySettingsToUI() {
   if (!settings.acctWa && ACCT.phone && ACCT.phone !== '+254700000000') {
     settings.acctWa = ACCT.phone;
   }
+  // Show/hide first-run nudge based on whether email is configured
+  var nudge = document.getElementById('setup-nudge');
+  if (nudge) nudge.style.display = (!settings.acctEmail) ? 'block' : 'none';
   setVal('s-company',   settings.company);
   setVal('s-acct-email',settings.acctEmail);
   setVal('s-acct-wa',   settings.acctWa);
@@ -1064,6 +1079,15 @@ function applySettingsToUI() {
   setVal('s-phone',     settings.phone);
   setChk('s-compress',  settings.compress);
   setChk('s-autosend',  settings.autosend);
+}
+
+function toggleKnownSources() {
+  var body = document.getElementById('known-sources-body');
+  var chev = document.getElementById('known-sources-chevron');
+  if (!body) return;
+  var isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : 'block';
+  if (chev) chev.style.transform = isOpen ? '' : 'rotate(180deg)';
 }
 
 function saveSettings() {
@@ -1075,6 +1099,9 @@ function saveSettings() {
   settings.compress  = getChk('s-compress');
   settings.autosend  = getChk('s-autosend');
   localStorage.setItem('taxbot-settings', JSON.stringify(settings));
+  // Hide first-run nudge once email is filled in
+  var nudge = document.getElementById('setup-nudge');
+  if (nudge) nudge.style.display = settings.acctEmail ? 'none' : 'block';
 }
 
 function getVal(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
@@ -1353,6 +1380,9 @@ var currentDirection = 'out'; // default: expense
 
 function setDirection(dir) {
   currentDirection = dir;
+  // Clear auto-classify hint when user manually changes direction
+  var autoHint = document.getElementById('direction-auto-hint');
+  if (autoHint) autoHint.style.display = 'none';
   var outBtn = document.getElementById('dir-out');
   var inBtn  = document.getElementById('dir-in');
   var amtLbl = document.getElementById('amount-hero-label');
@@ -1457,6 +1487,21 @@ function saveRevenueSources(list) {
 function renderRevenueSources() {
   var list = loadRevenueSources();
   var el = document.getElementById('revenue-source-list');
+  var chev = document.getElementById('known-sources-chevron');
+  // Update title count badge
+  var titleEl = document.querySelector('.settings-section-title[onclick*="toggleKnownSources"]');
+  if (titleEl) {
+    var countBadge = titleEl.querySelector('.ks-count');
+    if (!countBadge) {
+      countBadge = document.createElement('span');
+      countBadge.className = 'ks-count';
+      countBadge.style.cssText = 'background:rgba(16,185,129,.15);color:#10B981;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:700;margin-left:6px';
+      // insert before chevron
+      var chevEl = titleEl.querySelector('#known-sources-chevron');
+      if (chevEl) titleEl.insertBefore(countBadge, chevEl);
+    }
+    countBadge.textContent = list.length;
+  }
   if (!el) return;
   if (list.length === 0) {
     el.innerHTML = '<div style="font-size:12px;color:var(--muted);font-style:italic">No sources added yet.</div>';
@@ -1502,6 +1547,8 @@ function checkKnownSources() {
   if (match) {
     badge.textContent = '✅ Known Income Source — switching to Money IN (Revenue)';
     badge.style.display = 'block';
+    var autoHint = document.getElementById('direction-auto-hint');
+    if (autoHint) { autoHint.textContent = '🤖 Auto-classified as income (known source)'; autoHint.style.display = 'block'; }
     if (currentDirection !== 'in') setDirection('in');
     // Auto-set doctype to settlement if not already income type
     var dt = document.getElementById('f-doctype').value;
@@ -1680,7 +1727,54 @@ function saveToQueue(rec, status) {
 }
 
 function sendAllPending() {
-  showView('queue');
+  if (!db) { showView('queue'); return; }
+  dbGetAll().then(function(recs) {
+    var pending = recs.filter(function(r){ return r.status === 'pending'; });
+    if (pending.length === 0) {
+      toast('✅ No pending receipts in queue', 'success');
+      return;
+    }
+    if (pending.length === 1) {
+      // Single pending: restore it to review screen and let user send normally
+      var r = pending[0];
+      currentDataUrl = r.dataUrl || null;
+      if (r.dataUrl) {
+        fetch(r.dataUrl).then(function(res){ return res.blob(); })
+          .then(function(b){ currentBlob = b; })
+          .catch(function(){ currentBlob = null; });
+      } else { currentBlob = null; }
+      setVal('f-vendor', r.vendor || '');
+      setVal('f-amount', r.amount || '');
+      setVal('f-date', r.date || '');
+      setVal('f-notes', r.notes || '');
+      if (r.direction === 'in') setDirection('in'); else setDirection('out');
+      showView('review');
+      toast('📋 Receipt loaded — tap Email to send', 'success');
+    } else {
+      // Multiple pending: send a WhatsApp summary to accountant
+      var wa = settings.acctWa ? settings.acctWa.replace(/\D/g,'') : '';
+      if (wa) {
+        var summary = pending.map(function(r, i) {
+          return (i+1) + '. ' + (r.vendor||'Unknown') + ' — KES ' + (r.amount||'?') +
+                 ' (' + (r.direction === 'in' ? 'INCOME' : 'EXPENSE') + ')';
+        }).join('
+');
+        var msg = encodeURIComponent(
+          '📋 *' + pending.length + ' queued receipts — ' + (settings.company||'Client') + '*
+
+' +
+          summary + '
+
+_Please process these from your queue. Images saved on my device._'
+        );
+        window.open('https://wa.me/' + wa + '?text=' + msg, '_blank');
+      } else {
+        // No WhatsApp — show queue for manual dispatch
+        showView('queue');
+        toast('📋 ' + pending.length + ' receipts pending — send each from the queue', 'success');
+      }
+    }
+  });
 }
 
 // ── UI refresh ────────────────────────────────────────────────────────────────
@@ -1694,6 +1788,15 @@ function refreshHomeQueue() {
     } else {
       badge.style.display = 'none';
     }
+    // Also update bottom nav queue badges
+    document.querySelectorAll('[id^="bn-queue-badge"]').forEach(function(b) {
+      if (pending.length > 0) {
+        b.textContent = pending.length > 9 ? '9+' : pending.length;
+        b.style.display = 'inline-block';
+      } else {
+        b.style.display = 'none';
+      }
+    });
 
     var list = document.getElementById('home-queue-list');
     var recent = recs.slice(-5).reverse();
@@ -1790,9 +1893,11 @@ function updateOnline() {
   if (navigator.onLine) {
     badge.textContent = '● online';
     badge.classList.add('live');
+    badge.classList.remove('offline-warn');
   } else {
     badge.textContent = '● offline';
     badge.classList.remove('live');
+    badge.classList.add('offline-warn');  // amber colour — clear warning
   }
 }
 
